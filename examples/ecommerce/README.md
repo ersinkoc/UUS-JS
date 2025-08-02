@@ -12,6 +12,7 @@ A fully-featured e-commerce store built with UUS.js, showcasing:
 ## Features
 
 ### 🛍️ Shopping Experience
+
 - Product grid with category filtering
 - Price range filtering and sorting
 - Product search functionality
@@ -20,6 +21,7 @@ A fully-featured e-commerce store built with UUS.js, showcasing:
 - Persistent cart storage
 
 ### 🎨 User Interface
+
 - Clean, modern design
 - Responsive layout for all devices
 - Loading states and empty states
@@ -27,6 +29,7 @@ A fully-featured e-commerce store built with UUS.js, showcasing:
 - Smooth animations
 
 ### ⚡ Performance
+
 - Efficient reactivity system
 - Optimized images
 - Fast filtering and search
@@ -67,8 +70,11 @@ src/
 ## Implementation Highlights
 
 ### Reactive Shopping Cart
+
 ```html
-<div id="app" uus-state="{
+<div
+  id="app"
+  uus-state="{
   // Cart state
   cartItems: [],
   
@@ -84,36 +90,39 @@ src/
   get orderTotal() {
     return this.cartTotal + this.shipping + this.tax;
   }
-}">
+}"
+></div>
 ```
 
 ### Product Filtering
+
 ```javascript
 get filteredProducts() {
   let filtered = this.products;
-  
+
   // Category filter
   if (this.selectedCategory !== 'all') {
     filtered = filtered.filter(p => p.category === this.selectedCategory);
   }
-  
+
   // Price filter
   filtered = filtered.filter(p => p.price <= this.maxPrice);
-  
+
   // Search filter
   if (this.searchQuery) {
     const query = this.searchQuery.toLowerCase();
-    filtered = filtered.filter(p => 
+    filtered = filtered.filter(p =>
       p.name.toLowerCase().includes(query) ||
       p.description.toLowerCase().includes(query)
     );
   }
-  
+
   return filtered;
 }
 ```
 
 ### Page-based Product Loading
+
 ```javascript
 // In the navigateTo method within uus-state
 navigateTo(page, productId = null) {
@@ -130,6 +139,7 @@ navigateTo(page, productId = null) {
 ## Customization
 
 ### Adding New Products
+
 Edit `src/data/products.js` to add new products or categories:
 
 ```javascript
@@ -147,6 +157,7 @@ Edit `src/data/products.js` to add new products or categories:
 ```
 
 ### Styling
+
 Customize the appearance by modifying CSS variables in `src/style.css`:
 
 ```css
@@ -159,6 +170,7 @@ Customize the appearance by modifying CSS variables in `src/style.css`:
 ```
 
 ### Adding Payment Integration
+
 The checkout page is ready for payment integration:
 
 ```javascript

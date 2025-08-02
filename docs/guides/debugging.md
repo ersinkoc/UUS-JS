@@ -17,7 +17,7 @@ const devtools = initDevTools(app, {
   logDirectives: true,
   logLifecycle: true,
   performanceMetrics: true,
-  breakOnError: true
+  breakOnError: true,
 });
 
 app.mount('#app');
@@ -29,12 +29,12 @@ Once DevTools are enabled, you can access your app from the console:
 
 ```javascript
 // Access app instance
-__UUS_APP__.state
+__UUS_APP__.state;
 
 // Access DevTools
-__UUS_DEVTOOLS__.logState()
-__UUS_DEVTOOLS__.getHistory()
-__UUS_DEVTOOLS__.visualizeTree()
+__UUS_DEVTOOLS__.logState();
+__UUS_DEVTOOLS__.getHistory();
+__UUS_DEVTOOLS__.visualizeTree();
 ```
 
 ## State Debugging
@@ -43,13 +43,14 @@ __UUS_DEVTOOLS__.visualizeTree()
 
 ```javascript
 // In console
-__UUS_DEVTOOLS__.logState()
+__UUS_DEVTOOLS__.logState();
 
 // Or programmatically
 devtools.logState();
 ```
 
 Output:
+
 ```
 📊 Current State
 ┌─────────┬────────────┬─────────┐
@@ -97,6 +98,7 @@ __UUS_DEVTOOLS__.inspectElement(element);
 ```
 
 Output:
+
 ```
 🔍 Element Inspector
 Element: <div class="my-component">
@@ -121,6 +123,7 @@ __UUS_DEVTOOLS__.visualizeTree();
 ```
 
 Output:
+
 ```
 🌳 Component Tree
 div [uus-state]
@@ -172,6 +175,7 @@ Use Chrome DevTools Memory Profiler:
 5. Compare snapshots
 
 Look for:
+
 - Detached DOM nodes
 - Growing object counts
 - Memory leaks in effects
@@ -187,19 +191,20 @@ app.directive('debug', {
     console.log('Directive mounted:', {
       element: el,
       value: binding.value,
-      modifiers: binding.modifiers
+      modifiers: binding.modifiers,
     });
   },
   updated(el, binding) {
     console.log('Directive updated:', {
       oldValue: binding.oldValue,
-      newValue: binding.value
+      newValue: binding.value,
     });
-  }
+  },
 });
 ```
 
 Use in template:
+
 ```html
 <div uus-debug="someValue">Debug me</div>
 ```
@@ -210,7 +215,7 @@ Use in template:
 // Enable directive logging
 const app = new Uus({
   debug: true,
-  logDirectives: true
+  logDirectives: true,
 });
 ```
 
@@ -253,7 +258,7 @@ watch(
     console.log('New:', newVal);
     console.trace('Change source');
     console.groupEnd();
-    
+
     performSearch(newVal);
   }
 );
@@ -283,13 +288,13 @@ app.directive('safe', {
       console.error('Directive error:', error);
       el.textContent = 'Error occurred';
       el.style.color = 'red';
-      
+
       // Report to error tracking
       if (window.errorReporter) {
         window.errorReporter.log(error);
       }
     }
-  }
+  },
 });
 ```
 
@@ -317,13 +322,14 @@ window.addEventListener('error', (event) => {
    - Use $0 to reference selected element
 
 2. **Console Panel**
+
    ```javascript
    // Quick element query
-   $$('[uus-state]') // All elements with state
-   
+   $$('[uus-state]'); // All elements with state
+
    // Monitor function calls
-   monitor(app.state.addTodo)
-   
+   monitor(app.state.addTodo);
+
    // Debug specific property
    Object.defineProperty(app.state, 'count', {
      set(value) {
@@ -332,7 +338,7 @@ window.addEventListener('error', (event) => {
      },
      get() {
        return this._count;
-     }
+     },
    });
    ```
 
@@ -353,11 +359,13 @@ While Uus.js doesn't have dedicated DevTools yet, you can use some Vue DevTools 
 ```javascript
 // Make state compatible
 window.__VUE__ = {
-  apps: [{
-    _instance: {
-      proxy: app.state
-    }
-  }]
+  apps: [
+    {
+      _instance: {
+        proxy: app.state,
+      },
+    },
+  ],
 };
 ```
 
@@ -400,10 +408,13 @@ console.timeEnd('render');
 
 // Check for unnecessary updates
 let updateCount = 0;
-watch(() => state.value, () => {
-  updateCount++;
-  console.log(`Updated ${updateCount} times`);
-});
+watch(
+  () => state.value,
+  () => {
+    updateCount++;
+    console.log(`Updated ${updateCount} times`);
+  }
+);
 ```
 
 ### 4. Memory Leaks
@@ -417,7 +428,7 @@ function trackEffect(fn) {
     console.log('Effect running');
     fn();
   });
-  
+
   effects.add(stop);
   return () => {
     effects.delete(stop);
@@ -440,8 +451,8 @@ export default {
   define: {
     __DEV__: true,
     __DEBUG_STATE__: true,
-    __DEBUG_DIRECTIVES__: true
-  }
+    __DEBUG_DIRECTIVES__: true,
+  },
 };
 ```
 
@@ -462,7 +473,7 @@ function createDebugComponent(name, component) {
     onUnmount() {
       console.log(`[${name}] Unmounted`);
       component.onUnmount?.();
-    }
+    },
   };
 }
 ```
@@ -475,7 +486,9 @@ function validateState(state, schema) {
     if (!(key in state)) {
       console.warn(`Missing required state property: ${key}`);
     } else if (typeof state[key] !== type) {
-      console.warn(`Invalid type for ${key}: expected ${type}, got ${typeof state[key]}`);
+      console.warn(
+        `Invalid type for ${key}: expected ${type}, got ${typeof state[key]}`
+      );
     }
   }
 }
@@ -484,7 +497,7 @@ function validateState(state, schema) {
 validateState(app.state, {
   count: 'number',
   user: 'object',
-  todos: 'object' // arrays are objects
+  todos: 'object', // arrays are objects
 });
 ```
 
@@ -516,8 +529,8 @@ window.addEventListener('error', async (event) => {
         stack: event.error.stack,
         state: sanitizeState(app.state),
         userAgent: navigator.userAgent,
-        timestamp: Date.now()
-      })
+        timestamp: Date.now(),
+      }),
     });
   }
 });
@@ -526,30 +539,31 @@ window.addEventListener('error', async (event) => {
 ## Best Practices
 
 1. **Use Descriptive State Names**
+
    ```javascript
    // Good
-   state.isUserLoggedIn
-   state.todoItems
-   
+   state.isUserLoggedIn;
+   state.todoItems;
+
    // Bad
-   state.flag
-   state.data
+   state.flag;
+   state.data;
    ```
 
 2. **Add Debug Comments**
+
    ```html
    <!-- Debug: This shows when user has no todos -->
-   <div uus-show="todos.length === 0">
-     No todos yet
-   </div>
+   <div uus-show="todos.length === 0">No todos yet</div>
    ```
 
 3. **Create Debug Helpers**
+
    ```javascript
    window.uusDebug = {
      state: () => __UUS_DEVTOOLS__.logState(),
      history: () => __UUS_DEVTOOLS__.getHistory(),
-     reset: () => app.state = reactive(initialState)
+     reset: () => (app.state = reactive(initialState)),
    };
    ```
 
@@ -558,10 +572,10 @@ window.addEventListener('error', async (event) => {
    function addTodo(text) {
      console.assert(text && text.trim(), 'Todo text cannot be empty');
      console.assert(typeof text === 'string', 'Todo text must be a string');
-     
+
      state.todos.push({
        id: Date.now(),
-       text: text.trim()
+       text: text.trim(),
      });
    }
    ```

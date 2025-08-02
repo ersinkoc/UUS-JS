@@ -14,8 +14,8 @@ export const formDirective: Directive = {
 
     const formName = binding.expression || 'form';
     const form = new Form({
-      validateOn: el.getAttribute('uus-validate-on') as any || 'blur',
-      revalidateOn: el.getAttribute('uus-revalidate-on') as any || 'change'
+      validateOn: (el.getAttribute('uus-validate-on') as any) || 'blur',
+      revalidateOn: (el.getAttribute('uus-revalidate-on') as any) || 'change',
     });
 
     // Store form in state
@@ -25,7 +25,7 @@ export const formDirective: Directive = {
     // Handle form submission
     const handleSubmit = async (e: Event) => {
       e.preventDefault();
-      
+
       const submitHandler = el.getAttribute('uus-on:submit');
       if (!submitHandler) return;
 
@@ -34,7 +34,7 @@ export const formDirective: Directive = {
           // Evaluate submit handler
           const evaluator = (uus as any).createSafeEvaluator({
             ...uus.state,
-            $values: values
+            $values: values,
           });
           await evaluator(submitHandler);
         });
@@ -51,16 +51,20 @@ export const formDirective: Directive = {
       el.removeEventListener('submit', handleSubmit);
     });
     uus.cleanups.set(el, cleanups);
-  }
+  },
 };
 
 // Field directive
 export const fieldDirective: Directive = {
   name: 'field',
   bind(el, binding, uus) {
-    if (!(el instanceof HTMLInputElement || 
-          el instanceof HTMLTextAreaElement || 
-          el instanceof HTMLSelectElement)) {
+    if (
+      !(
+        el instanceof HTMLInputElement ||
+        el instanceof HTMLTextAreaElement ||
+        el instanceof HTMLSelectElement
+      )
+    ) {
       console.error('uus-field can only be used on form elements');
       return;
     }
@@ -137,7 +141,7 @@ export const fieldDirective: Directive = {
       updateElement();
     });
     uus.cleanups.set(el, cleanups);
-  }
+  },
 };
 
 // Error directive
@@ -171,7 +175,7 @@ export const errorDirective: Directive = {
     const cleanups = uus.cleanups.get(el) || new Set();
     cleanups.add(updateError);
     uus.cleanups.set(el, cleanups);
-  }
+  },
 };
 
 // Submit directive
@@ -190,12 +194,13 @@ export const submitDirective: Directive = {
 
     // Update disabled state
     const updateDisabled = effect(() => {
-      const shouldDisable = binding.expression === 'false' 
-        ? false 
-        : !form.state.valid || form.state.submitting;
-      
+      const shouldDisable =
+        binding.expression === 'false'
+          ? false
+          : !form.state.valid || form.state.submitting;
+
       el.disabled = shouldDisable;
-      
+
       if (form.state.submitting) {
         el.setAttribute('aria-busy', 'true');
       } else {
@@ -207,22 +212,26 @@ export const submitDirective: Directive = {
     const cleanups = uus.cleanups.get(el) || new Set();
     cleanups.add(updateDisabled);
     uus.cleanups.set(el, cleanups);
-  }
+  },
 };
 
 // Disabled directive
 export const disabledDirective: Directive = {
   name: 'disabled',
   bind(el, binding, uus) {
-    if (!(el instanceof HTMLInputElement || 
-          el instanceof HTMLButtonElement ||
-          el instanceof HTMLTextAreaElement ||
-          el instanceof HTMLSelectElement)) {
+    if (
+      !(
+        el instanceof HTMLInputElement ||
+        el instanceof HTMLButtonElement ||
+        el instanceof HTMLTextAreaElement ||
+        el instanceof HTMLSelectElement
+      )
+    ) {
       return;
     }
 
     const evaluator = (uus as any).createSafeEvaluator(uus.state);
-    
+
     const updateDisabled = effect(() => {
       try {
         const shouldDisable = evaluator(binding.expression || 'false');
@@ -236,5 +245,5 @@ export const disabledDirective: Directive = {
     const cleanups = uus.cleanups.get(el) || new Set();
     cleanups.add(updateDisabled);
     uus.cleanups.set(el, cleanups);
-  }
+  },
 };

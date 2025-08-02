@@ -1,24 +1,34 @@
-import type { Directive, UusInstance } from '../types';
+import type { Directive, GenericDirectiveBinding } from '../types';
 import { effect } from '../reactive';
 import { createSafeEvaluator } from '../evaluator';
+import { asDirectiveName, asExpressionString } from '../type-guards';
 
-export const modelDirective: Directive = {
-  name: 'model',
+export const modelDirective: Directive<GenericDirectiveBinding> = {
+  name: asDirectiveName('model'),
   bind(el, binding, uus) {
-    if (!(el instanceof HTMLInputElement || 
-          el instanceof HTMLTextAreaElement || 
-          el instanceof HTMLSelectElement)) {
-      console.error('uus-model can only be used on input, textarea, or select elements');
+    if (
+      !(
+        el instanceof HTMLInputElement ||
+        el instanceof HTMLTextAreaElement ||
+        el instanceof HTMLSelectElement
+      )
+    ) {
+      console.error(
+        'uus-model can only be used on input, textarea, or select elements'
+      );
       return;
     }
 
     const evaluator = createSafeEvaluator(uus.state);
-    
+
     // Update element value when state changes
     const cleanup = effect(() => {
       try {
-        const value = evaluator(binding.expression || '');
-        if (el instanceof HTMLInputElement && (el.type === 'checkbox' || el.type === 'radio')) {
+        const value = evaluator(binding.expression ? asExpressionString(binding.expression) : asExpressionString(''));
+        if (
+          el instanceof HTMLInputElement &&
+          (el.type === 'checkbox' || el.type === 'radio')
+        ) {
           el.checked = !!value;
         } else {
           el.value = String(value ?? '');
@@ -31,7 +41,7 @@ export const modelDirective: Directive = {
     // Update state when element value changes
     const updateState = () => {
       try {
-        let value: any;
+        let value: unknown;
         if (el instanceof HTMLInputElement && el.type === 'checkbox') {
           value = el.checked;
         } else if (el instanceof HTMLInputElement && el.type === 'number') {
@@ -46,15 +56,19 @@ export const modelDirective: Directive = {
 
         // Simple property assignment (doesn't handle nested paths yet)
         const parts = propPath.split('.');
-        let target: any = uus.state;
-        
+        let target: Record<string, unknown> = uus.state as Record<
+          string,
+          unknown
+        >;
+
         for (let i = 0; i < parts.length - 1; i++) {
           const key = parts[i];
           if (!key) return;
-          target = target[key];
-          if (!target) return;
+          const nextTarget = target[key];
+          if (!nextTarget || typeof nextTarget !== 'object') return;
+          target = nextTarget as Record<string, unknown>;
         }
-        
+
         const lastKey = parts[parts.length - 1];
         if (lastKey) {
           target[lastKey] = value;

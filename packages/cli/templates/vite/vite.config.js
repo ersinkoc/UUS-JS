@@ -3,11 +3,11 @@ import { defineConfig } from 'vite';
 export default defineConfig({
   resolve: {
     alias: {
-      '@': '/src'
-    }
+      '@': '/src',
+    },
   },
   build: {
     target: 'es2015',
-    minify: 'terser'
-  }
+    minify: 'terser',
+  },
 });

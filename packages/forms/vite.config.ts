@@ -10,26 +10,26 @@ export default defineConfig({
       fileName: (format) => {
         const formatMap = {
           es: 'index.js',
-          cjs: 'index.cjs'
+          cjs: 'index.cjs',
         };
         return formatMap[format] || 'index.js';
-      }
+      },
     },
     rollupOptions: {
       external: ['@uusjs/core'],
       output: {
         exports: 'named',
         globals: {
-          '@uusjs/core': 'Uus'
-        }
-      }
+          '@uusjs/core': 'Uus',
+        },
+      },
     },
     minify: 'terser',
     terserOptions: {
       compress: {
         drop_console: true,
-        drop_debugger: true
-      }
-    }
-  }
+        drop_debugger: true,
+      },
+    },
+  },
 });

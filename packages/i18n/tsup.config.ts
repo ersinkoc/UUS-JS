@@ -11,11 +11,11 @@ export default defineConfig({
   external: ['@uusjs/core'],
   esbuildOptions(options) {
     options.supported = {
-      'dynamic-import': true
+      'dynamic-import': true,
     };
   },
   loader: {
-    '.json': 'json'
+    '.json': 'json',
   },
-  ignoreWatch: ['**/locales/**']
+  ignoreWatch: ['**/locales/**'],
 });

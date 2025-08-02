@@ -18,30 +18,30 @@ export class Spring {
 
   step(state: SpringState, target: number, dt: number): SpringState {
     const { position, velocity } = state;
-    
+
     // Calculate spring force
     const springForce = -this.stiffness * (position - target);
-    
+
     // Calculate damping force
     const dampingForce = -this.damping * velocity;
-    
+
     // Calculate acceleration
     const acceleration = (springForce + dampingForce) / this.mass;
-    
+
     // Update velocity and position
     const newVelocity = velocity + acceleration * dt;
     const newPosition = position + newVelocity * dt;
-    
+
     return {
       position: newPosition,
-      velocity: newVelocity
+      velocity: newVelocity,
     };
   }
 
   isDone(state: SpringState, target: number, threshold = 0.001): boolean {
     const positionError = Math.abs(state.position - target);
     const velocityError = Math.abs(state.velocity);
-    
+
     return positionError < threshold && velocityError < threshold;
   }
 }
@@ -56,20 +56,20 @@ export function createSpringAnimation(
   const spring = new Spring(options);
   let state: SpringState = {
     position: from,
-    velocity: options.velocity ?? 0
+    velocity: options.velocity ?? 0,
   };
-  
+
   let lastTime = performance.now();
   let animationId: number;
-  
+
   const animate = () => {
     const currentTime = performance.now();
     const dt = Math.min((currentTime - lastTime) / 1000, 0.1); // Cap dt at 100ms
     lastTime = currentTime;
-    
+
     state = spring.step(state, to, dt);
     onUpdate(state.position);
-    
+
     if (spring.isDone(state, to)) {
       onUpdate(to);
       if (onComplete) onComplete();
@@ -77,9 +77,9 @@ export function createSpringAnimation(
       animationId = requestAnimationFrame(animate);
     }
   };
-  
+
   animationId = requestAnimationFrame(animate);
-  
+
   // Return cancel function
   return () => {
     if (animationId) {

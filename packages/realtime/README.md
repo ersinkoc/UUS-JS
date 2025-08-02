@@ -31,21 +31,23 @@ import { websocket } from '@uusjs/realtime';
 const app = new Uus({
   state: {
     messages: [],
-    
+
     sendMessage(text) {
       this.$ws.send('message', { text });
-    }
-  }
+    },
+  },
 });
 
 // Configure WebSocket
-app.use(websocket({
-  url: 'ws://localhost:3000',
-  reconnect: {
-    enabled: true,
-    delay: 1000
-  }
-}));
+app.use(
+  websocket({
+    url: 'ws://localhost:3000',
+    reconnect: {
+      enabled: true,
+      delay: 1000,
+    },
+  })
+);
 
 // Listen for messages
 app.$ws.on('message', (data) => {
@@ -58,10 +60,12 @@ app.$ws.on('message', (data) => {
 ```javascript
 import { sse } from '@uusjs/realtime';
 
-app.use(sse({
-  url: '/api/events',
-  withCredentials: true
-}));
+app.use(
+  sse({
+    url: '/api/events',
+    withCredentials: true,
+  })
+);
 
 // Listen for updates
 app.$sse.on('update', (data) => {
@@ -74,10 +78,12 @@ app.$sse.on('update', (data) => {
 ```javascript
 import { socketio } from '@uusjs/realtime';
 
-app.use(socketio({
-  url: 'http://localhost:3000',
-  transports: ['websocket', 'polling']
-}));
+app.use(
+  socketio({
+    url: 'http://localhost:3000',
+    transports: ['websocket', 'polling'],
+  })
+);
 
 // Join room
 app.$io.join('chat-room');
@@ -122,13 +128,17 @@ Synchronize state across clients:
 ```javascript
 import { createRealtimeStore } from '@uusjs/realtime';
 
-const store = createRealtimeStore(app.$ws, {
-  todos: [],
-  filter: 'all'
-}, {
-  channel: 'todos',
-  conflictResolution: 'remote'
-});
+const store = createRealtimeStore(
+  app.$ws,
+  {
+    todos: [],
+    filter: 'all',
+  },
+  {
+    channel: 'todos',
+    conflictResolution: 'remote',
+  }
+);
 
 // Subscribe to changes
 store.subscribe((state) => {
@@ -140,7 +150,7 @@ store.update((state) => {
   state.todos.push({
     id: Date.now(),
     text: 'New todo',
-    done: false
+    done: false,
   });
 });
 ```
@@ -154,7 +164,7 @@ import { createCollaborativeText } from '@uusjs/realtime';
 
 const editor = createCollaborativeText(app.$ws, {
   channel: 'document-1',
-  debounce: 300
+  debounce: 300,
 });
 
 // Subscribe to changes
@@ -172,13 +182,15 @@ document.getElementById('editor').addEventListener('input', (e) => {
 ## Authentication
 
 ```javascript
-app.use(websocket({
-  url: 'wss://api.example.com',
-  auth: async () => {
-    const token = await getAuthToken();
-    return { token };
-  }
-}));
+app.use(
+  websocket({
+    url: 'wss://api.example.com',
+    auth: async () => {
+      const token = await getAuthToken();
+      return { token };
+    },
+  })
+);
 ```
 
 ## Connection Management
@@ -212,33 +224,37 @@ app.$ws.on('error', (error) => {
 ### WebSocket with Heartbeat
 
 ```javascript
-app.use(websocket({
-  url: 'wss://api.example.com',
-  heartbeat: {
-    interval: 30000, // 30 seconds
-    timeout: 60000,  // 60 seconds
-    message: 'ping'
-  },
-  reconnect: {
-    enabled: true,
-    delay: 1000,
-    maxDelay: 30000,
-    attempts: 10
-  }
-}));
+app.use(
+  websocket({
+    url: 'wss://api.example.com',
+    heartbeat: {
+      interval: 30000, // 30 seconds
+      timeout: 60000, // 60 seconds
+      message: 'ping',
+    },
+    reconnect: {
+      enabled: true,
+      delay: 1000,
+      maxDelay: 30000,
+      attempts: 10,
+    },
+  })
+);
 ```
 
 ### SSE with Custom Headers
 
 ```javascript
-app.use(sse({
-  url: '/api/stream',
-  headers: {
-    'Authorization': 'Bearer token',
-    'X-Custom-Header': 'value'
-  },
-  retry: 5000 // 5 seconds
-}));
+app.use(
+  sse({
+    url: '/api/stream',
+    headers: {
+      Authorization: 'Bearer token',
+      'X-Custom-Header': 'value',
+    },
+    retry: 5000, // 5 seconds
+  })
+);
 ```
 
 ## Server Examples
@@ -252,18 +268,20 @@ const wss = new WebSocketServer({ port: 3000 });
 
 wss.on('connection', (ws) => {
   console.log('Client connected');
-  
+
   ws.on('message', (data) => {
     const message = JSON.parse(data);
-    
+
     // Broadcast to all clients
     wss.clients.forEach((client) => {
       if (client.readyState === WebSocket.OPEN) {
-        client.send(JSON.stringify({
-          event: message.event,
-          data: message.data,
-          timestamp: Date.now()
-        }));
+        client.send(
+          JSON.stringify({
+            event: message.event,
+            data: message.data,
+            timestamp: Date.now(),
+          })
+        );
       }
     });
   });
@@ -277,20 +295,22 @@ app.get('/api/events', (req, res) => {
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache',
-    'Connection': 'keep-alive'
+    Connection: 'keep-alive',
   });
-  
+
   // Send initial data
   res.write(`data: ${JSON.stringify({ event: 'connected' })}\n\n`);
-  
+
   // Send updates every second
   const interval = setInterval(() => {
-    res.write(`data: ${JSON.stringify({
-      event: 'update',
-      data: { time: new Date().toISOString() }
-    })}\n\n`);
+    res.write(
+      `data: ${JSON.stringify({
+        event: 'update',
+        data: { time: new Date().toISOString() },
+      })}\n\n`
+    );
   }, 1000);
-  
+
   // Clean up on disconnect
   req.on('close', () => {
     clearInterval(interval);
@@ -317,8 +337,8 @@ interface Message {
 
 const app = new Uus<AppState>({
   state: {
-    messages: []
-  }
+    messages: [],
+  },
 });
 
 app.use(websocket());

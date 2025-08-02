@@ -1,6 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import { createRouter, Router } from '../src/index';
-import type { Route, RouteMatch, RouterOptions, RouteGuard, ScrollBehavior } from '../src/index';
+import type {
+  Route,
+  RouteMatch,
+  RouterOptions,
+  RouteGuard,
+  ScrollBehavior,
+} from '../src/index';
 
 describe('index exports', () => {
   it('should export createRouter function', () => {

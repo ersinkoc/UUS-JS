@@ -1,0 +1,25 @@
+{
+  "framework": null,
+  "buildCommand": "pnpm build",
+  "outputDirectory": "packages/core/dist",
+  "installCommand": "pnpm install",
+  "devCommand": "pnpm dev",
+  "routes": [
+    {
+      "src": "/demos/dashboard",
+      "dest": "/examples/dashboard/dist/index.html"
+    },
+    {
+      "src": "/demos/ecommerce",
+      "dest": "/examples/ecommerce/dist/index.html"
+    },
+    {
+      "src": "/demos/i18n",
+      "dest": "/examples/i18n-demo/dist/index.html"
+    },
+    {
+      "src": "/demos/api-showcase",
+      "dest": "/examples/api-showcase/dist/index.html"
+    }
+  ]
+}

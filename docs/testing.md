@@ -5,6 +5,7 @@ Uus.js uses [Vitest](https://vitest.dev/) for unit testing across all packages. 
 ## Running Tests
 
 ### All Packages
+
 ```bash
 # Run all tests once
 pnpm test
@@ -17,6 +18,7 @@ pnpm test:coverage
 ```
 
 ### Individual Package
+
 ```bash
 # Navigate to package
 cd packages/core
@@ -60,7 +62,7 @@ describe('Reactive System', () => {
   it('should create a ref', () => {
     const count = ref(0);
     expect(count.value).toBe(0);
-    
+
     count.value = 5;
     expect(count.value).toBe(5);
   });
@@ -87,7 +89,7 @@ describe('Text Directive', () => {
   it('should set text content', () => {
     const directive = createTextDirective();
     directive(el, 'message', app);
-    
+
     expect(el.textContent).toBe('Hello');
   });
 });
@@ -101,7 +103,7 @@ import { describe, it, expect, vi } from 'vitest';
 describe('Async Operations', () => {
   it('should handle async validation', async () => {
     const validator = vi.fn(async (value) => {
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
       return value === 'valid' ? null : { error: true };
     });
 
@@ -120,10 +122,10 @@ describe('Event Handling', () => {
   it('should call event handler', () => {
     const handler = vi.fn();
     const button = document.createElement('button');
-    
+
     button.addEventListener('click', handler);
     button.click();
-    
+
     expect(handler).toHaveBeenCalledTimes(1);
   });
 });
@@ -139,6 +141,7 @@ We aim for high test coverage across all packages:
 - **Forms Package**: >85% coverage for validation and state management
 
 View coverage reports:
+
 ```bash
 pnpm test:coverage
 # Coverage reports are generated in packages/*/coverage/
@@ -151,23 +154,25 @@ pnpm test:coverage
    - Tests should survive refactoring
 
 2. **Use Descriptive Test Names**
+
    ```typescript
    // Good
-   it('should update text content when state changes')
-   
+   it('should update text content when state changes');
+
    // Bad
-   it('test update')
+   it('test update');
    ```
 
 3. **Arrange, Act, Assert**
+
    ```typescript
    it('should validate email', () => {
      // Arrange
      const validator = validators.email();
-     
+
      // Act
      const result = validator('test@example.com');
-     
+
      // Assert
      expect(result).toBeNull();
    });
@@ -187,17 +192,21 @@ pnpm test:coverage
 ## Debugging Tests
 
 ### Run Single Test File
+
 ```bash
 pnpm vitest packages/core/__tests__/reactive.test.ts
 ```
 
 ### Run Tests Matching Pattern
+
 ```bash
 pnpm vitest -t "should create ref"
 ```
 
 ### Debug in VS Code
+
 Add to `.vscode/launch.json`:
+
 ```json
 {
   "type": "node",
@@ -215,6 +224,7 @@ Add to `.vscode/launch.json`:
 ## CI/CD Integration
 
 Tests run automatically on:
+
 - Pull requests
 - Pushes to main branch
 - Release builds
@@ -224,10 +234,13 @@ See `.github/workflows/ci.yml` for CI configuration.
 ## Common Issues
 
 ### DOM Not Available
+
 Vitest uses `jsdom` or `happy-dom` for DOM APIs. Ensure `environment: 'jsdom'` is set in `vitest.config.ts`.
 
 ### Module Resolution
+
 Use path aliases configured in `vitest.config.ts`:
+
 ```typescript
 resolve: {
   alias: {
@@ -237,7 +250,9 @@ resolve: {
 ```
 
 ### Async Test Timeout
+
 Increase timeout for slow async tests:
+
 ```typescript
 it('should handle slow operation', async () => {
   // test code

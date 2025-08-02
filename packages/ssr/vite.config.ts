@@ -7,7 +7,7 @@ export default defineConfig({
       entry: resolve(__dirname, 'src/index.ts'),
       name: 'UusSSR',
       formats: ['es', 'cjs'],
-      fileName: (format) => format === 'es' ? 'index.js' : 'index.cjs'
+      fileName: (format) => (format === 'es' ? 'index.js' : 'index.cjs'),
     },
     rollupOptions: {
       external: [
@@ -34,13 +34,13 @@ export default defineConfig({
         'querystring',
         'constants',
         'perf_hooks',
-        'punycode'
+        'punycode',
       ],
       output: {
         globals: {
-          '@uusjs/core': 'Uus'
-        }
-      }
-    }
-  }
+          '@uusjs/core': 'Uus',
+        },
+      },
+    },
+  },
 });

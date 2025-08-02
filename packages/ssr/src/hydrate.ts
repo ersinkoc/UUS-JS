@@ -9,10 +9,11 @@ export function hydrate(
   container: string | Element = '#app',
   options?: HydrationOptions
 ): void {
-  const element = typeof container === 'string' 
-    ? document.querySelector(container) 
-    : container;
-    
+  const element =
+    typeof container === 'string'
+      ? document.querySelector(container)
+      : container;
+
   if (!element) {
     throw new Error(`Hydration container not found: ${container}`);
   }
@@ -33,7 +34,7 @@ export function hydrate(
 
   // Find SSR markers
   const ssrElements = element.querySelectorAll('[data-uus-ssr]');
-  
+
   // Verify hydration match
   if (!options?.suppressWarnings) {
     verifyHydration(element, ssrElements);
@@ -43,13 +44,13 @@ export function hydrate(
   app.mount(element);
 
   // Remove SSR markers
-  ssrElements.forEach(el => {
+  ssrElements.forEach((el) => {
     el.removeAttribute('data-uus-ssr');
   });
 
   // Mark hydration complete
   (app as any).__hydrating = false;
-  
+
   if (process.env.NODE_ENV === 'development') {
     console.log('✅ Hydration complete');
   }
@@ -58,25 +59,28 @@ export function hydrate(
 /**
  * Verify hydration matches server output
  */
-function verifyHydration(container: Element, ssrElements: NodeListOf<Element>): void {
+function verifyHydration(
+  container: Element,
+  ssrElements: NodeListOf<Element>
+): void {
   const warnings: string[] = [];
-  
+
   // Check for hydration mismatches
-  ssrElements.forEach(el => {
+  ssrElements.forEach((el) => {
     const directives = getDirectives(el);
-    
+
     directives.forEach(({ name, value }) => {
       // Verify directive values match
       const serverValue = el.getAttribute(name);
       if (serverValue !== value) {
         warnings.push(
           `Hydration mismatch on ${el.tagName}: ` +
-          `${name}="${serverValue}" (server) vs "${value}" (client)`
+            `${name}="${serverValue}" (server) vs "${value}" (client)`
         );
       }
     });
   });
-  
+
   if (warnings.length > 0) {
     console.warn('⚠️ Hydration warnings:', warnings);
   }
@@ -85,20 +89,24 @@ function verifyHydration(container: Element, ssrElements: NodeListOf<Element>): 
 /**
  * Get all Uus directives from element
  */
-function getDirectives(element: Element): Array<{ name: string; value: string }> {
+function getDirectives(
+  element: Element
+): Array<{ name: string; value: string }> {
   const directives: Array<{ name: string; value: string }> = [];
-  
+
   for (const attr of element.attributes) {
-    if (attr.name.startsWith('uus-') || 
-        attr.name.startsWith(':') || 
-        attr.name.startsWith('@')) {
+    if (
+      attr.name.startsWith('uus-') ||
+      attr.name.startsWith(':') ||
+      attr.name.startsWith('@')
+    ) {
       directives.push({
         name: attr.name,
-        value: attr.value
+        value: attr.value,
       });
     }
   }
-  
+
   return directives;
 }
 
@@ -107,19 +115,19 @@ function getDirectives(element: Element): Array<{ name: string; value: string }>
  */
 export function createSSRApp(options?: any): Uus {
   const app = new Uus(options);
-  
+
   // Override mount to handle hydration
   const originalMount = app.mount.bind(app);
-  
-  app.mount = function(container?: string | Element) {
+
+  app.mount = function (container?: string | Element) {
     // Check if we're hydrating
     if (typeof window !== 'undefined' && (window as any).__UUS_STATE__) {
       hydrate(app, container);
       return app;
     }
-    
+
     return originalMount(container);
   };
-  
+
   return app;
 }

@@ -2,7 +2,14 @@
   "name": "@uusjs/i18n",
   "version": "0.0.1",
   "description": "Internationalization and localization support for Uus.js",
-  "keywords": ["uus", "uusjs", "i18n", "l10n", "internationalization", "localization"],
+  "keywords": [
+    "uus",
+    "uusjs",
+    "i18n",
+    "l10n",
+    "internationalization",
+    "localization"
+  ],
   "homepage": "https://uusjs.dev",
   "bugs": {
     "url": "https://github.com/uus-js/uus/issues",

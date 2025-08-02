@@ -1,22 +1,28 @@
-import type { Directive, UusInstance } from '../types';
+import type { Directive, BindDirectiveBinding } from '../types';
 import { effect } from '../reactive';
 import { createSafeEvaluator } from '../evaluator';
+import { asDirectiveName, asExpressionString, isBindDirectiveBinding } from '../type-guards';
 
-export const bindDirective: Directive = {
-  name: 'bind',
+export const bindDirective: Directive<BindDirectiveBinding> = {
+  name: asDirectiveName('bind'),
   bind(el, binding, uus) {
     if (!binding.arg) {
       console.error('Attribute name required for uus-bind');
       return;
     }
 
+    if (!isBindDirectiveBinding(binding)) {
+      console.error('Invalid binding for bind directive');
+      return;
+    }
+
     const attrName = binding.arg;
     const evaluator = createSafeEvaluator(uus.state);
-    
+
     const cleanup = effect(() => {
       try {
-        const value = evaluator(binding.expression || '');
-        
+        const value = evaluator(binding.expression ? asExpressionString(binding.expression) : asExpressionString(''));
+
         // Special handling for certain attributes
         if (attrName === 'class') {
           if (typeof value === 'object' && value !== null) {
@@ -36,8 +42,9 @@ export const bindDirective: Directive = {
           if (typeof value === 'object' && value !== null) {
             // Object syntax: { color: 'red', fontSize: '14px' }
             Object.entries(value).forEach(([prop, val]) => {
-              const cssProp = prop.replace(/([A-Z])/g, '-$1').toLowerCase();
-              (el.style as any)[prop] = val;
+              (el.style as unknown as Record<string, string>)[prop] = String(
+                val ?? ''
+              );
             });
           } else {
             // String syntax

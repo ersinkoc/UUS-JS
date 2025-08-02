@@ -29,13 +29,13 @@ export class HashHistory implements History {
 
   listen(callback: (path: string) => void): () => void {
     this.listeners.add(callback);
-    
+
     const handleHashChange = () => {
       callback(this.current);
     };
-    
+
     window.addEventListener('hashchange', handleHashChange);
-    
+
     return () => {
       this.listeners.delete(callback);
       window.removeEventListener('hashchange', handleHashChange);
@@ -44,7 +44,7 @@ export class HashHistory implements History {
 
   private notifyListeners(): void {
     const current = this.current;
-    this.listeners.forEach(listener => listener(current));
+    this.listeners.forEach((listener) => listener(current));
   }
 }
 
@@ -82,26 +82,30 @@ export class HTML5History implements History {
 
   listen(callback: (path: string) => void): () => void {
     this.listeners.add(callback);
-    
+
     const handlePopState = () => {
       callback(this.current);
     };
-    
+
     window.addEventListener('popstate', handlePopState);
-    
+
     // Intercept link clicks
     const handleClick = (e: MouseEvent) => {
       const link = (e.target as HTMLElement).closest('a');
-      if (link && link.href && link.target !== '_blank' && 
-          link.hostname === window.location.hostname) {
+      if (
+        link &&
+        link.href &&
+        link.target !== '_blank' &&
+        link.hostname === window.location.hostname
+      ) {
         e.preventDefault();
         const path = link.pathname + link.search + link.hash;
         this.push(path);
       }
     };
-    
+
     document.addEventListener('click', handleClick);
-    
+
     return () => {
       this.listeners.delete(callback);
       window.removeEventListener('popstate', handlePopState);
@@ -111,6 +115,6 @@ export class HTML5History implements History {
 
   private notifyListeners(): void {
     const current = this.current;
-    this.listeners.forEach(listener => listener(current));
+    this.listeners.forEach((listener) => listener(current));
   }
 }

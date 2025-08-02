@@ -8,7 +8,6 @@
     "declarationMap": true,
     "sourceMap": true,
     "outDir": "./dist",
-    "rootDir": "./src",
     "removeComments": true,
     "noEmit": true,
     "isolatedModules": true,
@@ -28,5 +27,6 @@
     "allowJs": true,
     "checkJs": true
   },
-  "exclude": ["node_modules", "dist", "build", "coverage"]
+  "include": ["packages/*/src/**/*"],
+  "exclude": ["node_modules", "dist", "build", "coverage", "examples", "uus-devtools-extension", "packages/*/node_modules", "packages/*/dist", "packages/*/coverage"]
 }

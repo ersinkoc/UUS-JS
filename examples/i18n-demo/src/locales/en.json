@@ -3,7 +3,7 @@
   "subtitle": "Uus.js i18n Package Showcase",
   "sections": {
     "basic": "Basic Translation",
-    "interpolation": "String Interpolation", 
+    "interpolation": "String Interpolation",
     "pluralization": "Pluralization",
     "forms": "Date & Number Formatting",
     "dynamic": "Dynamic Content"
@@ -23,13 +23,13 @@
   "plurals": {
     "item": {
       "0": "No items",
-      "1": "One item", 
+      "1": "One item",
       "2": "{count} items"
     },
     "message": {
       "0": "No messages",
       "1": "One message",
-      "2": "{count} messages" 
+      "2": "{count} messages"
     },
     "notification": {
       "0": "No notifications",
@@ -39,7 +39,7 @@
   },
   "actions": {
     "increase": "Increase",
-    "decrease": "Decrease", 
+    "decrease": "Decrease",
     "reset": "Reset",
     "submit": "Submit",
     "clear": "Clear"

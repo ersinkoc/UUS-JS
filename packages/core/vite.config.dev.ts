@@ -7,18 +7,18 @@ export default defineConfig({
       entry: resolve(__dirname, 'src/index.ts'),
       name: 'Uus',
       formats: ['es'],
-      fileName: () => 'index.js'
+      fileName: () => 'index.js',
     },
     rollupOptions: {
       output: {
-        exports: 'named'
-      }
+        exports: 'named',
+      },
     },
     sourcemap: true,
-    minify: false
+    minify: false,
   },
   server: {
     port: 3000,
-    open: '/example.html'
-  }
+    open: '/example.html',
+  },
 });

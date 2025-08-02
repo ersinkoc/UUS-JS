@@ -17,11 +17,13 @@ Initializes reactive state for the element and its children.
 **Advanced usage with computed values:**
 
 ```html
-<div uus-state="{ 
+<div
+  uus-state="{ 
   price: 100,
   quantity: 2,
   total: computed(() => price * quantity)
-}">
+}"
+>
   Total: $<span uus-text="total"></span>
 </div>
 ```
@@ -55,6 +57,7 @@ Toggles the display of an element using CSS.
 ```
 
 **How it works:**
+
 - `true`: Removes `display: none`
 - `false`: Adds `display: none`
 - Element stays in DOM
@@ -64,9 +67,7 @@ Toggles the display of an element using CSS.
 Conditionally renders an element by adding/removing it from the DOM.
 
 ```html
-<div uus-if="isLoggedIn">
-  Welcome back!
-</div>
+<div uus-if="isLoggedIn">Welcome back!</div>
 
 <template uus-if="loading">
   <div class="spinner"></div>
@@ -74,6 +75,7 @@ Conditionally renders an element by adding/removing it from the DOM.
 ```
 
 **vs uus-show:**
+
 - `uus-if`: Removes from DOM (better for rarely shown content)
 - `uus-show`: CSS display toggle (better for frequently toggled content)
 
@@ -114,17 +116,17 @@ Creates two-way data binding on form elements.
 
 ```html
 <!-- Text input -->
-<input uus-model="username">
+<input uus-model="username" />
 
 <!-- Number input -->
-<input type="number" uus-model="age">
+<input type="number" uus-model="age" />
 
 <!-- Checkbox -->
-<input type="checkbox" uus-model="agreed">
+<input type="checkbox" uus-model="agreed" />
 
 <!-- Radio buttons -->
-<input type="radio" uus-model="plan" value="basic">
-<input type="radio" uus-model="plan" value="pro">
+<input type="radio" uus-model="plan" value="basic" />
+<input type="radio" uus-model="plan" value="pro" />
 
 <!-- Select -->
 <select uus-model="country">
@@ -136,9 +138,12 @@ Creates two-way data binding on form elements.
 <textarea uus-model="description"></textarea>
 
 <!-- With modifiers -->
-<input uus-model.trim="username">     <!-- Trims whitespace -->
-<input uus-model.number="age">        <!-- Converts to number -->
-<input uus-model.lazy="search">       <!-- Updates on change, not input -->
+<input uus-model.trim="username" />
+<!-- Trims whitespace -->
+<input uus-model.number="age" />
+<!-- Converts to number -->
+<input uus-model.lazy="search" />
+<!-- Updates on change, not input -->
 ```
 
 ### uus-bind
@@ -147,13 +152,13 @@ Dynamically binds attributes to expressions.
 
 ```html
 <!-- Basic binding -->
-<img uus-bind:src="imageUrl">
+<img uus-bind:src="imageUrl" />
 <a uus-bind:href="link">Link</a>
 <button uus-bind:disabled="!isValid">Submit</button>
 
 <!-- Shorthand with : -->
-<img :src="imageUrl">
-<input :value="name" :placeholder="placeholder">
+<img :src="imageUrl" />
+<input :value="name" :placeholder="placeholder" />
 
 <!-- Class binding -->
 <div :class="{ active: isActive, disabled: isDisabled }"></div>
@@ -164,12 +169,12 @@ Dynamically binds attributes to expressions.
 <div :style="[baseStyles, overrideStyles]"></div>
 
 <!-- Multiple attributes -->
-<input 
+<input
   :type="inputType"
   :placeholder="placeholder"
   :disabled="isDisabled"
   :required="isRequired"
->
+/>
 ```
 
 ### uus-on
@@ -179,53 +184,68 @@ Attaches event listeners to elements.
 ```html
 <!-- Basic events -->
 <button uus-on:click="count++">Increment</button>
-<input uus-on:input="handleInput">
+<input uus-on:input="handleInput" />
 <form uus-on:submit="handleSubmit">
+  <!-- Shorthand with @ -->
+  <button @click="handleClick">Click me</button>
 
-<!-- Shorthand with @ -->
-<button @click="handleClick">Click me</button>
+  <!-- With event modifiers -->
+  <form @submit.prevent="handleSubmit">
+    <!-- preventDefault() -->
+    <button @click.stop="handleClick">
+      <!-- stopPropagation() -->
+      <input @keyup.enter="submit" />
+      <!-- Key filter -->
+      <button @click.once="showAlert">
+        <!-- One-time listener -->
+        <div @scroll.passive="handleScroll">
+          <!-- Passive listener -->
+          <button @click.capture="handleClick">
+            <!-- Capture phase -->
+            <input @input.debounce="search" />
+            <!-- Debounced (custom) -->
 
-<!-- With event modifiers -->
-<form @submit.prevent="handleSubmit">          <!-- preventDefault() -->
-<button @click.stop="handleClick">             <!-- stopPropagation() -->
-<input @keyup.enter="submit">                  <!-- Key filter -->
-<button @click.once="showAlert">               <!-- One-time listener -->
-<div @scroll.passive="handleScroll">           <!-- Passive listener -->
-<button @click.capture="handleClick">          <!-- Capture phase -->
-<input @input.debounce="search">               <!-- Debounced (custom) -->
+            <!-- Key modifiers -->
+            <input @keyup.enter="submit" />
+            <input @keyup.esc="cancel" />
+            <input @keyup.tab="next" />
+            <input @keyup.delete="remove" />
+            <input @keyup.space="pause" />
+            <input @keyup.up="moveUp" />
+            <input @keyup.down="moveDown" />
+            <input @keyup.left="moveLeft" />
+            <input @keyup.right="moveRight" />
 
-<!-- Key modifiers -->
-<input @keyup.enter="submit">
-<input @keyup.esc="cancel">
-<input @keyup.tab="next">
-<input @keyup.delete="remove">
-<input @keyup.space="pause">
-<input @keyup.up="moveUp">
-<input @keyup.down="moveDown">
-<input @keyup.left="moveLeft">
-<input @keyup.right="moveRight">
+            <!-- Mouse modifiers -->
+            <button @click.left="handleLeftClick">
+              <button @click.right="handleRightClick">
+                <button @click.middle="handleMiddleClick">
+                  <!-- Combination modifiers -->
+                  <input @keyup.ctrl.enter="submit" />
+                  <button @click.shift="selectMultiple">
+                    <div @click.alt.prevent="showMenu">
+                      <!-- Inline expressions -->
+                      <button @click="count++; showMessage = true">
+                        Multiple actions
+                      </button>
 
-<!-- Mouse modifiers -->
-<button @click.left="handleLeftClick">
-<button @click.right="handleRightClick">
-<button @click.middle="handleMiddleClick">
+                      <!-- Method calls with arguments -->
+                      <button @click="addItem('apple', 5)">Add Apple</button>
 
-<!-- Combination modifiers -->
-<input @keyup.ctrl.enter="submit">
-<button @click.shift="selectMultiple">
-<div @click.alt.prevent="showMenu">
-
-<!-- Inline expressions -->
-<button @click="count++; showMessage = true">
-  Multiple actions
-</button>
-
-<!-- Method calls with arguments -->
-<button @click="addItem('apple', 5)">Add Apple</button>
-
-<!-- Access event object -->
-<input @input="handleInput($event)">
-<button @click="handleClick($event, extraParam)">
+                      <!-- Access event object -->
+                      <input @input="handleInput($event)" />
+                      <button @click="handleClick($event, extraParam)"></button>
+                    </div>
+                  </button>
+                </button>
+              </button>
+            </button>
+          </button>
+        </div>
+      </button>
+    </button>
+  </form>
+</form>
 ```
 
 ### uus-class
@@ -243,12 +263,16 @@ Dynamically manages CSS classes.
 <div uus-class="computedClasses"></div>
 
 <!-- Multiple classes -->
-<button uus-class="{
+<button
+  uus-class="{
   'btn': true,
   'btn-primary': type === 'primary',
   'btn-disabled': isDisabled,
   'btn-loading': isLoading
-}">Click me</button>
+}"
+>
+  Click me
+</button>
 ```
 
 ### uus-style
@@ -260,23 +284,29 @@ Dynamically manages inline styles.
 <div uus-style="{ color: textColor, fontSize: size + 'px' }"></div>
 
 <!-- With units -->
-<div uus-style="{ 
+<div
+  uus-style="{ 
   width: width + 'px',
   height: height + 'px',
   transform: `rotate(${rotation}deg)`
-}"></div>
+}"
+></div>
 
 <!-- Conditional styles -->
-<div uus-style="{
+<div
+  uus-style="{
   backgroundColor: isError ? 'red' : 'green',
   opacity: isVisible ? 1 : 0
-}"></div>
+}"
+></div>
 
 <!-- CSS variables -->
-<div uus-style="{
+<div
+  uus-style="{
   '--primary-color': primaryColor,
   '--spacing': spacing + 'px'
-}"></div>
+}"
+></div>
 ```
 
 ### uus-component
@@ -284,7 +314,8 @@ Dynamically manages inline styles.
 Defines lifecycle hooks for elements.
 
 ```html
-<div uus-component="{
+<div
+  uus-component="{
   onMount() {
     console.log('Component mounted');
     this.interval = setInterval(() => this.time = Date.now(), 1000);
@@ -298,7 +329,8 @@ Defines lifecycle hooks for elements.
   onUpdate() {
     console.log('Component updated');
   }
-}">
+}"
+>
   Current time: <span uus-text="time"></span>
 </div>
 ```
@@ -349,7 +381,7 @@ app.directive('focus', {
       el.focus();
     }
   },
-  
+
   // Called when value changes
   updated(el, binding) {
     if (binding.value) {
@@ -358,18 +390,18 @@ app.directive('focus', {
       el.blur();
     }
   },
-  
+
   // Called when element is removed
   unmounted(el) {
     // Cleanup if needed
-  }
+  },
 });
 ```
 
 Use your custom directive:
 
 ```html
-<input uus-focus="shouldFocus">
+<input uus-focus="shouldFocus" />
 ```
 
 ## Directive Processing Order
@@ -403,7 +435,8 @@ Directives are processed in a specific order:
 ### Dynamic Form
 
 ```html
-<form uus-state="{ 
+<form
+  uus-state="{ 
   fields: [
     { name: 'username', type: 'text', required: true },
     { name: 'email', type: 'email', required: true },
@@ -411,24 +444,25 @@ Directives are processed in a specific order:
   ],
   values: {},
   errors: {}
-}" @submit.prevent="handleSubmit">
-  
+}"
+  @submit.prevent="handleSubmit"
+>
   <div uus-for="field in fields">
     <label :for="field.name" uus-text="field.name"></label>
-    <input 
+    <input
       :id="field.name"
       :type="field.type"
       :required="field.required"
       uus-model="values[field.name]"
       @blur="validateField(field.name)"
-    >
-    <span 
-      uus-show="errors[field.name]" 
+    />
+    <span
+      uus-show="errors[field.name]"
       uus-text="errors[field.name]"
       class="error"
     ></span>
   </div>
-  
+
   <button type="submit">Submit</button>
 </form>
 ```
@@ -436,35 +470,37 @@ Directives are processed in a specific order:
 ### Interactive Gallery
 
 ```html
-<div uus-state="{ 
+<div
+  uus-state="{ 
   images: [...],
   selectedIndex: 0,
   selected: computed(() => images[selectedIndex])
-}">
-  <img 
-    :src="selected.url" 
-    :alt="selected.title"
-    uus-animate="fadeIn"
-  >
-  
+}"
+>
+  <img :src="selected.url" :alt="selected.title" uus-animate="fadeIn" />
+
   <div class="thumbnails">
-    <img 
+    <img
       uus-for="(img, index) in images"
       :src="img.thumbnail"
       :class="{ active: index === selectedIndex }"
       @click="selectedIndex = index"
-    >
+    />
   </div>
-  
-  <button 
+
+  <button
     @click="selectedIndex = Math.max(0, selectedIndex - 1)"
     :disabled="selectedIndex === 0"
-  >Previous</button>
-  
-  <button 
+  >
+    Previous
+  </button>
+
+  <button
     @click="selectedIndex = Math.min(images.length - 1, selectedIndex + 1)"
     :disabled="selectedIndex === images.length - 1"
-  >Next</button>
+  >
+    Next
+  </button>
 </div>
 ```
 

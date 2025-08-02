@@ -1,50 +1,56 @@
 # Uus.js Design Document
 
 ## Architecture Overview
+
 ┌─────────────────────────────────────────────────────────┐
-│                    Application Layer                     │
+│ Application Layer │
 ├─────────────────────────────────────────────────────────┤
-│                     Plugin System                        │
+│ Plugin System │
 ├──────────┬──────────┬──────────┬──────────┬───────────┤
-│  Router  │ Animate  │  Forms   │   i18n   │  DevTools │
+│ Router │ Animate │ Forms │ i18n │ DevTools │
 ├──────────┴──────────┴──────────┴──────────┴───────────┤
-│                      Core Layer                          │
+│ Core Layer │
 ├──────────┬──────────┬──────────┬──────────┬───────────┤
-│ Reactive │Directive │  Event   │ Lifecycle│   Utils   │
-│  System  │  System  │  System  │  Hooks   │           │
+│ Reactive │Directive │ Event │ Lifecycle│ Utils │
+│ System │ System │ System │ Hooks │ │
 ├──────────┴──────────┴──────────┴──────────┴───────────┤
-│                    DOM Abstraction                       │
+│ DOM Abstraction │
 ├─────────────────────────────────────────────────────────┤
-│                    Browser APIs                          │
+│ Browser APIs │
 └─────────────────────────────────────────────────────────┘
 
 ## Core Design Principles
 
 ### 1. Progressive Enhancement
+
 - Enhance existing HTML without replacing it
 - Work without JavaScript where possible
 - Graceful degradation
 - Server-side rendering friendly
 
 ### 2. Declarative Programming
+
 - Behavior defined in HTML attributes
 - Minimal JavaScript required
 - Self-documenting code
 - Predictable outcomes
 
 ### 3. Reactive by Default
+
 - Automatic UI updates
 - Efficient change detection
 - Minimal re-renders
 - Predictable data flow
 
 ### 4. Zero Configuration
+
 - No build step required
 - Convention over configuration
 - Smart defaults
 - Plug and play
 
 ### 5. Composability
+
 - Small, focused directives
 - Combinable behaviors
 - Plugin architecture
@@ -67,11 +73,11 @@ interface ReactiveSystem {
 class ReactiveCore {
   private deps = new WeakMap<object, Set<Effect>>();
   private effects = new Set<Effect>();
-  
+
   track(target: object, key: string | symbol) {
     // Dependency tracking
   }
-  
+
   trigger(target: object, key: string | symbol) {
     // Effect triggering
   }
@@ -165,7 +171,7 @@ html<!-- Parent to Child (props) -->
 <div uus-store="shared" uus-action="updateUser">
 Animation Design
 1. CSS-Based Animations
-html<div uus-animate="fadeIn" 
+html<div uus-animate="fadeIn"
      uus-duration="300ms"
      uus-easing="ease-out">
 2. JavaScript Animations
@@ -279,3 +285,4 @@ Plugin hooks
 Custom directives
 Event system
 Middleware support
+```

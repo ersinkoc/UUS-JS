@@ -11,7 +11,7 @@ describe('Bind Directive', () => {
     uus = new Uus();
     element = document.createElement('div');
     document.body.appendChild(element);
-    
+
     // Set up basic state
     uus.state.isVisible = true;
     uus.state.isDisabled = false;
@@ -26,12 +26,14 @@ describe('Bind Directive', () => {
       expression: 'isVisible',
       arg: undefined, // No attribute name
       modifiers: {},
-      value: 'isVisible'
+      value: 'isVisible',
     };
 
     bindDirective.bind!(element, binding, uus);
 
-    expect(consoleSpy).toHaveBeenCalledWith('Attribute name required for uus-bind');
+    expect(consoleSpy).toHaveBeenCalledWith(
+      'Attribute name required for uus-bind'
+    );
     consoleSpy.mockRestore();
   });
 
@@ -40,7 +42,7 @@ describe('Bind Directive', () => {
       expression: 'customId',
       arg: 'id',
       modifiers: {},
-      value: 'customId'
+      value: 'customId',
     };
 
     bindDirective.bind!(element, binding, uus);
@@ -53,7 +55,7 @@ describe('Bind Directive', () => {
       expression: 'isDisabled',
       arg: 'disabled',
       modifiers: {},
-      value: 'isDisabled'
+      value: 'isDisabled',
     };
 
     bindDirective.bind!(element, binding, uus);
@@ -72,7 +74,7 @@ describe('Bind Directive', () => {
       expression: 'falsyValue',
       arg: 'data-test',
       modifiers: {},
-      value: 'falsyValue'
+      value: 'falsyValue',
     };
 
     bindDirective.bind!(element, binding, uus);
@@ -87,7 +89,7 @@ describe('Bind Directive', () => {
       expression: 'nullValue',
       arg: 'data-test',
       modifiers: {},
-      value: 'nullValue'
+      value: 'nullValue',
     };
 
     bindDirective.bind!(element, binding, uus);
@@ -102,7 +104,7 @@ describe('Bind Directive', () => {
       expression: 'undefinedValue',
       arg: 'data-test',
       modifiers: {},
-      value: 'undefinedValue'
+      value: 'undefinedValue',
     };
 
     bindDirective.bind!(element, binding, uus);
@@ -117,7 +119,7 @@ describe('Bind Directive', () => {
       expression: 'classes',
       arg: 'class',
       modifiers: {},
-      value: 'classes'
+      value: 'classes',
     };
 
     bindDirective.bind!(element, binding, uus);
@@ -134,7 +136,7 @@ describe('Bind Directive', () => {
       expression: 'classString',
       arg: 'class',
       modifiers: {},
-      value: 'classString'
+      value: 'classString',
     };
 
     bindDirective.bind!(element, binding, uus);
@@ -143,13 +145,17 @@ describe('Bind Directive', () => {
   });
 
   it('should handle style binding with object syntax', () => {
-    uus.state.styles = { color: 'red', fontSize: '16px', backgroundColor: 'blue' };
+    uus.state.styles = {
+      color: 'red',
+      fontSize: '16px',
+      backgroundColor: 'blue',
+    };
 
     const binding = {
       expression: 'styles',
       arg: 'style',
       modifiers: {},
-      value: 'styles'
+      value: 'styles',
     };
 
     bindDirective.bind!(element, binding, uus);
@@ -166,7 +172,7 @@ describe('Bind Directive', () => {
       expression: 'styleString',
       arg: 'style',
       modifiers: {},
-      value: 'styleString'
+      value: 'styleString',
     };
 
     bindDirective.bind!(element, binding, uus);
@@ -181,7 +187,7 @@ describe('Bind Directive', () => {
       expression: 'camelStyles',
       arg: 'style',
       modifiers: {},
-      value: 'camelStyles'
+      value: 'camelStyles',
     };
 
     bindDirective.bind!(element, binding, uus);
@@ -198,7 +204,7 @@ describe('Bind Directive', () => {
       expression: 'tabIndex',
       arg: 'tabindex',
       modifiers: {},
-      value: 'tabIndex'
+      value: 'tabIndex',
     };
 
     bindDirective.bind!(element, binding, uus);
@@ -213,13 +219,15 @@ describe('Bind Directive', () => {
       expression: 'nonExistentProperty.value',
       arg: 'data-test',
       modifiers: {},
-      value: 'nonExistentProperty.value'
+      value: 'nonExistentProperty.value',
     };
 
     bindDirective.bind!(element, binding, uus);
 
     // The evaluator catches errors first, but bind directive has its own error handling
-    expect(consoleSpy).toHaveBeenCalledWith(expect.stringMatching(/Error (evaluating expression|binding attribute)/), expect.any(Error));
+    expect(consoleSpy).toHaveBeenCalledWith(
+      expect.stringContaining('[UUS_EVALUATION_ERROR]')
+    );
     consoleSpy.mockRestore();
   });
 
@@ -228,7 +236,7 @@ describe('Bind Directive', () => {
       expression: '',
       arg: 'data-test',
       modifiers: {},
-      value: ''
+      value: '',
     };
 
     bindDirective.bind!(element, binding, uus);
@@ -245,7 +253,7 @@ describe('Bind Directive', () => {
       expression: '\"item-\" + (count * multiplier)',
       arg: 'data-id',
       modifiers: {},
-      value: '\"item-\" + (count * multiplier)'
+      value: '\"item-\" + (count * multiplier)',
     };
 
     bindDirective.bind!(element, binding, uus);
@@ -261,7 +269,7 @@ describe('Bind Directive', () => {
       expression: 'showId ? id : null',
       arg: 'data-id',
       modifiers: {},
-      value: 'showId ? id : null'
+      value: 'showId ? id : null',
     };
 
     bindDirective.bind!(element, binding, uus);
@@ -276,7 +284,7 @@ describe('Bind Directive', () => {
       expression: 'isExpanded',
       arg: 'aria-expanded',
       modifiers: {},
-      value: 'isExpanded'
+      value: 'isExpanded',
     };
 
     bindDirective.bind!(element, binding, uus);
@@ -291,7 +299,7 @@ describe('Bind Directive', () => {
       expression: 'userId',
       arg: 'data-user-id',
       modifiers: {},
-      value: 'userId'
+      value: 'userId',
     };
 
     bindDirective.bind!(element, binding, uus);
@@ -304,15 +312,15 @@ describe('Bind Directive', () => {
       expression: 'customId',
       arg: 'id',
       modifiers: {},
-      value: 'customId'
+      value: 'customId',
     };
 
     bindDirective.bind!(element, binding, uus);
-    
+
     expect(uus.cleanups.has(element)).toBe(true);
-    
+
     bindDirective.unbind!(element, binding, uus);
-    
+
     expect(uus.cleanups.has(element)).toBe(false);
   });
 
@@ -321,7 +329,7 @@ describe('Bind Directive', () => {
       expression: 'customId',
       arg: 'id',
       modifiers: {},
-      value: 'customId'
+      value: 'customId',
     };
 
     // Call unbind without bind first
@@ -337,7 +345,7 @@ describe('Bind Directive', () => {
       expression: 'nullClassValue',
       arg: 'class',
       modifiers: {},
-      value: 'nullClassValue'
+      value: 'nullClassValue',
     };
 
     bindDirective.bind!(element, binding, uus);
@@ -352,7 +360,7 @@ describe('Bind Directive', () => {
       expression: 'nullStyleValue',
       arg: 'style',
       modifiers: {},
-      value: 'nullStyleValue'
+      value: 'nullStyleValue',
     };
 
     bindDirective.bind!(element, binding, uus);
@@ -367,7 +375,7 @@ describe('Bind Directive', () => {
       expression: 'mixedStyles',
       arg: 'style',
       modifiers: {},
-      value: 'mixedStyles'
+      value: 'mixedStyles',
     };
 
     bindDirective.bind!(element, binding, uus);
@@ -386,7 +394,7 @@ describe('Bind Directive', () => {
       expression: 'dynamicClasses',
       arg: 'class',
       modifiers: {},
-      value: 'dynamicClasses'
+      value: 'dynamicClasses',
     };
 
     bindDirective.bind!(element, binding, uus);
@@ -403,7 +411,7 @@ describe('Bind Directive', () => {
       expression: 'linkUrl',
       arg: 'href',
       modifiers: {},
-      value: 'linkUrl'
+      value: 'linkUrl',
     };
 
     const linkElement = document.createElement('a');

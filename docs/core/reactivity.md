@@ -27,13 +27,13 @@ const app = new Uus();
 app.state = reactive({
   user: {
     name: 'John',
-    age: 30
+    age: 30,
   },
   todos: [],
   settings: {
     theme: 'dark',
-    notifications: true
-  }
+    notifications: true,
+  },
 });
 
 // Changes are automatically tracked
@@ -94,7 +94,7 @@ Some operations need special handling:
 
 ```javascript
 const state = reactive({
-  obj: {}
+  obj: {},
 });
 
 // ❌ Won't be reactive:
@@ -114,7 +114,7 @@ Computed values automatically recalculate when dependencies change:
 const state = reactive({
   price: 100,
   quantity: 2,
-  tax: 0.08
+  tax: 0.08,
 });
 
 // Simple computed
@@ -125,7 +125,7 @@ const total = computed(() => {
 // Computed with multiple dependencies
 const finalPrice = computed(() => {
   const subtotal = state.price * state.quantity;
-  return subtotal + (subtotal * state.tax);
+  return subtotal + subtotal * state.tax;
 });
 
 console.log(total.value); // 200
@@ -134,6 +134,7 @@ console.log(total.value); // 300 (automatically updated)
 ```
 
 **Computed values are:**
+
 - **Lazy**: Only calculated when accessed
 - **Cached**: Recomputed only when dependencies change
 - **Read-only**: Cannot be directly assigned
@@ -141,7 +142,8 @@ console.log(total.value); // 300 (automatically updated)
 ### Computed in Templates
 
 ```html
-<div uus-state="{ 
+<div
+  uus-state="{ 
   items: [
     { name: 'Apple', price: 1.5, qty: 2 },
     { name: 'Banana', price: 0.8, qty: 5 }
@@ -149,12 +151,14 @@ console.log(total.value); // 300 (automatically updated)
   total: computed(() => 
     items.reduce((sum, item) => sum + item.price * item.qty, 0)
   )
-}">
+}"
+>
   <div uus-for="item in items">
-    <span uus-text="item.name"></span>: 
-    $<span uus-text="item.price * item.qty"></span>
+    <span uus-text="item.name"></span>: $<span
+      uus-text="item.price * item.qty"
+    ></span>
   </div>
-  <hr>
+  <hr />
   Total: $<span uus-text="total"></span>
 </div>
 ```
@@ -189,7 +193,7 @@ effect(() => {
   const timer = setInterval(() => {
     state.time = new Date().toLocaleTimeString();
   }, 1000);
-  
+
   // Cleanup function
   return () => {
     clearInterval(timer);
@@ -204,9 +208,9 @@ Watch specific sources for changes:
 ```javascript
 import { watch } from '@uusjs/core';
 
-const state = reactive({ 
+const state = reactive({
   query: '',
-  results: []
+  results: [],
 });
 
 // Watch a single source
@@ -227,17 +231,14 @@ watch(
   },
   {
     immediate: true, // Run immediately
-    deep: true // Deep watch objects
+    deep: true, // Deep watch objects
   }
 );
 
 // Watch multiple sources
-watch(
-  [() => state.page, () => state.filters],
-  ([page, filters]) => {
-    loadData(page, filters);
-  }
-);
+watch([() => state.page, () => state.filters], ([page, filters]) => {
+  loadData(page, filters);
+});
 ```
 
 ## Reactive Utilities
@@ -294,7 +295,7 @@ import { markRaw } from '@uusjs/core';
 
 const socket = markRaw(new WebSocket('ws://...'));
 const state = reactive({
-  socket // Won't be made reactive
+  socket, // Won't be made reactive
 });
 ```
 
@@ -307,41 +308,41 @@ const state = reactive({
 function createCounter() {
   const state = reactive({
     count: 0,
-    history: []
+    history: [],
   });
-  
+
   const increment = () => {
     state.count++;
     state.history.push({
       value: state.count,
-      time: Date.now()
+      time: Date.now(),
     });
   };
-  
+
   const decrement = () => {
     state.count--;
   };
-  
+
   const reset = () => {
     state.count = 0;
     state.history = [];
   };
-  
+
   return {
     state,
     increment,
     decrement,
-    reset
+    reset,
   };
 }
 
 // Use in template
 const counter = createCounter();
 app.state = counter.state;
-app.methods = { 
+app.methods = {
   increment: counter.increment,
   decrement: counter.decrement,
-  reset: counter.reset
+  reset: counter.reset,
 };
 ```
 
@@ -354,14 +355,14 @@ Create stores for shared state:
 export const userStore = reactive({
   user: null,
   isLoggedIn: computed(() => userStore.user !== null),
-  
+
   login(userData) {
     this.user = userData;
   },
-  
+
   logout() {
     this.user = null;
-  }
+  },
 });
 
 // Use in multiple components
@@ -369,7 +370,7 @@ import { userStore } from './store';
 
 app.state = {
   ...userStore,
-  localData: {}
+  localData: {},
 };
 ```
 
@@ -423,7 +424,7 @@ const chart = markRaw(new Chart(...));
 const state = reactive({
   userId: 1,
   userName: 'John',
-  userEmail: 'john@example.com'
+  userEmail: 'john@example.com',
 });
 
 // ❌ Avoid deep nesting when not needed
@@ -431,10 +432,10 @@ const state = reactive({
   user: {
     profile: {
       personal: {
-        name: 'John'
-      }
-    }
-  }
+        name: 'John',
+      },
+    },
+  },
 });
 ```
 
@@ -445,9 +446,7 @@ const state = reactive({
 state.fullName = state.firstName + ' ' + state.lastName;
 
 // ✅ Use computed
-const fullName = computed(() => 
-  state.firstName + ' ' + state.lastName
-);
+const fullName = computed(() => state.firstName + ' ' + state.lastName);
 ```
 
 ### 3. Avoid Side Effects in Computed
@@ -475,7 +474,7 @@ effect(() => {
 effect(() => {
   const handler = () => console.log('clicked');
   window.addEventListener('click', handler);
-  
+
   return () => {
     window.removeEventListener('click', handler);
   };
@@ -497,7 +496,7 @@ Object.defineProperty(state, 'debugCount', {
   get() {
     console.trace('Accessing count');
     return state.count;
-  }
+  },
 });
 ```
 
@@ -520,7 +519,7 @@ const state = reactive({
   isOpen: false,
   toggle() {
     this.isOpen = !this.isOpen;
-  }
+  },
 });
 ```
 
@@ -531,11 +530,11 @@ const state = reactive({
   loading: false,
   error: null,
   data: null,
-  
+
   async fetchData() {
     this.loading = true;
     this.error = null;
-    
+
     try {
       this.data = await api.getData();
     } catch (err) {
@@ -543,7 +542,7 @@ const state = reactive({
     } finally {
       this.loading = false;
     }
-  }
+  },
 });
 ```
 
@@ -553,11 +552,11 @@ const state = reactive({
 const formState = reactive({
   values: {
     name: '',
-    email: ''
+    email: '',
   },
   errors: {},
   touched: {},
-  
+
   validate() {
     this.errors = {};
     if (!this.values.name) {
@@ -567,7 +566,7 @@ const formState = reactive({
       this.errors.email = 'Invalid email';
     }
     return Object.keys(this.errors).length === 0;
-  }
+  },
 });
 ```
 

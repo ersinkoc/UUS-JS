@@ -77,11 +77,13 @@ Attach event listeners with optional modifiers:
 
 <!-- With modifiers -->
 <form uus-on:submit.prevent="handleSubmit()">
-<button uus-on:click.once="showAlert()">
-<input uus-on:keyup.enter="submit()">
+  <button uus-on:click.once="showAlert()">
+    <input uus-on:keyup.enter="submit()" />
 
-<!-- Access event object -->
-<input uus-on:input="value = $event.target.value">
+    <!-- Access event object -->
+    <input uus-on:input="value = $event.target.value" />
+  </button>
+</form>
 ```
 
 ## API Reference
@@ -93,6 +95,7 @@ const app = new Uus(config);
 ```
 
 **Config Options:**
+
 - `debug` (boolean): Enable debug logging
 - `prefix` (string): Custom directive prefix (default: 'uus-')
 
@@ -133,7 +136,7 @@ Set global configuration:
 ```javascript
 Uus.config({
   debug: true,
-  plugins: [plugin1, plugin2]
+  plugins: [plugin1, plugin2],
 });
 ```
 
@@ -148,9 +151,9 @@ const myPlugin = {
       name: 'custom',
       bind(el, binding, uus) {
         // Directive logic
-      }
+      },
     });
-  }
+  },
 };
 ```
 

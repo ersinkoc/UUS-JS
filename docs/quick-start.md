@@ -9,23 +9,23 @@ Create an HTML file and add:
 ```html
 <!DOCTYPE html>
 <html>
-<head>
-  <title>My First Uus.js App</title>
-</head>
-<body>
-  <!-- Your app -->
-  <div id="app" uus-state="{ message: 'Hello Uus.js!' }">
-    <h1 uus-text="message"></h1>
-    <input uus-model="message" placeholder="Change the message">
-  </div>
+  <head>
+    <title>My First Uus.js App</title>
+  </head>
+  <body>
+    <!-- Your app -->
+    <div id="app" uus-state="{ message: 'Hello Uus.js!' }">
+      <h1 uus-text="message"></h1>
+      <input uus-model="message" placeholder="Change the message" />
+    </div>
 
-  <!-- Include Uus.js -->
-  <script src="https://unpkg.com/@uusjs/core"></script>
-  <script>
-    // Initialize Uus.js
-    new Uus().mount('#app');
-  </script>
-</body>
+    <!-- Include Uus.js -->
+    <script src="https://unpkg.com/@uusjs/core"></script>
+    <script>
+      // Initialize Uus.js
+      new Uus().mount('#app');
+    </script>
+  </body>
 </html>
 ```
 
@@ -38,11 +38,11 @@ Let's build something more interactive:
 ```html
 <div id="app" uus-state="{ count: 0 }">
   <h2>Counter: <span uus-text="count">0</span></h2>
-  
+
   <button uus-on:click="count++">Increment</button>
   <button uus-on:click="count--">Decrement</button>
   <button uus-on:click="count = 0">Reset</button>
-  
+
   <p uus-show="count > 10">🎉 You've reached 10!</p>
   <p uus-show="count < 0">📉 Going negative!</p>
 </div>
@@ -53,15 +53,19 @@ Let's build something more interactive:
 A classic todo app in under 50 lines:
 
 ```html
-<div id="app" uus-state="{ 
+<div
+  id="app"
+  uus-state="{ 
   todos: [],
   newTodo: '',
   filter: 'all'
-}">
+}"
+>
   <h1>Todo List</h1>
-  
+
   <!-- Add todo form -->
-  <form uus-on:submit.prevent="
+  <form
+    uus-on:submit.prevent="
     if (newTodo.trim()) {
       todos.push({
         id: Date.now(),
@@ -70,34 +74,34 @@ A classic todo app in under 50 lines:
       });
       newTodo = '';
     }
-  ">
-    <input 
-      uus-model="newTodo" 
+  "
+  >
+    <input
+      uus-model="newTodo"
       placeholder="What needs to be done?"
       uus-on:keyup.escape="newTodo = ''"
-    >
+    />
     <button type="submit">Add</button>
   </form>
-  
+
   <!-- Filter buttons -->
   <div>
     <button uus-on:click="filter = 'all'">All</button>
     <button uus-on:click="filter = 'active'">Active</button>
     <button uus-on:click="filter = 'completed'">Completed</button>
   </div>
-  
+
   <!-- Todo list -->
   <ul>
-    <li uus-for="todo in todos.filter(t => 
+    <li
+      uus-for="todo in todos.filter(t => 
       filter === 'all' || 
       (filter === 'active' && !t.done) || 
       (filter === 'completed' && t.done)
-    )">
-      <input 
-        type="checkbox" 
-        uus-model="todo.done"
-      >
-      <span 
+    )"
+    >
+      <input type="checkbox" uus-model="todo.done" />
+      <span
         uus-text="todo.text"
         uus-style="{ textDecoration: todo.done ? 'line-through' : 'none' }"
       ></span>
@@ -106,11 +110,9 @@ A classic todo app in under 50 lines:
       </button>
     </li>
   </ul>
-  
+
   <!-- Stats -->
-  <p>
-    <span uus-text="todos.filter(t => !t.done).length"></span> items left
-  </p>
+  <p><span uus-text="todos.filter(t => !t.done).length"></span> items left</p>
 </div>
 ```
 
@@ -124,12 +126,8 @@ Make it smooth with the animate package:
 
 <div id="app" uus-state="{ show: false }">
   <button uus-on:click="show = !show">Toggle</button>
-  
-  <div 
-    uus-show="show"
-    uus-animate="fadeIn"
-    uus-animate-out="fadeOut"
-  >
+
+  <div uus-show="show" uus-animate="fadeIn" uus-animate-out="fadeOut">
     <h2>Animated Content!</h2>
     <p>This fades in and out smoothly.</p>
   </div>
@@ -147,12 +145,16 @@ Make it smooth with the animate package:
 Fetch data and display it:
 
 ```html
-<div id="app" uus-state="{ 
+<div
+  id="app"
+  uus-state="{ 
   users: [],
   loading: false,
   error: null
-}">
-  <button uus-on:click="
+}"
+>
+  <button
+    uus-on:click="
     loading = true;
     fetch('https://jsonplaceholder.typicode.com/users')
       .then(r => r.json())
@@ -164,13 +166,14 @@ Fetch data and display it:
         error = err.message;
         loading = false;
       });
-  ">
+  "
+  >
     Load Users
   </button>
-  
+
   <div uus-show="loading">Loading...</div>
   <div uus-show="error" uus-text="error"></div>
-  
+
   <ul uus-show="users.length > 0">
     <li uus-for="user in users" uus-text="user.name"></li>
   </ul>
@@ -185,39 +188,39 @@ Organize code with a component-like pattern:
 <div id="app"></div>
 
 <script>
-const app = new Uus();
+  const app = new Uus();
 
-// Define component state and methods
-app.state = reactive({
-  todos: [],
-  newTodo: '',
-  
-  addTodo() {
-    if (this.newTodo.trim()) {
-      this.todos.push({
-        id: Date.now(),
-        text: this.newTodo,
-        done: false
-      });
-      this.newTodo = '';
-    }
-  },
-  
-  removeTodo(id) {
-    this.todos = this.todos.filter(t => t.id !== id);
-  },
-  
-  toggleTodo(id) {
-    const todo = this.todos.find(t => t.id === id);
-    if (todo) todo.done = !todo.done;
-  }
-});
+  // Define component state and methods
+  app.state = reactive({
+    todos: [],
+    newTodo: '',
 
-// Mount to element
-app.mount('#app');
+    addTodo() {
+      if (this.newTodo.trim()) {
+        this.todos.push({
+          id: Date.now(),
+          text: this.newTodo,
+          done: false,
+        });
+        this.newTodo = '';
+      }
+    },
 
-// Add template
-document.getElementById('app').innerHTML = `
+    removeTodo(id) {
+      this.todos = this.todos.filter((t) => t.id !== id);
+    },
+
+    toggleTodo(id) {
+      const todo = this.todos.find((t) => t.id === id);
+      if (todo) todo.done = !todo.done;
+    },
+  });
+
+  // Mount to element
+  app.mount('#app');
+
+  // Add template
+  document.getElementById('app').innerHTML = `
   <h1>Todo App</h1>
   <form uus-on:submit.prevent="addTodo">
     <input uus-model="newTodo" placeholder="Add todo">
@@ -259,8 +262,9 @@ Congratulations! You've learned the basics of Uus.js. Here's what to explore nex
 ## Common Patterns
 
 ### Computed Values
+
 ```javascript
-uus-state="{ 
+uus-state="{
   price: 100,
   tax: 0.08,
   total: computed(() => price + (price * tax))
@@ -268,8 +272,9 @@ uus-state="{
 ```
 
 ### Method Calls
+
 ```javascript
-uus-state="{ 
+uus-state="{
   items: [],
   addItem(name) {
     this.items.push({ id: Date.now(), name });
@@ -278,6 +283,7 @@ uus-state="{
 ```
 
 ### Lifecycle Hooks
+
 ```javascript
 uus-component="
   onMount() {

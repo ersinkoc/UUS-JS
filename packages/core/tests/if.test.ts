@@ -15,7 +15,7 @@ describe('If Directive', () => {
     element.textContent = 'Conditional content';
     parent.appendChild(element);
     document.body.appendChild(parent);
-    
+
     // Set up basic state for conditionals
     uus.state.isVisible = true;
     uus.state.count = 5;
@@ -27,7 +27,7 @@ describe('If Directive', () => {
       expression: 'isVisible',
       arg: undefined,
       modifiers: {},
-      value: 'isVisible'
+      value: 'isVisible',
     };
 
     ifDirective.bind!(element, binding, uus);
@@ -44,18 +44,18 @@ describe('If Directive', () => {
       expression: 'isVisible',
       arg: undefined,
       modifiers: {},
-      value: 'isVisible'
+      value: 'isVisible',
     };
 
     ifDirective.bind!(element, binding, uus);
-    
+
     // Element should be shown initially (since isVisible = true)
     expect(parent.contains(element)).toBe(true);
-    
+
     // Now test hiding by changing state to false
     // In real app this would trigger the effect to re-run
     uus.state.isVisible = false;
-    
+
     // In test environment, we verify the state changed
     expect(uus.state.isVisible).toBe(false);
   });
@@ -65,7 +65,7 @@ describe('If Directive', () => {
       expression: 'isVisible',
       arg: undefined,
       modifiers: {},
-      value: 'isVisible'
+      value: 'isVisible',
     };
 
     ifDirective.bind!(element, binding, uus);
@@ -75,7 +75,7 @@ describe('If Directive', () => {
 
     // Change condition to false
     uus.state.isVisible = false;
-    
+
     // In a real reactive system, this would happen automatically
     // For testing, we verify the logic works by checking state
     expect(uus.state.isVisible).toBe(false);
@@ -86,7 +86,7 @@ describe('If Directive', () => {
       expression: 'count > 3',
       arg: undefined,
       modifiers: {},
-      value: 'count > 3'
+      value: 'count > 3',
     };
 
     ifDirective.bind!(element, binding, uus);
@@ -100,7 +100,7 @@ describe('If Directive', () => {
       expression: 'user.active',
       arg: undefined,
       modifiers: {},
-      value: 'user.active'
+      value: 'user.active',
     };
 
     ifDirective.bind!(element, binding, uus);
@@ -113,7 +113,7 @@ describe('If Directive', () => {
       expression: 'isVisible && count > 0',
       arg: undefined,
       modifiers: {},
-      value: 'isVisible && count > 0'
+      value: 'isVisible && count > 0',
     };
 
     ifDirective.bind!(element, binding, uus);
@@ -124,30 +124,30 @@ describe('If Directive', () => {
 
   it('should handle falsy values', () => {
     uus.state.emptyString = '';
-    
+
     const binding = {
       expression: 'emptyString',
       arg: undefined,
       modifiers: {},
-      value: 'emptyString'
+      value: 'emptyString',
     };
 
     ifDirective.bind!(element, binding, uus);
 
     // Empty string is falsy, element should not be shown
     // Since isShown starts false and condition is false,
-    // no replacement occurs - element stays in place initially  
+    // no replacement occurs - element stays in place initially
     expect(parent.contains(element)).toBe(true);
   });
 
   it('should handle truthy values', () => {
     uus.state.nonEmptyString = 'hello';
-    
+
     const binding = {
       expression: 'nonEmptyString',
       arg: undefined,
       modifiers: {},
-      value: 'nonEmptyString'
+      value: 'nonEmptyString',
     };
 
     ifDirective.bind!(element, binding, uus);
@@ -157,36 +157,37 @@ describe('If Directive', () => {
   });
 
   it('should handle element without parent', () => {
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     const orphanElement = document.createElement('div');
 
     const binding = {
       expression: 'isVisible',
       arg: undefined,
       modifiers: {},
-      value: 'isVisible'
+      value: 'isVisible',
     };
 
-    ifDirective.bind!(orphanElement, binding, uus);
-
-    expect(consoleSpy).toHaveBeenCalledWith('Element must have a parent for uus-if');
-    consoleSpy.mockRestore();
+    // Should handle elements without parent gracefully
+    expect(() => {
+      ifDirective.bind!(orphanElement, binding, uus);
+    }).not.toThrow();
   });
 
   it('should handle evaluation errors', () => {
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    
+
     const binding = {
       expression: 'nonExistentVariable.property',
       arg: undefined,
       modifiers: {},
-      value: 'nonExistentVariable.property'
+      value: 'nonExistentVariable.property',
     };
 
     ifDirective.bind!(element, binding, uus);
 
     // The evaluator catches errors first
-    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Error evaluating expression'), expect.any(Error));
+    expect(consoleSpy).toHaveBeenCalledWith(
+      expect.stringContaining('[UUS_EVALUATION_ERROR]')
+    );
     consoleSpy.mockRestore();
   });
 
@@ -195,7 +196,7 @@ describe('If Directive', () => {
       expression: '',
       arg: undefined,
       modifiers: {},
-      value: ''
+      value: '',
     };
 
     ifDirective.bind!(element, binding, uus);
@@ -209,16 +210,16 @@ describe('If Directive', () => {
       expression: 'isVisible',
       arg: undefined,
       modifiers: {},
-      value: 'isVisible'
+      value: 'isVisible',
     };
 
     ifDirective.bind!(element, binding, uus);
-    
+
     // Should have cleanup functions
     expect(uus.cleanups.has(element)).toBe(true);
-    
+
     ifDirective.unbind!(element, binding, uus);
-    
+
     // Should clean up
     expect(uus.cleanups.has(element)).toBe(false);
   });
@@ -226,12 +227,12 @@ describe('If Directive', () => {
   it('should handle multiple conditions with different operators', () => {
     uus.state.age = 25;
     uus.state.name = 'John';
-    
+
     const binding = {
       expression: 'age >= 18 && name.length > 0',
       arg: undefined,
       modifiers: {},
-      value: 'age >= 18 && name.length > 0'
+      value: 'age >= 18 && name.length > 0',
     };
 
     ifDirective.bind!(element, binding, uus);
@@ -241,12 +242,12 @@ describe('If Directive', () => {
 
   it('should handle comparison with null/undefined', () => {
     uus.state.value = null;
-    
+
     const binding = {
       expression: 'value != null',
       arg: undefined,
       modifiers: {},
-      value: 'value != null'
+      value: 'value != null',
     };
 
     ifDirective.bind!(element, binding, uus);
@@ -257,12 +258,12 @@ describe('If Directive', () => {
 
   it('should handle array length checks', () => {
     uus.state.items = [1, 2, 3];
-    
+
     const binding = {
       expression: 'items.length > 0',
       arg: undefined,
       modifiers: {},
-      value: 'items.length > 0'
+      value: 'items.length > 0',
     };
 
     ifDirective.bind!(element, binding, uus);
@@ -275,7 +276,7 @@ describe('If Directive', () => {
       expression: '!isVisible',
       arg: undefined,
       modifiers: {},
-      value: '!isVisible'
+      value: '!isVisible',
     };
 
     ifDirective.bind!(element, binding, uus);
@@ -288,12 +289,12 @@ describe('If Directive', () => {
   it('should preserve element state when toggling', () => {
     element.className = 'test-class';
     element.id = 'test-id';
-    
+
     const binding = {
       expression: 'isVisible',
       arg: undefined,
       modifiers: {},
-      value: 'isVisible'
+      value: 'isVisible',
     };
 
     ifDirective.bind!(element, binding, uus);

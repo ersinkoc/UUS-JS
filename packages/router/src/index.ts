@@ -4,5 +4,5 @@ export type {
   RouteMatch,
   RouterOptions,
   RouteGuard,
-  ScrollBehavior
+  ScrollBehavior,
 } from './types';

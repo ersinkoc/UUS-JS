@@ -2,7 +2,13 @@
   "name": "@uusjs/router",
   "version": "0.0.1",
   "description": "Router for Uus.js",
-  "keywords": ["uus", "uusjs", "router", "routing", "spa"],
+  "keywords": [
+    "uus",
+    "uusjs",
+    "router",
+    "routing",
+    "spa"
+  ],
   "homepage": "https://uusjs.dev",
   "bugs": {
     "url": "https://github.com/uus-js/uus/issues",

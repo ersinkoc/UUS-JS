@@ -12,7 +12,7 @@ describe('On Directive', () => {
     element = document.createElement('button');
     element.textContent = 'Click me';
     document.body.appendChild(element);
-    
+
     // Set up basic state
     uus.state.count = 0;
     uus.state.message = 'initial';
@@ -24,7 +24,7 @@ describe('On Directive', () => {
       expression: 'count++',
       arg: 'click',
       modifiers: {},
-      value: 'count++'
+      value: 'count++',
     };
 
     onDirective.bind!(element, binding, uus);
@@ -40,7 +40,7 @@ describe('On Directive', () => {
       expression: 'message = "hovered"',
       arg: 'mouseover',
       modifiers: {},
-      value: 'message = "hovered"'
+      value: 'message = "hovered"',
     };
 
     onDirective.bind!(element, mouseOverBinding, uus);
@@ -59,7 +59,7 @@ describe('On Directive', () => {
       expression: 'count++',
       arg: 'click',
       modifiers: { prevent: true },
-      value: 'count++'
+      value: 'count++',
     };
 
     onDirective.bind!(element, binding, uus);
@@ -79,7 +79,7 @@ describe('On Directive', () => {
       expression: 'count++',
       arg: 'click',
       modifiers: { stop: true },
-      value: 'count++'
+      value: 'count++',
     };
 
     onDirective.bind!(element, binding, uus);
@@ -99,7 +99,7 @@ describe('On Directive', () => {
       expression: 'count++',
       arg: 'click',
       modifiers: { prevent: true, stop: true },
-      value: 'count++'
+      value: 'count++',
     };
 
     onDirective.bind!(element, binding, uus);
@@ -118,7 +118,7 @@ describe('On Directive', () => {
       expression: 'count++',
       arg: 'click',
       modifiers: { once: true },
-      value: 'count++'
+      value: 'count++',
     };
 
     onDirective.bind!(element, binding, uus);
@@ -126,7 +126,7 @@ describe('On Directive', () => {
     // First click
     element.click();
     expect(uus.state.count).toBe(1);
-    
+
     // Verify event listener was removed
     expect(removeEventListenerSpy).toHaveBeenCalled();
 
@@ -142,7 +142,7 @@ describe('On Directive', () => {
       expression: 'count++',
       arg: 'click',
       modifiers: { capture: true },
-      value: 'count++'
+      value: 'count++',
     };
 
     onDirective.bind!(element, binding, uus);
@@ -161,7 +161,7 @@ describe('On Directive', () => {
       expression: 'count++',
       arg: 'click',
       modifiers: { passive: true },
-      value: 'count++'
+      value: 'count++',
     };
 
     onDirective.bind!(element, binding, uus);
@@ -178,7 +178,7 @@ describe('On Directive', () => {
       expression: 'message = $event.type',
       arg: 'click',
       modifiers: {},
-      value: 'message = $event.type'
+      value: 'message = $event.type',
     };
 
     onDirective.bind!(element, binding, uus);
@@ -193,7 +193,7 @@ describe('On Directive', () => {
       expression: 'message = $event.type',
       arg: 'click',
       modifiers: {},
-      value: 'message = $event.type'
+      value: 'message = $event.type',
     };
 
     onDirective.bind!(element, binding, uus);
@@ -211,7 +211,7 @@ describe('On Directive', () => {
       expression: 'count++',
       arg: undefined, // No event type
       modifiers: {},
-      value: 'count++'
+      value: 'count++',
     };
 
     onDirective.bind!(element, binding, uus);
@@ -227,7 +227,7 @@ describe('On Directive', () => {
       expression: 'nonExistentProperty.method()',
       arg: 'click',
       modifiers: {},
-      value: 'nonExistentProperty.method()'
+      value: 'nonExistentProperty.method()',
     };
 
     onDirective.bind!(element, binding, uus);
@@ -235,7 +235,9 @@ describe('On Directive', () => {
     element.click();
 
     // The evaluator catches errors first
-    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Error evaluating expression'), expect.any(Error));
+    expect(consoleSpy).toHaveBeenCalledWith(
+      expect.stringContaining('[UUS_EVALUATION_ERROR]')
+    );
     consoleSpy.mockRestore();
   });
 
@@ -244,7 +246,7 @@ describe('On Directive', () => {
       expression: '',
       arg: 'click',
       modifiers: {},
-      value: ''
+      value: '',
     };
 
     onDirective.bind!(element, binding, uus);
@@ -260,7 +262,7 @@ describe('On Directive', () => {
       expression: 'message = $event.target.tagName.toLowerCase()',
       arg: 'click',
       modifiers: {},
-      value: 'message = $event.target.tagName.toLowerCase()'
+      value: 'message = $event.target.tagName.toLowerCase()',
     };
 
     onDirective.bind!(element, binding, uus);
@@ -275,7 +277,7 @@ describe('On Directive', () => {
       expression: 'count = count > 5 ? 0 : count + 1',
       arg: 'click',
       modifiers: {},
-      value: 'count = count > 5 ? 0 : count + 1'
+      value: 'count = count > 5 ? 0 : count + 1',
     };
 
     onDirective.bind!(element, binding, uus);
@@ -296,15 +298,15 @@ describe('On Directive', () => {
       expression: 'count++',
       arg: 'click',
       modifiers: {},
-      value: 'count++'
+      value: 'count++',
     };
 
     onDirective.bind!(element, binding, uus);
-    
+
     expect(uus.cleanups.has(element)).toBe(true);
-    
+
     onDirective.unbind!(element, binding, uus);
-    
+
     expect(uus.cleanups.has(element)).toBe(false);
     expect(removeEventListenerSpy).toHaveBeenCalled();
   });
@@ -314,7 +316,7 @@ describe('On Directive', () => {
       expression: 'count++',
       arg: 'click',
       modifiers: {},
-      value: 'count++'
+      value: 'count++',
     };
 
     // Call unbind without bind first
@@ -331,7 +333,7 @@ describe('On Directive', () => {
       expression: 'message = $event.key',
       arg: 'keydown',
       modifiers: {},
-      value: 'message = $event.key'
+      value: 'message = $event.key',
     };
 
     onDirective.bind!(input, binding, uus);
@@ -350,14 +352,14 @@ describe('On Directive', () => {
       expression: 'clicked = true',
       arg: 'submit',
       modifiers: { prevent: true },
-      value: 'clicked = true'
+      value: 'clicked = true',
     };
 
     onDirective.bind!(form, binding, uus);
 
     const submitEvent = new Event('submit', { cancelable: true });
     const preventDefaultSpy = vi.spyOn(submitEvent, 'preventDefault');
-    
+
     form.dispatchEvent(submitEvent);
 
     expect(uus.state.clicked).toBe(true);
@@ -369,7 +371,7 @@ describe('On Directive', () => {
       expression: 'message = "custom event triggered"',
       arg: 'custom',
       modifiers: {},
-      value: 'message = "custom event triggered"'
+      value: 'message = "custom event triggered"',
     };
 
     onDirective.bind!(element, binding, uus);
@@ -390,7 +392,7 @@ describe('On Directive', () => {
       expression: 'updateMessage("method called")',
       arg: 'click',
       modifiers: {},
-      value: 'updateMessage("method called")'
+      value: 'updateMessage("method called")',
     };
 
     onDirective.bind!(element, binding, uus);
@@ -405,7 +407,7 @@ describe('On Directive', () => {
       expression: 'clicked = $event.bubbles',
       arg: 'click',
       modifiers: {},
-      value: 'clicked = $event.bubbles'
+      value: 'clicked = $event.bubbles',
     };
 
     onDirective.bind!(element, binding, uus);

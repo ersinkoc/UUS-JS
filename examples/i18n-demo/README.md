@@ -13,12 +13,14 @@ A comprehensive internationalization example built with UUS.js, demonstrating:
 ## Features
 
 ### 🌍 Language Support
+
 - **English** - Default language with comprehensive translations
 - **Turkish** - Full Turkish localization
 - **Arabic** - Right-to-left (RTL) with complex pluralization
 - **Spanish** - Spanish translations with proper grammar
 
 ### 🔄 Translation Features
+
 - Simple string translation
 - Variable interpolation with named placeholders
 - Complex pluralization rules
@@ -27,6 +29,7 @@ A comprehensive internationalization example built with UUS.js, demonstrating:
 - Missing translation fallbacks
 
 ### 📱 User Experience
+
 - Instant language switching
 - Automatic text direction (RTL/LTR)
 - Responsive design for all languages
@@ -48,30 +51,35 @@ npm run build
 ## Translation System
 
 ### Basic Translation
+
 ```html
 <h1 uus-text="t('title')"></h1>
 <!-- Renders: "UUS.js Internationalization Demo" in English -->
 ```
 
 ### Variable Interpolation
+
 ```html
 <span uus-text="t('examples.welcome', { name: userName })"></span>
 <!-- Renders: "Welcome, John!" with user input -->
 ```
 
 ### Pluralization
+
 ```html
 <span uus-text="tp('plurals.item', itemCount)"></span>
 <!-- Renders: "No items", "1 item", "5 items" based on count -->
 ```
 
 ### Number Formatting
+
 ```html
 <span uus-text="n(price, 'currency')"></span>
 <!-- Renders: "$1,234.56" in English, "1.234,56 $" in Turkish -->
 ```
 
 ### Date Formatting
+
 ```html
 <span uus-text="d(currentDate, 'long')"></span>
 <!-- Renders locale-appropriate date format -->
@@ -80,8 +88,11 @@ npm run build
 ## Implementation
 
 ### State Management
+
 ```html
-<div id="app" uus-state="{
+<div
+  id="app"
+  uus-state="{
   // Current locale
   currentLocale: 'en',
   
@@ -101,12 +112,14 @@ npm run build
   tp(key, count) {
     // Pluralization logic
   }
-}">
+}"
+></div>
 ```
 
 ### Language Switching
+
 ```html
-<button 
+<button
   uus-for="lang in languages"
   uus-on:click="changeLanguage(lang.code)"
   uus-class="{ active: currentLocale === lang.code }"
@@ -117,6 +130,7 @@ npm run build
 ```
 
 ### RTL/LTR Support
+
 ```javascript
 get isRTL() {
   return ['ar', 'he', 'fa'].includes(this.currentLocale);
@@ -132,6 +146,7 @@ changeLanguage(locale) {
 ## Translation Files
 
 ### English (en.json)
+
 ```json
 {
   "title": "UUS.js Internationalization Demo",
@@ -146,6 +161,7 @@ changeLanguage(locale) {
 ```
 
 ### Arabic (ar.json) with Complex Plurals
+
 ```json
 {
   "plurals": {
@@ -157,11 +173,13 @@ changeLanguage(locale) {
 ## Pluralization Rules
 
 ### English Pluralization
+
 - 0: "No items"
-- 1: "1 item" 
+- 1: "1 item"
 - 2+: "X items"
 
 ### Arabic Pluralization (Complex)
+
 - 0: لا توجد عناصر (No items)
 - 1: عنصر واحد (One item)
 - 2: عنصران (Two items)
@@ -170,6 +188,7 @@ changeLanguage(locale) {
 - 100+: عنصر (Other items)
 
 ### Turkish Pluralization
+
 - 0: Öğe yok (No items)
 - 1: 1 öğe (1 item)
 - 2+: X öğe (X items)
@@ -177,34 +196,38 @@ changeLanguage(locale) {
 ## Formatting Examples
 
 ### Currency Formatting
+
 ```javascript
 // English: $1,234.56
-// Turkish: 1.234,56 ₺ 
+// Turkish: 1.234,56 ₺
 // Arabic: ١٬٢٣٤٫٥٦ ﷼
 // Spanish: 1.234,56 €
-n(1234.56, 'currency')
+n(1234.56, 'currency');
 ```
 
 ### Date Formatting
+
 ```javascript
 // English: Monday, January 15, 2024 at 2:30 PM
 // Turkish: 15 Ocak 2024 Pazartesi 14:30
 // Arabic: الاثنين، 15 يناير 2024 في 2:30 م
 // Spanish: lunes, 15 de enero de 2024, 14:30
-d(new Date(), 'long')
+d(new Date(), 'long');
 ```
 
 ## Form Validation
 
 ### Translated Error Messages
+
 ```html
-<input uus-model="formData.email" type="email">
+<input uus-model="formData.email" type="email" />
 <div uus-show="!isValidEmail(formData.email) && showValidation" class="error">
   <span uus-text="t('examples.form_validation.email')"></span>
 </div>
 ```
 
 ### Validation Messages by Language
+
 - **English**: "Please enter a valid email address"
 - **Turkish**: "Lütfen geçerli bir e-posta adresi girin"
 - **Arabic**: "يرجى إدخال عنوان بريد إلكتروني صحيح"
@@ -221,11 +244,13 @@ d(new Date(), 'long')
 ## Customization
 
 ### Adding New Languages
+
 1. Create translation file in `src/locales/`
 2. Add language to the `languages` array
 3. Include RTL support if needed
 
 ### Custom Pluralization
+
 Modify the `tp()` method to support additional plural forms:
 
 ```javascript
@@ -237,6 +262,7 @@ tp(key, count) {
 ```
 
 ### Number Format Customization
+
 ```javascript
 n(number, format) {
   const locale = this.currentLocale;

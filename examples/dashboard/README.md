@@ -11,6 +11,7 @@ A comprehensive analytics dashboard built with UUS.js, featuring:
 ## Features
 
 ### 📊 Dashboard Pages
+
 - **Overview**: Key metrics, traffic charts, and performance summaries
 - **Analytics**: Detailed analysis with geographic data and conversion funnels
 - **Real-time**: Live user activity and event monitoring
@@ -18,6 +19,7 @@ A comprehensive analytics dashboard built with UUS.js, featuring:
 - **Settings**: User preferences and configuration options
 
 ### 📈 Data Visualization
+
 - Time-series line charts
 - Device breakdown statistics
 - Traffic source analysis
@@ -26,6 +28,7 @@ A comprehensive analytics dashboard built with UUS.js, featuring:
 - Real-time activity feed
 
 ### ⚡ Real-time Features
+
 - Live user count updates
 - Real-time event streaming
 - Activity feed with recent events
@@ -67,8 +70,11 @@ src/
 ## Implementation Highlights
 
 ### Reactive Analytics State
+
 ```html
-<div id="app" uus-state="{
+<div
+  id="app"
+  uus-state="{
   // Navigation state
   currentPage: 'overview',
   sidebarOpen: true,
@@ -90,10 +96,12 @@ src/
   formatNumber(num) {
     return new Intl.NumberFormat('en-US').format(num);
   }
-}">
+}"
+></div>
 ```
 
 ### Real-time Data Updates
+
 ```javascript
 // Simulate real-time updates in main.js
 setInterval(() => {
@@ -112,15 +120,16 @@ function updateDashboardData() {
 ```
 
 ### Custom Chart Rendering
+
 ```javascript
 export function createChart(containerId, data, type = 'visitors') {
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
-  
+
   // Draw background grid
   ctx.strokeStyle = '#e9ecef';
   // ... grid rendering
-  
+
   // Draw line chart
   ctx.strokeStyle = type === 'revenue' ? '#2ecc71' : '#3498db';
   ctx.lineWidth = 3;
@@ -129,11 +138,12 @@ export function createChart(containerId, data, type = 'visitors') {
 ```
 
 ### Page-based Chart Initialization
+
 ```javascript
 // In the navigateTo method within uus-state
 navigateTo(page) {
   this.currentPage = page;
-  
+
   // Initialize charts based on current page
   setTimeout(() => {
     if (page === 'overview') {
@@ -148,20 +158,20 @@ navigateTo(page) {
 ## Dashboard Components
 
 ### Stats Cards
+
 ```html
 <div class="stat-card">
   <div class="stat-icon">👥</div>
   <div class="stat-content">
     <div class="stat-label">Total Visitors</div>
     <div class="stat-value" uus-text="formatNumber(stats.totalVisitors)"></div>
-    <div class="stat-change positive">
-      ↑ 12.3% from last period
-    </div>
+    <div class="stat-change positive">↑ 12.3% from last period</div>
   </div>
 </div>
 ```
 
 ### Data Tables
+
 ```html
 <table class="data-table">
   <tbody>
@@ -179,12 +189,10 @@ navigateTo(page) {
 ```
 
 ### Real-time Events
+
 ```html
 <div class="events-list">
-  <div 
-    uus-for="event in realtimeData.recentEvents"
-    class="event-item"
-  >
+  <div uus-for="event in realtimeData.recentEvents" class="event-item">
     <div class="event-icon" uus-class="'event-' + event.type">
       <span uus-show="event.type === 'conversion'">💰</span>
     </div>
@@ -199,6 +207,7 @@ navigateTo(page) {
 ## Customization
 
 ### Adding New Metrics
+
 Extend the analytics data structure:
 
 ```javascript
@@ -211,6 +220,7 @@ export const summaryStats = {
 ```
 
 ### Custom Chart Types
+
 Create new chart renderers:
 
 ```javascript
@@ -220,11 +230,12 @@ export function createBarChart(containerId, data) {
 }
 
 export function createPieChart(containerId, data) {
-  // Custom pie chart implementation  
+  // Custom pie chart implementation
 }
 ```
 
 ### Theme Customization
+
 Modify CSS variables for styling:
 
 ```css
@@ -237,14 +248,17 @@ Modify CSS variables for styling:
 ```
 
 ### Real-time Integration
+
 Connect to actual analytics APIs:
 
 ```javascript
 // Replace mock data with real API calls
-app.use(sse({
-  url: '/api/analytics/stream',
-  auth: () => ({ token: getAuthToken() })
-}));
+app.use(
+  sse({
+    url: '/api/analytics/stream',
+    auth: () => ({ token: getAuthToken() }),
+  })
+);
 
 // Handle different event types
 app.$sse.on('pageview', updatePageViews);
@@ -257,6 +271,7 @@ app.$sse.on('user:join', updateActiveUsers);
 The dashboard supports multiple data integration patterns:
 
 ### REST API Integration
+
 ```javascript
 // Fetch data from REST endpoints
 async loadAnalytics() {
@@ -266,11 +281,14 @@ async loadAnalytics() {
 ```
 
 ### WebSocket Integration
+
 ```javascript
 // Real-time WebSocket updates
-app.use(websocket({
-  url: 'wss://analytics.example.com'
-}));
+app.use(
+  websocket({
+    url: 'wss://analytics.example.com',
+  })
+);
 
 app.$ws.on('metrics', (data) => {
   app.state.realtimeData = data;
@@ -278,6 +296,7 @@ app.$ws.on('metrics', (data) => {
 ```
 
 ### GraphQL Integration
+
 ```javascript
 // GraphQL queries for complex data
 const ANALYTICS_QUERY = `

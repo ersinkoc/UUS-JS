@@ -88,12 +88,14 @@ import { createForm } from '@uusjs/forms';
 const app = new Uus();
 
 // Add plugins
-app.use(createRouter({
-  routes: [
-    { path: '/', component: 'home' },
-    { path: '/about', component: 'about' }
-  ]
-}));
+app.use(
+  createRouter({
+    routes: [
+      { path: '/', component: 'home' },
+      { path: '/about', component: 'about' },
+    ],
+  })
+);
 
 app.use(createAnimate());
 
@@ -138,7 +140,7 @@ import { Uus } from '@uusjs/core';
 
 const app = new Uus();
 app.state = reactive({
-  message: 'Hello from Vite!'
+  message: 'Hello from Vite!',
 });
 app.mount('#app');
 ```
@@ -150,17 +152,17 @@ app.mount('#app');
 module.exports = {
   entry: './src/main.js',
   output: {
-    filename: 'bundle.js'
+    filename: 'bundle.js',
   },
   module: {
     rules: [
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        use: 'babel-loader'
-      }
-    ]
-  }
+        use: 'babel-loader',
+      },
+    ],
+  },
 };
 ```
 
@@ -182,9 +184,9 @@ export default {
   input: 'src/main.js',
   output: {
     file: 'dist/bundle.js',
-    format: 'iife'
+    format: 'iife',
   },
-  plugins: [nodeResolve()]
+  plugins: [nodeResolve()],
 };
 ```
 
@@ -205,7 +207,7 @@ const app = new Uus();
 // Type-safe state
 app.state = reactive<AppState>({
   count: 0,
-  message: 'Hello TypeScript!'
+  message: 'Hello TypeScript!',
 });
 
 // Type-safe refs
@@ -237,9 +239,7 @@ Uus.js can be added to existing applications:
 ```html
 <!-- In your existing app -->
 <div id="uus-widget" uus-state="{ count: 0 }">
-  <button uus-on:click="count++">
-    Count: <span uus-text="count">0</span>
-  </button>
+  <button uus-on:click="count++">Count: <span uus-text="count">0</span></button>
 </div>
 
 <script>
@@ -262,11 +262,11 @@ app2.mount('#widget2');
 ### With jQuery
 
 ```javascript
-$(document).ready(function() {
+$(document).ready(function () {
   // Initialize Uus after jQuery
   const app = new Uus();
   app.mount();
-  
+
   // They can work together
   $('#jquery-button').click(() => {
     app.state.message = 'Clicked from jQuery!';
@@ -303,6 +303,7 @@ if (process.env.NODE_ENV === 'production') {
 ## Browser Support & Polyfills
 
 ### Modern Browsers (Default)
+
 - Chrome/Edge 88+
 - Firefox 78+
 - Safari 14+
@@ -368,6 +369,7 @@ Now that you have Uus.js installed:
 ## Troubleshooting
 
 ### Module Not Found
+
 ```bash
 # Clear cache and reinstall
 rm -rf node_modules package-lock.json
@@ -375,12 +377,14 @@ npm install
 ```
 
 ### TypeScript Errors
+
 ```bash
 # Install types
 npm install --save-dev @types/node
 ```
 
 ### Build Errors
+
 ```javascript
 // Ensure correct import
 import { Uus } from '@uusjs/core'; // ✅

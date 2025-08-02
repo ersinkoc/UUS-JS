@@ -6,12 +6,12 @@ export default defineConfig({
     environment: 'happy-dom',
     globals: true,
     coverage: {
-      reporter: ['text', 'json', 'html']
-    }
+      reporter: ['text', 'json', 'html'],
+    },
   },
   resolve: {
     alias: {
-      '@uusjs/core': resolve(__dirname, '../core/src/index.ts')
-    }
-  }
+      '@uusjs/core': resolve(__dirname, '../core/src/index.ts'),
+    },
+  },
 });

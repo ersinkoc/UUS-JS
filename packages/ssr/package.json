@@ -2,7 +2,13 @@
   "name": "@uusjs/ssr",
   "version": "0.0.1",
   "description": "Server-side rendering for Uus.js",
-  "keywords": ["uus", "uusjs", "ssr", "server-rendering", "universal"],
+  "keywords": [
+    "uus",
+    "uusjs",
+    "ssr",
+    "server-rendering",
+    "universal"
+  ],
   "homepage": "https://uusjs.dev",
   "bugs": {
     "url": "https://github.com/uus-js/uus/issues",

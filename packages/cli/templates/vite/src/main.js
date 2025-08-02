@@ -53,9 +53,9 @@ const app = new Uus({
       '🎯 Reactive data binding',
       '🎨 Scoped styling',
       '📦 Optimized builds',
-      '🔧 Zero config'
-    ]
-  }
+      '🔧 Zero config',
+    ],
+  },
 });
 
 // Mount app

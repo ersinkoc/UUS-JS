@@ -1,0 +1,44 @@
+[build]
+  command = "pnpm build"
+  publish = "packages/core/dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+[[redirects]]
+  from = "/demos/dashboard"
+  to = "/examples/dashboard/dist/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/demos/ecommerce"
+  to = "/examples/ecommerce/dist/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/demos/i18n"
+  to = "/examples/i18n-demo/dist/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/demos/api-showcase"
+  to = "/examples/api-showcase/dist/index.html"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[headers]]
+  for = "*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

@@ -6,6 +6,7 @@
 ## Phase 1: Foundation (Weeks 1-3)
 
 ### Week 1: Project Setup
+
 - [ ] Create GitHub organization (github.com/uus-js)
 - [ ] Setup main monorepo repository
 - [ ] Configure pnpm workspaces
@@ -20,6 +21,7 @@
 - [ ] Create CODE_OF_CONDUCT.md
 
 ### Week 2: Core Reactive System
+
 - [ ] Implement Proxy-based reactivity
 - [ ] Create effect system
 - [ ] Implement computed properties
@@ -32,6 +34,7 @@
 - [ ] Document reactive API
 
 ### Week 3: Directive System
+
 - [ ] Design directive architecture
 - [ ] Implement directive parser
 - [ ] Create directive registry
@@ -53,6 +56,7 @@
 ## Phase 2: Event System & DOM (Weeks 4-5)
 
 ### Week 4: Event System
+
 - [ ] Design event architecture
 - [ ] Implement event delegation
 - [ ] Add event modifiers (.prevent, .stop, .once)
@@ -64,6 +68,7 @@
 - [ ] Add performance optimizations
 
 ### Week 5: DOM Operations
+
 - [ ] Create DOM abstraction layer
 - [ ] Implement efficient DOM updates
 - [ ] Add DOM diffing algorithm
@@ -76,6 +81,7 @@
 ## Phase 3: Core Features (Weeks 6-8)
 
 ### Week 6: Component System
+
 - [ ] Design component architecture
 - [ ] Implement component state
 - [ ] Add lifecycle hooks
@@ -86,6 +92,7 @@
 - [ ] Write component tests
 
 ### Week 7: Advanced Features
+
 - [ ] Implement transition system
 - [ ] Add animation queue
 - [ ] Create expression evaluator
@@ -96,6 +103,7 @@
 - [ ] Write integration tests
 
 ### Week 8: Performance & Optimization
+
 - [ ] Implement lazy loading
 - [ ] Add code splitting
 - [ ] Create build optimizations
@@ -108,6 +116,7 @@
 ## Phase 4: Router Package (Weeks 9-10)
 
 ### Week 9: Router Core
+
 - [ ] Create @uusjs/router package
 - [ ] Implement route matching
 - [ ] Add history management
@@ -118,6 +127,7 @@
 - [ ] Write router tests
 
 ### Week 10: Router Features
+
 - [ ] Add lazy route loading
 - [ ] Implement route transitions
 - [ ] Create scroll behavior
@@ -130,6 +140,7 @@
 ## Phase 5: Animation Package (Weeks 11-12)
 
 ### Week 11: Animation Core
+
 - [ ] Create @uusjs/animate package
 - [ ] Implement animation engine
 - [ ] Add spring physics
@@ -140,6 +151,7 @@
 - [ ] Write animation tests
 
 ### Week 12: Animation Features
+
 - [ ] Build animation presets
 - [ ] Add scroll animations
 - [ ] Implement parallax effects
@@ -152,6 +164,7 @@
 ## Phase 6: Form Package (Weeks 13-14)
 
 ### Week 13: Form Core
+
 - [ ] Create @uusjs/forms package
 - [ ] Implement form state
 - [ ] Add validation engine
@@ -162,6 +175,7 @@
 - [ ] Write form tests
 
 ### Week 14: Form Features
+
 - [ ] Add async validation
 - [ ] Implement field arrays
 - [ ] Create conditional fields
@@ -174,6 +188,7 @@
 ## Phase 7: DevTools & CLI (Weeks 15-16)
 
 ### Week 15: Developer Tools
+
 - [ ] Create @uusjs/devtools package
 - [ ] Build browser extension
 - [ ] Implement state inspector
@@ -184,6 +199,7 @@
 - [ ] Write DevTools tests
 
 ### Week 16: CLI & Templates
+
 - [ ] Create @uusjs/cli package
 - [ ] Implement project scaffolding
 - [ ] Add dev server
@@ -196,6 +212,7 @@
 ## Phase 8: Documentation (Weeks 17-18)
 
 ### Week 17: Documentation Site
+
 - [ ] Setup VitePress
 - [ ] Create site structure
 - [ ] Write getting started guide
@@ -206,6 +223,7 @@
 - [ ] Deploy to docs.uusjs.dev
 
 ### Week 18: Examples & Tutorials
+
 - [ ] Create example applications:
   - [ ] Todo app
   - [ ] Blog
@@ -221,6 +239,7 @@
 ## Phase 9: Testing & QA (Weeks 19-20)
 
 ### Week 19: Comprehensive Testing
+
 - [ ] Achieve 95%+ test coverage
 - [ ] Run cross-browser tests
 - [ ] Perform security audit
@@ -231,6 +250,7 @@
 - [ ] Test all examples
 
 ### Week 20: Final Polish
+
 - [ ] Fix all reported bugs
 - [ ] Optimize performance
 - [ ] Minimize bundle sizes
@@ -243,7 +263,8 @@
 ## Phase 10: Launch (Week 21)
 
 ### Launch Checklist
-- [ ] Publish to NPM (@uusjs/*)
+
+- [ ] Publish to NPM (@uusjs/\*)
 - [ ] Deploy documentation
 - [ ] Launch website (uusjs.dev)
 - [ ] Announce on:
@@ -263,6 +284,7 @@
 ## Post-Launch
 
 ### Ongoing Tasks
+
 - [ ] Weekly bug fixes
 - [ ] Monthly feature releases
 - [ ] Quarterly major updates
@@ -273,6 +295,7 @@
 - [ ] Partner integrations
 
 ### Success Metrics
+
 - [ ] 1,000 GitHub stars (1 month)
 - [ ] 5,000 NPM downloads/week (3 months)
 - [ ] 10,000 GitHub stars (6 months)
@@ -281,9 +304,11 @@
 - [ ] Enterprise adoption (5+ companies)
 
 ### Future Packages
+
 - @uusjs/ui - Component library
 - @uusjs/native - Mobile support
 - @uusjs/ssr - Server rendering
 - @uusjs/pwa - PWA utilities
 - @uusjs/graphql - GraphQL integration
 - @uusjs/state - Global state management
+```

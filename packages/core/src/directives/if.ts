@@ -1,67 +1,151 @@
-import type { Directive, UusInstance } from '../types';
+import type { Directive, ConditionalDirectiveBinding } from '../types';
 import { effect } from '../reactive';
 import { createSafeEvaluator } from '../evaluator';
+import { DirectiveError, ErrorCategory, ValidationError, validate } from '../errors';
+import { asDirectiveName, asExpressionString } from '../type-guards';
 
-export const ifDirective: Directive = {
-  name: 'if',
+export const ifDirective: Directive<ConditionalDirectiveBinding> = {
+  name: asDirectiveName('if'),
   bind(el, binding, uus) {
-    const evaluator = createSafeEvaluator(uus.state);
-    const comment = document.createComment('uus-if');
-    let parent = el.parentNode;
-    
-    if (!parent) {
-      console.error('Element must have a parent for uus-if');
-      return;
-    }
+    try {
+      // Validate inputs
+      validate('el', el, {
+        required: true,
+        custom: (value) => value instanceof HTMLElement ? true : 'Element must be an HTMLElement'
+      });
 
-    // Track if this is first run
-    let isFirstRun = true;
-    let isShown = true; // Element starts in DOM
-    
-    const cleanup = effect(() => {
-      try {
-        const shouldShow = evaluator(binding.expression || 'true');
-        
-        // Skip the first run to keep element in place initially
+      validate('binding', binding, {
+        required: true,
+        type: 'object'
+      });
+
+      if (!el.parentNode) {
+        throw new DirectiveError(
+          'if',
+          'bind',
+          new Error('Element must have a parent for uus-if directive'),
+          { element: el }
+        );
+      }
+
+      const evaluator = createSafeEvaluator(uus.state);
+      const comment = document.createComment('uus-if');
+      let parent = el.parentNode;
+
+      // Track if this is first run and current visibility state
+      let isFirstRun = true;
+      let isShown = true; // Element starts in DOM
+
+      const cleanup = effect(() => {
+        const context = {
+          element: el,
+          directive: 'if',
+          expression: binding.expression,
+          isFirstRun,
+          isShown
+        };
+
+        // Safely evaluate condition
+        const shouldShow = uus.errorHandler.safe(
+          () => {
+            const result = evaluator(binding.expression ? asExpressionString(binding.expression) : asExpressionString('true'));
+            return Boolean(result); // Ensure boolean result
+          },
+          ErrorCategory.EVALUATION,
+          context,
+          false // Default to false on evaluation error for safety
+        );
+
+        // Handle first run - need to check initial condition
         if (isFirstRun) {
           isFirstRun = false;
-          // Only update isShown if condition is false
-          if (!shouldShow) {
-            isShown = true; // Keep tracking that element is shown even though condition is false
+          // If condition is false on first run, hide the element
+          if (!shouldShow && isShown) {
+            if (el.parentNode) {
+              parent = el.parentNode;
+              parent.replaceChild(comment, el);
+              isShown = false;
+            }
           }
           return;
         }
-        
-        if (shouldShow && !isShown) {
-          // Show element - ensure we have the correct parent
-          if (comment.parentNode) {
-            parent = comment.parentNode;
-            parent.replaceChild(el, comment);
-            isShown = true;
-          }
-        } else if (!shouldShow && isShown) {
-          // Hide element - ensure element is in DOM
-          if (el.parentNode) {
-            parent = el.parentNode;
-            parent.replaceChild(comment, el);
-            isShown = false;
-          }
-        }
-      } catch (error) {
-        console.error('Error evaluating if condition:', error);
-      }
-    });
 
-    // Store cleanup function
-    const cleanups = uus.cleanups.get(el) || new Set();
-    cleanups.add(cleanup);
-    uus.cleanups.set(el, cleanups);
+        // Safely handle DOM manipulation
+        uus.errorHandler.safe(
+          () => {
+            if (shouldShow && !isShown) {
+              // Show element - ensure we have the correct parent
+              if (comment.parentNode) {
+                parent = comment.parentNode;
+                parent.replaceChild(el, comment);
+                isShown = true;
+              }
+            } else if (!shouldShow && isShown) {
+              // Hide element - ensure element is in DOM
+              if (el.parentNode) {
+                parent = el.parentNode;
+                parent.replaceChild(comment, el);
+                isShown = false;
+              }
+            }
+          },
+          ErrorCategory.DIRECTIVE,
+          { ...context, phase: 'dom-manipulation', shouldShow },
+          undefined
+        );
+      });
+
+      // Store cleanup function
+      const cleanups = uus.cleanups.get(el) || new Set();
+      cleanups.add(cleanup);
+      uus.cleanups.set(el, cleanups);
+
+    } catch (error) {
+      const directiveError = error instanceof DirectiveError ? error : new DirectiveError(
+        'if',
+        'bind',
+        error instanceof Error ? error : new Error(String(error)),
+        { element: el, expression: binding.expression }
+      );
+      uus.errorHandler.handle(directiveError);
+    }
   },
+  
   unbind(el, _, uus) {
-    const cleanups = uus.cleanups.get(el);
-    if (cleanups) {
-      cleanups.forEach((cleanup) => cleanup());
-      uus.cleanups.delete(el);
+    try {
+      const cleanups = uus.cleanups.get(el);
+      if (cleanups) {
+        cleanups.forEach((cleanup) => {
+          uus.errorHandler.safe(
+            () => cleanup(),
+            ErrorCategory.DIRECTIVE,
+            { element: el, directive: 'if', phase: 'unbind' },
+            undefined
+          );
+        });
+        uus.cleanups.delete(el);
+      }
+
+      // Ensure element is back in DOM if it was hidden
+      uus.errorHandler.safe(
+        () => {
+          const comment = el.parentNode?.previousSibling;
+          if (comment && comment.nodeType === Node.COMMENT_NODE && 
+              comment.textContent === 'uus-if') {
+            comment.parentNode?.replaceChild(el, comment);
+          }
+        },
+        ErrorCategory.DIRECTIVE,
+        { element: el, directive: 'if', phase: 'cleanup-dom' },
+        undefined
+      );
+
+    } catch (error) {
+      uus.errorHandler.handleGenericError(
+        error instanceof Error ? error : new Error(String(error)),
+        ErrorCategory.DIRECTIVE,
+        { element: el, directive: 'if', phase: 'unbind' }
+      );
     }
   },
 };

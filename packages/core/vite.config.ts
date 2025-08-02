@@ -11,29 +11,29 @@ export default defineConfig({
         const formatMap = {
           es: 'index.js',
           cjs: 'index.cjs',
-          umd: 'uus.min.js'
+          umd: 'uus.min.js',
         };
         return formatMap[format] || 'index.js';
-      }
+      },
     },
     rollupOptions: {
       output: {
-        exports: 'named'
-      }
+        exports: 'named',
+      },
     },
     minify: 'terser',
     terserOptions: {
       compress: {
         drop_console: true,
-        drop_debugger: true
-      }
-    }
+        drop_debugger: true,
+      },
+    },
   },
   test: {
     environment: 'happy-dom',
     coverage: {
       reporter: ['text', 'json', 'html'],
-      exclude: ['node_modules/', 'tests/']
-    }
-  }
+      exclude: ['node_modules/', 'tests/'],
+    },
+  },
 });

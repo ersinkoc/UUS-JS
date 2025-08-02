@@ -1,10 +1,10 @@
 import type { Uus } from '@uusjs/core';
-import type { 
-  RealtimeOptions, 
-  RealtimePlugin, 
+import type {
+  RealtimeOptions,
+  RealtimePlugin,
   RealtimeConnection,
   WebSocketOptions,
-  SSEOptions
+  SSEOptions,
 } from './types';
 import { createWebSocket, wsDirective } from './websocket';
 import { createSSE, sseDirective } from './sse';
@@ -24,57 +24,61 @@ export function createRealtime(
   options: RealtimeOptions = {}
 ): RealtimePlugin {
   let connection: RealtimeConnection;
-  
+
   switch (type) {
     case 'websocket':
       connection = createWebSocket(options as WebSocketOptions);
       break;
-      
+
     case 'sse':
       connection = createSSE(options as SSEOptions);
       break;
-      
+
     case 'socketio':
       connection = createSocketIO(options);
       break;
-      
+
     default:
       throw new Error(`Unknown realtime type: ${type}`);
   }
-  
+
   return {
     connection,
-    
+
     install(app: Uus) {
       // Add connection to app
       (app as any)[`$${type === 'socketio' ? 'io' : type}`] = connection;
-      
+
       // Auto-connect
-      connection.connect().catch(error => {
+      connection.connect().catch((error) => {
         console.error(`Failed to connect ${type}:`, error);
       });
-      
+
       // Register directives
       switch (type) {
         case 'websocket':
           app.directive('ws', wsDirective);
           break;
-          
+
         case 'sse':
           app.directive('sse', sseDirective);
           break;
-          
+
         case 'socketio':
           app.directive('io', ioDirective);
           break;
       }
-      
+
       // Add reactive connection state
       app.state.$realtime = {
-        get connected() { return connection.connected; },
-        get connecting() { return connection.connecting; }
+        get connected() {
+          return connection.connected;
+        },
+        get connecting() {
+          return connection.connecting;
+        },
       };
-    }
+    },
   };
 }
 

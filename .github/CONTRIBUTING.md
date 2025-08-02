@@ -46,17 +46,20 @@ Enhancement suggestions are welcome! Please:
 ### Getting Started
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/uus-js/uus.git
    cd uus
    ```
 
 2. Install dependencies:
+
    ```bash
    pnpm install
    ```
 
 3. Build all packages:
+
    ```bash
    pnpm build
    ```
@@ -117,6 +120,7 @@ We follow the [Conventional Commits](https://www.conventionalcommits.org/) speci
 - `chore:` Build process or auxiliary tool changes
 
 Examples:
+
 ```
 feat(core): add watch function to reactive system
 fix(router): handle special characters in route params
@@ -128,6 +132,7 @@ docs: update installation guide
 We use [Changesets](https://github.com/changesets/changesets) for version management:
 
 1. Create a changeset:
+
    ```bash
    pnpm changeset
    ```
@@ -152,6 +157,7 @@ We use [Changesets](https://github.com/changesets/changesets) for version manage
 ## Recognition
 
 Contributors will be recognized in:
+
 - Our README contributors section
 - The official documentation
 - Release notes

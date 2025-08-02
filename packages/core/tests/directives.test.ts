@@ -65,7 +65,7 @@ describe('Directives', () => {
 
       app.mount(container);
       const button = container.querySelector('#btn') as HTMLButtonElement;
-      
+
       expect(app.state.clicked).toBe(false);
       button.click();
       expect(app.state.clicked).toBe(true);
@@ -83,7 +83,7 @@ describe('Directives', () => {
       app.mount(container);
       const form = container.querySelector('form') as HTMLFormElement;
       const event = new Event('submit', { cancelable: true });
-      
+
       form.dispatchEvent(event);
       expect(event.defaultPrevented).toBe(true);
       expect(app.state.submitted).toBe(true);
@@ -98,7 +98,7 @@ describe('Directives', () => {
 
       app.mount(container);
       const button = container.querySelector('#btn') as HTMLButtonElement;
-      
+
       expect(app.state.count).toBe(0);
       button.click();
       expect(app.state.count).toBe(1);
@@ -115,7 +115,7 @@ describe('Directives', () => {
 
       app.mount(container);
       const input = container.querySelector('input') as HTMLInputElement;
-      
+
       input.value = 'test';
       input.dispatchEvent(new Event('input'));
       expect(app.state.value).toBe('test');
@@ -147,7 +147,7 @@ describe('Directives', () => {
       app.mount(container);
       const parentSpan = container.querySelector('#parent');
       const childSpan = container.querySelector('#child');
-      
+
       expect(parentSpan?.textContent).toBe('A');
       expect(childSpan?.textContent).toBe('B');
     });
@@ -159,7 +159,9 @@ describe('Directives', () => {
       `;
 
       // Should log error but not throw
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleSpy = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
       app.mount(container);
       expect(consoleSpy).toHaveBeenCalled();
       consoleSpy.mockRestore();
@@ -176,7 +178,7 @@ describe('Directives', () => {
 
       app.mount(container);
       const input = container.querySelector('input') as HTMLInputElement;
-      
+
       expect(input.id).toBe('test-id');
       expect(input.hasAttribute('disabled')).toBe(false);
     });
@@ -190,9 +192,9 @@ describe('Directives', () => {
 
       app.mount(container);
       const span = container.querySelector('#target') as HTMLSpanElement;
-      
+
       expect(span.title).toBe('initial');
-      
+
       span.click();
       expect(span.title).toBe('updated');
     });
@@ -206,7 +208,7 @@ describe('Directives', () => {
 
       app.mount(container);
       const div = container.querySelector('#target') as HTMLDivElement;
-      
+
       expect(div.classList.contains('active')).toBe(true);
       expect(div.classList.contains('disabled')).toBe(false);
     });
@@ -220,7 +222,7 @@ describe('Directives', () => {
 
       app.mount(container);
       const div = container.querySelector('#target') as HTMLDivElement;
-      
+
       expect(div.className).toBe('my-class other-class');
     });
 
@@ -233,7 +235,7 @@ describe('Directives', () => {
 
       app.mount(container);
       const div = container.querySelector('#target') as HTMLDivElement;
-      
+
       expect(div.style.color).toBe('red');
       expect(div.style.fontSize).toBe('16px');
     });
@@ -247,7 +249,7 @@ describe('Directives', () => {
 
       app.mount(container);
       const div = container.querySelector('#target') as HTMLDivElement;
-      
+
       expect(div.getAttribute('style')).toBe('color: blue; font-size: 18px;');
     });
 
@@ -260,7 +262,7 @@ describe('Directives', () => {
 
       app.mount(container);
       const input = container.querySelector('#target') as HTMLInputElement;
-      
+
       expect(input.hasAttribute('placeholder')).toBe(false);
     });
 
@@ -271,9 +273,13 @@ describe('Directives', () => {
         </div>
       `;
 
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleSpy = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
       app.mount(container);
-      expect(consoleSpy).toHaveBeenCalledWith('Attribute name required for uus-bind');
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'Attribute name required for uus-bind'
+      );
       consoleSpy.mockRestore();
     });
 
@@ -284,7 +290,9 @@ describe('Directives', () => {
         </div>
       `;
 
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleSpy = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
       app.mount(container);
       expect(consoleSpy).toHaveBeenCalled();
       consoleSpy.mockRestore();
@@ -301,7 +309,7 @@ describe('Directives', () => {
 
       app.mount(container);
       const div = container.querySelector('#target') as HTMLDivElement;
-      
+
       // HTML is rendered normally
       expect(div.innerHTML).toBe('<strong>Bold text</strong>');
     });
@@ -317,9 +325,9 @@ describe('Directives', () => {
       app.mount(container);
       const div = container.querySelector('#target') as HTMLDivElement;
       const button = container.querySelector('#update') as HTMLButtonElement;
-      
+
       expect(div.innerHTML).toBe('<em>Initial</em>');
-      
+
       button.click();
       expect(div.innerHTML).toBe('<u>Updated</u>');
     });
@@ -333,7 +341,7 @@ describe('Directives', () => {
 
       app.mount(container);
       const div = container.querySelector('#target') as HTMLDivElement;
-      
+
       // null values are converted to empty string in sanitization
       expect(div.innerHTML).toBe('');
     });
@@ -347,7 +355,7 @@ describe('Directives', () => {
 
       app.mount(container);
       const div = container.querySelector('#target') as HTMLDivElement;
-      
+
       // Script tags should be filtered out
       expect(div.innerHTML).not.toContain('<script>');
     });
@@ -363,7 +371,7 @@ describe('Directives', () => {
 
       app.mount(container);
       const span = container.querySelector('#target') as HTMLElement;
-      
+
       expect(span.style.display).not.toBe('none');
     });
 
@@ -376,7 +384,7 @@ describe('Directives', () => {
 
       app.mount(container);
       const span = container.querySelector('#target') as HTMLElement;
-      
+
       expect(span.style.display).toBe('none');
     });
 
@@ -389,7 +397,7 @@ describe('Directives', () => {
 
       app.mount(container);
       const span = container.querySelector('#target') as HTMLElement;
-      
+
       expect(span.style.display).toBe('inline-block');
     });
 
@@ -400,7 +408,9 @@ describe('Directives', () => {
         </div>
       `;
 
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleSpy = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
       app.mount(container);
       expect(consoleSpy).toHaveBeenCalled();
       consoleSpy.mockRestore();
@@ -417,7 +427,7 @@ describe('Directives', () => {
 
       app.mount(container);
       const div = container.querySelector('#target') as HTMLDivElement;
-      
+
       expect(div.classList.contains('active')).toBe(true);
       expect(div.classList.contains('disabled')).toBe(false);
     });
@@ -431,7 +441,7 @@ describe('Directives', () => {
 
       app.mount(container);
       const div = container.querySelector('#target') as HTMLDivElement;
-      
+
       expect(div.className).toContain('foo');
       expect(div.className).toContain('bar');
     });
@@ -443,7 +453,9 @@ describe('Directives', () => {
         </div>
       `;
 
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleSpy = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
       app.mount(container);
       // Should not throw, just handle gracefully
       consoleSpy.mockRestore();

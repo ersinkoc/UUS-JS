@@ -11,7 +11,7 @@ describe('Class Directive', () => {
     uus = new Uus();
     element = document.createElement('div');
     document.body.appendChild(element);
-    
+
     // Set up basic state
     uus.state.isActive = true;
     uus.state.isDisabled = false;
@@ -24,7 +24,7 @@ describe('Class Directive', () => {
       expression: '{ active: isActive, disabled: isDisabled }',
       arg: undefined,
       modifiers: {},
-      value: '{ active: isActive, disabled: isDisabled }'
+      value: '{ active: isActive, disabled: isDisabled }',
     };
 
     classDirective.bind!(element, binding, uus);
@@ -38,7 +38,7 @@ describe('Class Directive', () => {
       expression: '"btn btn-primary active"',
       arg: undefined,
       modifiers: {},
-      value: '"btn btn-primary active"'
+      value: '"btn btn-primary active"',
     };
 
     classDirective.bind!(element, binding, uus);
@@ -55,14 +55,14 @@ describe('Class Directive', () => {
       expression: 'classes',
       arg: undefined,
       modifiers: {},
-      value: 'classes'
+      value: 'classes',
     };
 
     classDirective.bind!(element, binding, uus);
 
     // Arrays are treated as objects, so indices with truthy values get added as class names
     expect(element.classList.contains('0')).toBe(true); // index '0' has truthy value 'btn'
-    expect(element.classList.contains('1')).toBe(true); // index '1' has truthy value 'btn-large' 
+    expect(element.classList.contains('1')).toBe(true); // index '1' has truthy value 'btn-large'
     expect(element.classList.contains('2')).toBe(true); // index '2' has truthy value 'btn-success'
     expect(element.classList.contains('5')).toBe(true); // index '5' has truthy value 'final'
     expect(element.classList.contains('3')).toBe(false); // index '3' has falsy value ''
@@ -76,7 +76,7 @@ describe('Class Directive', () => {
       expression: '{ added: true }',
       arg: undefined,
       modifiers: {},
-      value: '{ added: true }'
+      value: '{ added: true }',
     };
 
     classDirective.bind!(element, binding, uus);
@@ -91,7 +91,7 @@ describe('Class Directive', () => {
       expression: '{ [theme]: true, [status]: isActive }',
       arg: undefined,
       modifiers: {},
-      value: '{ [theme]: true, [status]: isActive }'
+      value: '{ [theme]: true, [status]: isActive }',
     };
 
     classDirective.bind!(element, binding, uus);
@@ -102,10 +102,12 @@ describe('Class Directive', () => {
 
   it('should handle conditional classes', () => {
     const binding = {
-      expression: '{ "theme-dark": theme === "dark", "is-loading": status === "loading" }',
+      expression:
+        '{ "theme-dark": theme === "dark", "is-loading": status === "loading" }',
       arg: undefined,
       modifiers: {},
-      value: '{ "theme-dark": theme === "dark", "is-loading": status === "loading" }'
+      value:
+        '{ "theme-dark": theme === "dark", "is-loading": status === "loading" }',
     };
 
     classDirective.bind!(element, binding, uus);
@@ -121,7 +123,7 @@ describe('Class Directive', () => {
       expression: '{ removable: isActive }',
       arg: undefined,
       modifiers: {},
-      value: '{ removable: isActive }'
+      value: '{ removable: isActive }',
     };
 
     classDirective.bind!(element, binding, uus);
@@ -143,7 +145,7 @@ describe('Class Directive', () => {
       expression: '""',
       arg: undefined,
       modifiers: {},
-      value: '""'
+      value: '""',
     };
 
     classDirective.bind!(element, binding, uus);
@@ -157,7 +159,7 @@ describe('Class Directive', () => {
       expression: '"  class1    class2  class3  "',
       arg: undefined,
       modifiers: {},
-      value: '"  class1    class2  class3  "'
+      value: '"  class1    class2  class3  "',
     };
 
     classDirective.bind!(element, binding, uus);
@@ -169,13 +171,21 @@ describe('Class Directive', () => {
   });
 
   it('should handle arrays with falsy values (processed as objects)', () => {
-    uus.state.mixedArray = ['valid-class', '', null, undefined, 'another-class', false, 0];
+    uus.state.mixedArray = [
+      'valid-class',
+      '',
+      null,
+      undefined,
+      'another-class',
+      false,
+      0,
+    ];
 
     const binding = {
       expression: 'mixedArray',
       arg: undefined,
       modifiers: {},
-      value: 'mixedArray'
+      value: 'mixedArray',
     };
 
     classDirective.bind!(element, binding, uus);
@@ -195,7 +205,7 @@ describe('Class Directive', () => {
       expression: '{ "high-count": count > 3, "low-count": count <= 3 }',
       arg: undefined,
       modifiers: {},
-      value: '{ "high-count": count > 3, "low-count": count <= 3 }'
+      value: '{ "high-count": count > 3, "low-count": count <= 3 }',
     };
 
     classDirective.bind!(element, binding, uus);
@@ -212,7 +222,7 @@ describe('Class Directive', () => {
       expression: 'nullValue || undefinedValue || "fallback-class"',
       arg: undefined,
       modifiers: {},
-      value: 'nullValue || undefinedValue || "fallback-class"'
+      value: 'nullValue || undefinedValue || "fallback-class"',
     };
 
     classDirective.bind!(element, binding, uus);
@@ -227,13 +237,15 @@ describe('Class Directive', () => {
       expression: 'nonExistentProperty.classes',
       arg: undefined,
       modifiers: {},
-      value: 'nonExistentProperty.classes'
+      value: 'nonExistentProperty.classes',
     };
 
     classDirective.bind!(element, binding, uus);
 
     // The evaluator catches errors and returns undefined
-    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Error evaluating expression'), expect.any(Error));
+    expect(consoleSpy).toHaveBeenCalledWith(
+      expect.stringContaining('[UUS_EVALUATION_ERROR]')
+    );
     consoleSpy.mockRestore();
   });
 
@@ -242,7 +254,7 @@ describe('Class Directive', () => {
       expression: '{}',
       arg: undefined,
       modifiers: {},
-      value: '{}'
+      value: '{}',
     };
 
     classDirective.bind!(element, binding, uus);
@@ -258,7 +270,7 @@ describe('Class Directive', () => {
       expression: 'showClass ? "visible" : "hidden"',
       arg: undefined,
       modifiers: {},
-      value: 'showClass ? "visible" : "hidden"'
+      value: 'showClass ? "visible" : "hidden"',
     };
 
     classDirective.bind!(element, binding, uus);
@@ -274,7 +286,7 @@ describe('Class Directive', () => {
       expression: '"priority-" + priority',
       arg: undefined,
       modifiers: {},
-      value: '"priority-" + priority'
+      value: '"priority-" + priority',
     };
 
     classDirective.bind!(element, binding, uus);
@@ -287,15 +299,15 @@ describe('Class Directive', () => {
       expression: '{ test: true }',
       arg: undefined,
       modifiers: {},
-      value: '{ test: true }'
+      value: '{ test: true }',
     };
 
     classDirective.bind!(element, binding, uus);
-    
+
     expect(uus.cleanups.has(element)).toBe(true);
-    
+
     classDirective.unbind!(element, binding, uus);
-    
+
     expect(uus.cleanups.has(element)).toBe(false);
   });
 
@@ -304,7 +316,7 @@ describe('Class Directive', () => {
       expression: '{ test: true }',
       arg: undefined,
       modifiers: {},
-      value: '{ test: true }'
+      value: '{ test: true }',
     };
 
     // Call unbind without bind first
@@ -320,7 +332,7 @@ describe('Class Directive', () => {
       expression: '{ dynamic: isActive }',
       arg: undefined,
       modifiers: {},
-      value: '{ dynamic: isActive }'
+      value: '{ dynamic: isActive }',
     };
 
     classDirective.bind!(element, binding, uus);
@@ -333,10 +345,12 @@ describe('Class Directive', () => {
 
   it('should handle mixed class types in expression', () => {
     const binding = {
-      expression: 'isActive ? { active: true, ready: true } : ["inactive", "pending"]',
+      expression:
+        'isActive ? { active: true, ready: true } : ["inactive", "pending"]',
       arg: undefined,
       modifiers: {},
-      value: 'isActive ? { active: true, ready: true } : ["inactive", "pending"]'
+      value:
+        'isActive ? { active: true, ready: true } : ["inactive", "pending"]',
     };
 
     classDirective.bind!(element, binding, uus);
@@ -350,10 +364,12 @@ describe('Class Directive', () => {
 
   it('should handle class names with special characters', () => {
     const binding = {
-      expression: '{ "btn-primary": true, "has_underscores": true, "with-123": true }',
+      expression:
+        '{ "btn-primary": true, "has_underscores": true, "with-123": true }',
       arg: undefined,
       modifiers: {},
-      value: '{ "btn-primary": true, "has_underscores": true, "with-123": true }'
+      value:
+        '{ "btn-primary": true, "has_underscores": true, "with-123": true }',
     };
 
     classDirective.bind!(element, binding, uus);
@@ -368,7 +384,7 @@ describe('Class Directive', () => {
       expression: '',
       arg: undefined,
       modifiers: {},
-      value: ''
+      value: '',
     };
 
     classDirective.bind!(element, binding, uus);

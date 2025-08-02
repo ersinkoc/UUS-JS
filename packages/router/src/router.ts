@@ -4,7 +4,7 @@ import type {
   RouteMatch,
   RouterOptions,
   RouteGuard,
-  Router as RouterInterface
+  Router as RouterInterface,
 } from './types';
 import { RouteMatcher } from './matcher';
 import { History, HashHistory, HTML5History } from './history';
@@ -13,20 +13,22 @@ export class Router implements RouterInterface {
   private matcher: RouteMatcher;
   private history: History;
   private guards: RouteGuard[] = [];
-  private afterHooks: ((to: RouteMatch, from: RouteMatch | null) => void)[] = [];
+  private afterHooks: ((to: RouteMatch, from: RouteMatch | null) => void)[] =
+    [];
   public currentRoute: RouteMatch | null = null;
   private scrollBehavior?: RouterOptions['scrollBehavior'];
 
   constructor(options: RouterOptions) {
     this.matcher = new RouteMatcher(options.routes);
-    this.history = options.mode === 'history' 
-      ? new HTML5History(options.base)
-      : new HashHistory();
+    this.history =
+      options.mode === 'history'
+        ? new HTML5History(options.base)
+        : new HashHistory();
     this.scrollBehavior = options.scrollBehavior;
-    
+
     // Initialize current route
     this.currentRoute = this.resolve(this.history.current);
-    
+
     // Listen for history changes
     this.history.listen((path) => {
       this.navigate(path);
@@ -73,7 +75,7 @@ export class Router implements RouterInterface {
     }
 
     const from = this.currentRoute;
-    
+
     // Run navigation guards
     this.runGuards(to, from, (shouldContinue) => {
       if (shouldContinue === false) {
@@ -92,10 +94,10 @@ export class Router implements RouterInterface {
 
       // Update current route
       this.currentRoute = to;
-      
+
       // Run after hooks
-      this.afterHooks.forEach(hook => hook(to, from));
-      
+      this.afterHooks.forEach((hook) => hook(to, from));
+
       // Handle scroll behavior
       if (this.scrollBehavior) {
         const position = this.scrollBehavior(to, from);
@@ -140,7 +142,7 @@ export class Router implements RouterInterface {
   install(uus: any): void {
     // Make router available in state
     uus.state.$router = this;
-    
+
     // Register router directives
     uus.registerDirective(linkDirective);
     uus.registerDirective(routeDirective);
@@ -160,15 +162,15 @@ const routerDirective = {
 
     // Mark as router outlet
     el.setAttribute('data-router-outlet', 'true');
-    
+
     // Initial render
     renderRoute(el, router.currentRoute, uus);
-    
+
     // Listen for route changes
     router.afterEach((to) => {
       renderRoute(el, to, uus);
     });
-  }
+  },
 };
 
 const routeDirective = {
@@ -180,7 +182,7 @@ const routeDirective = {
     const path = binding.expression;
     el.style.display = 'none';
     el.setAttribute('data-route-path', path);
-  }
+  },
 };
 
 const linkDirective = {
@@ -190,34 +192,38 @@ const linkDirective = {
     if (!router) return;
 
     const path = binding.expression?.replace(/['"]/g, '') || '';
-    
+
     // Add click handler
     const handleClick = (e: Event) => {
       e.preventDefault();
       router.push(path);
     };
-    
+
     el.addEventListener('click', handleClick);
-    
+
     // Update active class
     const updateActive = () => {
       const isActive = router.currentRoute?.path === path;
       el.classList.toggle('router-link-active', isActive);
     };
-    
+
     updateActive();
     router.afterEach(updateActive);
-    
+
     // Store cleanup
     const cleanups = uus.cleanups.get(el) || new Set();
     cleanups.add(() => {
       el.removeEventListener('click', handleClick);
     });
     uus.cleanups.set(el, cleanups);
-  }
+  },
 };
 
-function renderRoute(outlet: HTMLElement, route: RouteMatch | null, uus: any): void {
+function renderRoute(
+  outlet: HTMLElement,
+  route: RouteMatch | null,
+  uus: any
+): void {
   if (!route) {
     outlet.innerHTML = '';
     return;
@@ -228,7 +234,7 @@ function renderRoute(outlet: HTMLElement, route: RouteMatch | null, uus: any): v
   routeElements.forEach((el) => {
     const routePath = el.getAttribute('data-route-path');
     let shouldShow = false;
-    
+
     if (routePath === route.path) {
       // Exact match
       shouldShow = true;
@@ -237,9 +243,9 @@ function renderRoute(outlet: HTMLElement, route: RouteMatch | null, uus: any): v
       const pattern = '^' + routePath.replace(/:\w+/g, '[^/]+') + '$';
       shouldShow = new RegExp(pattern).test(route.path);
     }
-    
+
     (el as HTMLElement).style.display = shouldShow ? '' : 'none';
-    
+
     // Update route params in state
     if (shouldShow && route.params) {
       Object.assign(uus.state, route.params);
@@ -250,11 +256,11 @@ function renderRoute(outlet: HTMLElement, route: RouteMatch | null, uus: any): v
 // Create router plugin
 export function createRouter(options: RouterOptions): UusPlugin {
   const router = new Router(options);
-  
+
   return {
     name: 'uus-router',
     install(uus: any) {
       router.install(uus);
-    }
+    },
   };
 }

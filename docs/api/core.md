@@ -13,11 +13,12 @@ new Uus(options?: UusOptions)
 ```
 
 **Options:**
+
 ```typescript
 interface UusOptions {
-  debug?: boolean;          // Enable debug mode
-  strict?: boolean;         // Enable strict mode
-  devtools?: boolean;       // Enable devtools integration
+  debug?: boolean; // Enable debug mode
+  strict?: boolean; // Enable strict mode
+  devtools?: boolean; // Enable devtools integration
 }
 ```
 
@@ -32,11 +33,13 @@ mount(selector?: string | Element): Uus
 ```
 
 **Parameters:**
+
 - `selector` - CSS selector or DOM element (defaults to `document.body`)
 
 **Returns:** The Uus instance for chaining
 
 **Example:**
+
 ```javascript
 const app = new Uus();
 app.mount('#app');
@@ -57,6 +60,7 @@ unmount(): void
 ```
 
 **Example:**
+
 ```javascript
 app.unmount(); // Cleanup all listeners and effects
 ```
@@ -70,6 +74,7 @@ use(plugin: Plugin, options?: any): Uus
 ```
 
 **Example:**
+
 ```javascript
 app.use(createRouter({ routes }));
 app.use(createAnimate());
@@ -84,6 +89,7 @@ directive(name: string, definition: DirectiveDefinition): Uus
 ```
 
 **Example:**
+
 ```javascript
 app.directive('tooltip', {
   mounted(el, binding) {
@@ -94,7 +100,7 @@ app.directive('tooltip', {
   },
   unmounted(el) {
     // Cleanup tooltip
-  }
+  },
 });
 ```
 
@@ -105,14 +111,15 @@ app.directive('tooltip', {
 The reactive application state.
 
 ```typescript
-state: Record<string, any>
+state: Record<string, any>;
 ```
 
 **Example:**
+
 ```javascript
 app.state = reactive({
   count: 0,
-  user: null
+  user: null,
 });
 
 // Access
@@ -129,21 +136,23 @@ app.state.count++;
 Creates a reactive object.
 
 ```typescript
-function reactive<T extends object>(target: T): T
+function reactive<T extends object>(target: T): T;
 ```
 
 **Parameters:**
+
 - `target` - The object to make reactive
 
 **Returns:** A reactive proxy of the object
 
 **Example:**
+
 ```javascript
 const state = reactive({
   count: 0,
   nested: {
-    value: 'hello'
-  }
+    value: 'hello',
+  },
 });
 
 state.count++; // Triggers updates
@@ -155,7 +164,7 @@ state.nested.value = 'world'; // Deep reactivity
 Creates a reactive reference to a value.
 
 ```typescript
-function ref<T>(value: T): Ref<T>
+function ref<T>(value: T): Ref<T>;
 
 interface Ref<T> {
   value: T;
@@ -163,11 +172,13 @@ interface Ref<T> {
 ```
 
 **Parameters:**
+
 - `value` - The initial value
 
 **Returns:** A ref object
 
 **Example:**
+
 ```javascript
 const count = ref(0);
 console.log(count.value); // 0
@@ -183,7 +194,7 @@ count.value++; // Triggers updates
 Creates a computed value that automatically updates.
 
 ```typescript
-function computed<T>(getter: () => T): ComputedRef<T>
+function computed<T>(getter: () => T): ComputedRef<T>;
 
 interface ComputedRef<T> extends Ref<T> {
   readonly value: T;
@@ -191,11 +202,13 @@ interface ComputedRef<T> extends Ref<T> {
 ```
 
 **Parameters:**
+
 - `getter` - Function that computes the value
 
 **Returns:** A read-only computed ref
 
 **Example:**
+
 ```javascript
 const count = ref(0);
 const double = computed(() => count.value * 2);
@@ -210,21 +223,23 @@ console.log(double.value); // 10
 Runs a side effect when dependencies change.
 
 ```typescript
-function effect(fn: () => void | (() => void)): () => void
+function effect(fn: () => void | (() => void)): () => void;
 ```
 
 **Parameters:**
+
 - `fn` - Effect function (can return cleanup function)
 
 **Returns:** Stop function
 
 **Example:**
+
 ```javascript
 const state = reactive({ count: 0 });
 
 const stop = effect(() => {
   console.log('Count:', state.count);
-  
+
   // Optional cleanup
   return () => {
     console.log('Cleaning up');
@@ -244,18 +259,19 @@ function watch<T>(
   source: WatchSource<T> | WatchSource<T>[],
   callback: WatchCallback<T>,
   options?: WatchOptions
-): StopHandle
+): StopHandle;
 
-type WatchSource<T> = (() => T) | Ref<T> | Reactive<T>
+type WatchSource<T> = (() => T) | Ref<T> | Reactive<T>;
 
 interface WatchOptions {
-  immediate?: boolean;  // Run immediately
-  deep?: boolean;      // Deep watch objects
+  immediate?: boolean; // Run immediately
+  deep?: boolean; // Deep watch objects
   flush?: 'pre' | 'post' | 'sync';
 }
 ```
 
 **Example:**
+
 ```javascript
 const state = reactive({ query: '' });
 
@@ -290,10 +306,11 @@ watch(
 Checks if a value is a ref.
 
 ```typescript
-function isRef<T>(value: any): value is Ref<T>
+function isRef<T>(value: any): value is Ref<T>;
 ```
 
 **Example:**
+
 ```javascript
 const count = ref(0);
 console.log(isRef(count)); // true
@@ -305,10 +322,11 @@ console.log(isRef(0)); // false
 Checks if a value is reactive.
 
 ```typescript
-function isReactive(value: any): boolean
+function isReactive(value: any): boolean;
 ```
 
 **Example:**
+
 ```javascript
 const state = reactive({ count: 0 });
 console.log(isReactive(state)); // true
@@ -320,10 +338,11 @@ console.log(isReactive({})); // false
 Unwraps a ref or returns the value.
 
 ```typescript
-function unref<T>(value: T | Ref<T>): T
+function unref<T>(value: T | Ref<T>): T;
 ```
 
 **Example:**
+
 ```javascript
 const count = ref(10);
 console.log(unref(count)); // 10
@@ -335,10 +354,11 @@ console.log(unref(20)); // 20
 Returns the raw object from a reactive proxy.
 
 ```typescript
-function toRaw<T>(proxy: T): T
+function toRaw<T>(proxy: T): T;
 ```
 
 **Example:**
+
 ```javascript
 const state = reactive({ data: [] });
 const raw = toRaw(state);
@@ -351,14 +371,15 @@ console.log(isReactive(raw)); // false
 Marks an object to skip reactivity.
 
 ```typescript
-function markRaw<T extends object>(value: T): T
+function markRaw<T extends object>(value: T): T;
 ```
 
 **Example:**
+
 ```javascript
 const socket = markRaw(new WebSocket('ws://localhost'));
 const state = reactive({
-  socket // Won't be made reactive
+  socket, // Won't be made reactive
 });
 ```
 
@@ -386,19 +407,11 @@ All built-in directives are automatically registered:
 ```typescript
 interface DirectiveDefinition {
   // Called before element is inserted
-  created?(
-    el: Element,
-    binding: DirectiveBinding,
-    vnode: VNode
-  ): void;
-  
+  created?(el: Element, binding: DirectiveBinding, vnode: VNode): void;
+
   // Called when element is inserted
-  mounted?(
-    el: Element,
-    binding: DirectiveBinding,
-    vnode: VNode
-  ): void;
-  
+  mounted?(el: Element, binding: DirectiveBinding, vnode: VNode): void;
+
   // Called before element is updated
   beforeUpdate?(
     el: Element,
@@ -406,7 +419,7 @@ interface DirectiveDefinition {
     vnode: VNode,
     prevVnode: VNode
   ): void;
-  
+
   // Called after element is updated
   updated?(
     el: Element,
@@ -414,31 +427,24 @@ interface DirectiveDefinition {
     vnode: VNode,
     prevVnode: VNode
   ): void;
-  
+
   // Called before element is unmounted
-  beforeUnmount?(
-    el: Element,
-    binding: DirectiveBinding,
-    vnode: VNode
-  ): void;
-  
+  beforeUnmount?(el: Element, binding: DirectiveBinding, vnode: VNode): void;
+
   // Called when element is unmounted
-  unmounted?(
-    el: Element,
-    binding: DirectiveBinding,
-    vnode: VNode
-  ): void;
+  unmounted?(el: Element, binding: DirectiveBinding, vnode: VNode): void;
 }
 
 interface DirectiveBinding {
-  value: any;        // The directive value
-  oldValue: any;     // Previous value
-  arg?: string;      // Directive argument
+  value: any; // The directive value
+  oldValue: any; // Previous value
+  arg?: string; // Directive argument
   modifiers: Record<string, boolean>; // Modifiers
 }
 ```
 
 **Example:**
+
 ```javascript
 app.directive('color', {
   mounted(el, binding) {
@@ -446,7 +452,7 @@ app.directive('color', {
   },
   updated(el, binding) {
     el.style.color = binding.value;
-  }
+  },
 });
 
 // Usage: <div uus-color="red">Text</div>
@@ -491,7 +497,7 @@ import type {
   WatchCallback,
   WatchOptions,
   DirectiveBinding,
-  Plugin
+  Plugin,
 } from '@uusjs/core';
 
 // Component state type
@@ -505,7 +511,7 @@ interface AppState {
 const state: Reactive<AppState> = reactive({
   count: 0,
   user: null,
-  todos: []
+  todos: [],
 });
 
 // Typed ref
@@ -520,7 +526,7 @@ const double: ComputedRef<number> = computed(() => count.value * 2);
 ```typescript
 function createComponent<T>(initialData: T) {
   const state = reactive(initialData);
-  
+
   return {
     state,
     // Methods...
@@ -529,7 +535,7 @@ function createComponent<T>(initialData: T) {
 
 const counter = createComponent({
   count: 0,
-  step: 1
+  step: 1,
 });
 ```
 
@@ -556,7 +562,7 @@ app.directive('safe', {
       console.error('Directive error:', error);
       el.textContent = 'Error occurred';
     }
-  }
+  },
 });
 ```
 
@@ -593,6 +599,7 @@ if (condition) {
 ## Browser Compatibility
 
 ### Modern Browsers
+
 - Chrome/Edge 88+
 - Firefox 78+
 - Safari 14+

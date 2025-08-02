@@ -15,11 +15,13 @@ A fully functional real-time chat application built with UUS.js that demonstrate
 ## Running the Example
 
 1. **Install dependencies:**
+
    ```bash
    npm install
    ```
 
 2. **Start the WebSocket server:**
+
    ```bash
    npm start
    ```
@@ -32,12 +34,14 @@ A fully functional real-time chat application built with UUS.js that demonstrate
 ## Architecture
 
 ### Frontend (UUS.js)
+
 - **Reactive state management** - All chat data managed with UUS.js state
 - **Real-time UI updates** - Automatic DOM updates when state changes
 - **WebSocket integration** - Direct WebSocket handling in the state object
 - **Event-driven** - All user interactions handled through UUS.js directives
 
 ### Backend (Node.js + WebSocket)
+
 - **Express server** - Serves static files and WebSocket endpoint
 - **WebSocket Server** - Handles real-time connections using `ws` library
 - **Message broadcasting** - Efficiently sends messages to all connected clients
@@ -46,11 +50,13 @@ A fully functional real-time chat application built with UUS.js that demonstrate
 ## WebSocket Events
 
 ### Client → Server
+
 - `user:join` - User joins the chat
 - `message:send` - Send a chat message
 - `user:typing` - Send typing indicator
 
 ### Server → Client
+
 - `user:joined` - New user joined
 - `user:left` - User disconnected
 - `users:list` - Current online users
@@ -61,6 +67,7 @@ A fully functional real-time chat application built with UUS.js that demonstrate
 ## Key UUS.js Concepts Demonstrated
 
 1. **Complex State Management**
+
    ```javascript
    uus-state="{
      messages: [],
@@ -71,6 +78,7 @@ A fully functional real-time chat application built with UUS.js that demonstrate
    ```
 
 2. **Real-time WebSocket Integration**
+
    ```javascript
    initWebSocket() {
      this.ws = new WebSocket('ws://localhost:3000');
@@ -81,6 +89,7 @@ A fully functional real-time chat application built with UUS.js that demonstrate
    ```
 
 3. **Computed Properties**
+
    ```javascript
    get typingText() {
      if (this.typingUsers.length === 1) {

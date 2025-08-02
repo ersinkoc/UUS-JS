@@ -1,7 +1,7 @@
 import { Uus } from '@uusjs/core';
 
 // Simple chart drawing utility
-window.initCharts = function(page) {
+window.initCharts = function (page) {
   if (page === 'overview') {
     drawChart('traffic-chart');
   } else if (page === 'analytics') {
@@ -12,81 +12,81 @@ window.initCharts = function(page) {
 function drawChart(containerId) {
   const container = document.getElementById(containerId);
   if (!container) return;
-  
+
   // Clear previous chart
   container.innerHTML = '';
-  
+
   // Create canvas
   const canvas = document.createElement('canvas');
   canvas.width = container.clientWidth || 400;
   canvas.height = 200;
   container.appendChild(canvas);
-  
+
   const ctx = canvas.getContext('2d');
-  
+
   // Sample data
   const data = [65, 59, 80, 81, 56, 55, 40];
   const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  
+
   // Draw simple line chart
   const margin = 40;
   const chartWidth = canvas.width - 2 * margin;
   const chartHeight = canvas.height - 2 * margin;
-  
+
   // Background
   ctx.fillStyle = '#f8f9fa';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-  
+
   // Grid lines
   ctx.strokeStyle = '#e9ecef';
   ctx.lineWidth = 1;
-  
+
   for (let i = 0; i <= 5; i++) {
-    const y = margin + (i * chartHeight / 5);
+    const y = margin + (i * chartHeight) / 5;
     ctx.beginPath();
     ctx.moveTo(margin, y);
     ctx.lineTo(margin + chartWidth, y);
     ctx.stroke();
   }
-  
+
   // Data line
   ctx.strokeStyle = containerId === 'revenue-chart' ? '#2ecc71' : '#3498db';
   ctx.lineWidth = 3;
   ctx.beginPath();
-  
+
   const max = Math.max(...data);
-  
+
   data.forEach((value, index) => {
-    const x = margin + (index * chartWidth / (data.length - 1));
-    const y = margin + chartHeight - (value / max * chartHeight);
-    
+    const x = margin + (index * chartWidth) / (data.length - 1);
+    const y = margin + chartHeight - (value / max) * chartHeight;
+
     if (index === 0) {
       ctx.moveTo(x, y);
     } else {
       ctx.lineTo(x, y);
     }
   });
-  
+
   ctx.stroke();
-  
+
   // Data points
   ctx.fillStyle = containerId === 'revenue-chart' ? '#2ecc71' : '#3498db';
   data.forEach((value, index) => {
-    const x = margin + (index * chartWidth / (data.length - 1));
-    const y = margin + chartHeight - (value / max * chartHeight);
-    
+    const x = margin + (index * chartWidth) / (data.length - 1);
+    const y = margin + chartHeight - (value / max) * chartHeight;
+
     ctx.beginPath();
     ctx.arc(x, y, 4, 0, 2 * Math.PI);
     ctx.fill();
   });
-  
+
   // Labels
   ctx.fillStyle = '#6c757d';
   ctx.font = '12px sans-serif';
   ctx.textAlign = 'center';
-  
+
   labels.forEach((label, index) => {
-    const x = margin + (index * chartWidth / (data.length - 1));
+    const x = margin + (index * chartWidth) / (data.length - 1);
     ctx.fillText(label, x, canvas.height - 10);
   });
 }

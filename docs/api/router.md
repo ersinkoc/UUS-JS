@@ -18,8 +18,8 @@ const router = createRouter({
   routes: [
     { path: '/', component: 'home' },
     { path: '/about', component: 'about' },
-    { path: '/user/:id', component: 'user' }
-  ]
+    { path: '/user/:id', component: 'user' },
+  ],
 });
 
 app.use(router);
@@ -30,13 +30,13 @@ app.use(router);
 Creates a router instance.
 
 ```typescript
-function createRouter(options: RouterOptions): Router
+function createRouter(options: RouterOptions): Router;
 
 interface RouterOptions {
-  mode?: 'history' | 'hash';           // Routing mode (default: 'history')
-  base?: string;                       // Base URL path
-  routes: RouteConfig[];               // Route definitions
-  scrollBehavior?: ScrollBehavior;     // Scroll behavior function
+  mode?: 'history' | 'hash'; // Routing mode (default: 'history')
+  base?: string; // Base URL path
+  routes: RouteConfig[]; // Route definitions
+  scrollBehavior?: ScrollBehavior; // Scroll behavior function
 }
 ```
 
@@ -46,13 +46,13 @@ interface RouterOptions {
 
 ```typescript
 interface RouteConfig {
-  path: string;           // Route path
-  component: string;      // Component identifier
-  name?: string;          // Named route
-  redirect?: string;      // Redirect target
+  path: string; // Route path
+  component: string; // Component identifier
+  name?: string; // Named route
+  redirect?: string; // Redirect target
   beforeEnter?: NavigationGuard; // Route-specific guard
-  meta?: Record<string, any>;    // Route metadata
-  children?: RouteConfig[];      // Nested routes
+  meta?: Record<string, any>; // Route metadata
+  children?: RouteConfig[]; // Nested routes
 }
 ```
 
@@ -61,42 +61,42 @@ interface RouteConfig {
 ```javascript
 const routes = [
   // Basic route
-  { 
-    path: '/', 
-    component: 'home' 
+  {
+    path: '/',
+    component: 'home',
   },
-  
+
   // Named route
-  { 
-    path: '/about', 
+  {
+    path: '/about',
     component: 'about',
-    name: 'about-page'
+    name: 'about-page',
   },
-  
+
   // Route with params
-  { 
-    path: '/user/:id', 
-    component: 'user' 
+  {
+    path: '/user/:id',
+    component: 'user',
   },
-  
+
   // Optional params
-  { 
-    path: '/post/:id?', 
-    component: 'post' 
+  {
+    path: '/post/:id?',
+    component: 'post',
   },
-  
+
   // Wildcard
-  { 
-    path: '/docs/*', 
-    component: 'docs' 
+  {
+    path: '/docs/*',
+    component: 'docs',
   },
-  
+
   // Redirect
-  { 
-    path: '/home', 
-    redirect: '/' 
+  {
+    path: '/home',
+    redirect: '/',
   },
-  
+
   // Route with guard
   {
     path: '/admin',
@@ -107,24 +107,24 @@ const routes = [
       } else {
         next('/login');
       }
-    }
+    },
   },
-  
+
   // Route with meta
   {
     path: '/settings',
     component: 'settings',
-    meta: { 
+    meta: {
       requiresAuth: true,
-      title: 'Settings'
-    }
+      title: 'Settings',
+    },
   },
-  
+
   // 404 route (must be last)
-  { 
-    path: '*', 
-    component: 'not-found' 
-  }
+  {
+    path: '*',
+    component: 'not-found',
+  },
 ];
 ```
 
@@ -137,19 +137,19 @@ const routes = [
     component: 'user',
     children: [
       {
-        path: '',           // /user/:id
-        component: 'user-profile'
+        path: '', // /user/:id
+        component: 'user-profile',
       },
       {
-        path: 'posts',      // /user/:id/posts
-        component: 'user-posts'
+        path: 'posts', // /user/:id/posts
+        component: 'user-posts',
       },
       {
-        path: 'settings',   // /user/:id/settings
-        component: 'user-settings'
-      }
-    ]
-  }
+        path: 'settings', // /user/:id/settings
+        component: 'user-settings',
+      },
+    ],
+  },
 ];
 ```
 
@@ -162,21 +162,22 @@ const routes = [
 The current route object.
 
 ```typescript
-currentRoute: Ref<Route>
+currentRoute: Ref<Route>;
 
 interface Route {
-  path: string;         // Current path
-  params: Record<string, string>;  // Route params
-  query: Record<string, string>;   // Query params
-  hash: string;         // URL hash
-  fullPath: string;     // Full URL path
-  matched: RouteConfig[];  // Matched route configs
-  name?: string;        // Route name
+  path: string; // Current path
+  params: Record<string, string>; // Route params
+  query: Record<string, string>; // Query params
+  hash: string; // URL hash
+  fullPath: string; // Full URL path
+  matched: RouteConfig[]; // Matched route configs
+  name?: string; // Route name
   meta: Record<string, any>; // Combined meta fields
 }
 ```
 
 **Example:**
+
 ```javascript
 // Access current route
 console.log(router.currentRoute.value.path);
@@ -205,6 +206,7 @@ type RouteLocation = string | {
 ```
 
 **Examples:**
+
 ```javascript
 // Navigate by path
 router.push('/about');
@@ -215,19 +217,19 @@ router.push('/search?q=vue');
 // Object syntax
 router.push({
   path: '/user',
-  query: { id: '123' }
+  query: { id: '123' },
 });
 
 // Named route
 router.push({
   name: 'user',
-  params: { id: '123' }
+  params: { id: '123' },
 });
 
 // With hash
 router.push({
   path: '/docs',
-  hash: '#installation'
+  hash: '#installation',
 });
 ```
 
@@ -240,6 +242,7 @@ replace(location: RouteLocation): Promise<void>
 ```
 
 **Example:**
+
 ```javascript
 // Replace current route
 router.replace('/login');
@@ -247,7 +250,7 @@ router.replace('/login');
 // Useful for redirects after form submission
 router.replace({
   name: 'dashboard',
-  query: { welcome: 'true' }
+  query: { welcome: 'true' },
 });
 ```
 
@@ -260,10 +263,11 @@ go(delta: number): void
 ```
 
 **Examples:**
+
 ```javascript
-router.go(1);   // Forward one entry
-router.go(-1);  // Back one entry
-router.go(-3);  // Back three entries
+router.go(1); // Forward one entry
+router.go(-1); // Back one entry
+router.go(-3); // Back three entries
 ```
 
 #### back()
@@ -275,6 +279,7 @@ back(): void
 ```
 
 **Example:**
+
 ```javascript
 router.back(); // Same as go(-1)
 ```
@@ -288,6 +293,7 @@ forward(): void
 ```
 
 **Example:**
+
 ```javascript
 router.forward(); // Same as go(1)
 ```
@@ -311,6 +317,7 @@ type NavigationGuardNext = (
 ```
 
 **Examples:**
+
 ```javascript
 // Authentication guard
 router.beforeEach((to, from, next) => {
@@ -341,6 +348,7 @@ afterEach(hook: (to: Route, from: Route) => void): () => void
 ```
 
 **Examples:**
+
 ```javascript
 // Complete progress bar
 router.afterEach((to, from) => {
@@ -355,7 +363,7 @@ router.afterEach((to) => {
 // Analytics
 router.afterEach((to) => {
   gtag('config', 'GA_ID', {
-    page_path: to.fullPath
+    page_path: to.fullPath,
   });
 });
 ```
@@ -369,9 +377,10 @@ isActive(path: string, exact?: boolean): boolean
 ```
 
 **Examples:**
+
 ```javascript
-router.isActive('/about');        // true if on /about or /about/team
-router.isActive('/about', true);  // true only if exactly on /about
+router.isActive('/about'); // true if on /about or /about/team
+router.isActive('/about', true); // true only if exactly on /about
 
 // Use in templates for active links
 // <a :class="{ active: $router.isActive('/about') }">About</a>
@@ -443,9 +452,7 @@ Router-aware link component.
 <a uus-link="'/user/' + userId">Profile</a>
 
 <!-- Object syntax -->
-<a uus-link="{ path: '/search', query: { q: searchQuery } }">
-  Search
-</a>
+<a uus-link="{ path: '/search', query: { q: searchQuery } }"> Search </a>
 ```
 
 ## Navigation Guards
@@ -456,16 +463,16 @@ Router-aware link component.
 // Before each route
 router.beforeEach((to, from, next) => {
   console.log(`Navigating from ${from.path} to ${to.path}`);
-  
+
   // Continue navigation
   next();
-  
+
   // Cancel navigation
   next(false);
-  
+
   // Redirect
   next('/login');
-  
+
   // Pass error
   next(new Error('Not authorized'));
 });
@@ -492,8 +499,8 @@ const routes = [
       } else {
         next('/403');
       }
-    }
-  }
+    },
+  },
 ];
 ```
 
@@ -517,15 +524,15 @@ const router = createRouter({
     if (savedPosition) {
       return savedPosition;
     }
-    
+
     // Hash anchors
     if (to.hash) {
       return { selector: to.hash };
     }
-    
+
     // Scroll to top
     return { x: 0, y: 0 };
-  }
+  },
 });
 ```
 
@@ -540,7 +547,7 @@ scrollBehavior(to, from, savedPosition) {
       behavior: 'smooth'
     };
   }
-  
+
   // Delayed scrolling
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -584,10 +591,14 @@ scrollBehavior(to, from, savedPosition) {
 
 ```javascript
 // Only match numbers
-{ path: '/user/:id(\\d+)' }
+{
+  path: '/user/:id(\\d+)';
+}
 
 // Multiple segments
-{ path: '/files/*(.*)' }
+{
+  path: '/files/*(.*)';
+}
 ```
 
 ## Programmatic Navigation
@@ -600,10 +611,10 @@ const state = reactive({
   navigateToUser(id) {
     router.push(`/user/${id}`);
   },
-  
+
   goBack() {
     router.back();
-  }
+  },
 });
 ```
 
@@ -619,9 +630,7 @@ watch(route, (newRoute, oldRoute) => {
 });
 
 // Computed based on route
-const isUserPage = computed(() => 
-  route.value.path.startsWith('/user')
-);
+const isUserPage = computed(() => route.value.path.startsWith('/user'));
 ```
 
 ## Hash Mode vs History Mode
@@ -631,13 +640,14 @@ const isUserPage = computed(() =>
 ```javascript
 const router = createRouter({
   mode: 'history',
-  routes
+  routes,
 });
 
 // URLs: /about, /user/123
 ```
 
 **Server configuration needed:**
+
 ```nginx
 # Nginx
 location / {
@@ -650,7 +660,7 @@ location / {
 ```javascript
 const router = createRouter({
   mode: 'hash',
-  routes
+  routes,
 });
 
 // URLs: /#/about, /#/user/123
@@ -670,7 +680,7 @@ interface UserRouteParams {
 
 // Access typed params
 const route = router.currentRoute.value as Route & {
-  params: UserRouteParams
+  params: UserRouteParams;
 };
 
 console.log(route.params.id); // Type-safe
@@ -688,9 +698,9 @@ const routes: RouteConfig[] = [
     component: 'admin',
     meta: {
       requiresAuth: true,
-      roles: ['admin']
-    } as RouteMeta
-  }
+      roles: ['admin'],
+    } as RouteMeta,
+  },
 ];
 ```
 
@@ -707,8 +717,8 @@ const routes = [
       // Lazy load component
       await import('./components/about.js');
       next();
-    }
-  }
+    },
+  },
 ];
 ```
 
@@ -720,20 +730,16 @@ const routes = [
 </div>
 
 <!-- Different transitions per route -->
-<div 
-  uus-router 
-  :uus-animate="$route.meta.transition || 'fade'"
->
-</div>
+<div uus-router :uus-animate="$route.meta.transition || 'fade'"></div>
 ```
 
 ### Breadcrumbs
 
 ```javascript
 const breadcrumbs = computed(() => {
-  return router.currentRoute.value.matched.map(route => ({
+  return router.currentRoute.value.matched.map((route) => ({
     text: route.meta.title || route.name,
-    path: route.path
+    path: route.path,
   }));
 });
 ```
@@ -742,7 +748,7 @@ const breadcrumbs = computed(() => {
 
 ```javascript
 const state = reactive({
-  loading: false
+  loading: false,
 });
 
 router.beforeEach((to, from, next) => {

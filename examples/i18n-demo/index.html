@@ -3,718 +3,499 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Uus.js i18n Demo</title>
+  <title>UUS.js i18n Demo</title>
   <style>
     * {
       box-sizing: border-box;
-      margin: 0;
-      padding: 0;
     }
     
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: #f5f7fa;
-      color: #2c3e50;
-      line-height: 1.6;
+      margin: 0;
+      padding: 0;
+      background: #f5f5f5;
     }
     
-    .container {
+    #app {
       max-width: 800px;
       margin: 0 auto;
-      padding: 2rem;
+      padding: 20px;
     }
     
-    .header {
-      background: white;
-      padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-      margin-bottom: 2rem;
+    header {
       text-align: center;
+      margin-bottom: 40px;
+    }
+    
+    h1 {
+      color: #333;
+      margin-bottom: 20px;
     }
     
     .language-switcher {
       display: flex;
+      gap: 10px;
       justify-content: center;
-      gap: 1rem;
-      margin-top: 1.5rem;
+      flex-wrap: wrap;
     }
     
-    .lang-btn {
-      padding: 0.5rem 1rem;
-      background: #e9ecef;
-      border: none;
-      border-radius: 8px;
+    .language-switcher button {
+      padding: 10px 20px;
+      border: 2px solid #3498db;
+      background: white;
+      color: #3498db;
+      border-radius: 25px;
       cursor: pointer;
-      transition: all 0.2s;
-      font-size: 0.9rem;
+      transition: all 0.3s;
     }
     
-    .lang-btn.active {
+    .language-switcher button:hover {
+      background: #e3f2fd;
+    }
+    
+    .language-switcher button.active {
       background: #3498db;
       color: white;
     }
     
-    .lang-btn:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    }
-    
-    .demo-section {
+    section {
       background: white;
-      padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-      margin-bottom: 2rem;
-    }
-    
-    .demo-section h2 {
-      color: #3498db;
-      margin-bottom: 1.5rem;
-      padding-bottom: 0.75rem;
-      border-bottom: 2px solid #e9ecef;
-    }
-    
-    .demo-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 1.5rem;
-    }
-    
-    .demo-item {
-      padding: 1.5rem;
-      background: #f8f9fa;
+      padding: 20px;
       border-radius: 8px;
-      border-left: 4px solid #3498db;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     
-    .demo-item h3 {
+    h2, h3 {
+      margin-top: 0;
       color: #2c3e50;
-      margin-bottom: 1rem;
-      font-size: 1.1rem;
     }
     
-    .demo-item .result {
-      font-weight: 500;
-      color: #27ae60;
-      margin-bottom: 0.5rem;
-    }
-    
-    .demo-item .code {
-      font-family: 'Courier New', monospace;
-      background: white;
-      padding: 0.75rem;
+    input {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid #ddd;
       border-radius: 4px;
-      font-size: 0.85rem;
-      color: #666;
-      overflow-x: auto;
+      font-size: 16px;
     }
     
-    .user-form {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      max-width: 400px;
-    }
-    
-    .user-form input {
-      padding: 0.75rem;
-      border: 2px solid #e9ecef;
-      border-radius: 6px;
-      font-size: 1rem;
-    }
-    
-    .user-form input:focus {
+    input:focus {
       outline: none;
       border-color: #3498db;
-    }
-    
-    .user-form button {
-      padding: 0.75rem 1.5rem;
-      background: #27ae60;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 1rem;
-      transition: background 0.2s;
-    }
-    
-    .user-form button:hover {
-      background: #229954;
     }
     
     .counter-controls {
       display: flex;
       align-items: center;
-      gap: 1rem;
-      margin: 1rem 0;
+      gap: 20px;
+      margin-top: 10px;
     }
     
     .counter-controls button {
-      padding: 0.5rem 1rem;
+      padding: 8px 16px;
       background: #3498db;
       color: white;
       border: none;
-      border-radius: 6px;
+      border-radius: 4px;
       cursor: pointer;
-      font-size: 1rem;
+      font-size: 16px;
     }
     
-    .counter-controls span {
-      font-size: 1.25rem;
+    .counter-controls button:hover {
+      background: #2980b9;
+    }
+    
+    .count {
+      font-size: 24px;
       font-weight: bold;
-      min-width: 3rem;
+      color: #3498db;
+      min-width: 50px;
       text-align: center;
+    }
+    
+    .price-display {
+      font-size: 32px;
+      font-weight: bold;
+      color: #27ae60;
+      margin: 20px 0;
+      text-align: center;
+    }
+    
+    .date-time p {
+      margin: 10px 0;
+      font-size: 18px;
+    }
+    
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    
+    li {
+      padding: 10px;
+      margin: 5px 0;
+      background: #f8f9fa;
+      border-radius: 4px;
+      border-left: 4px solid #3498db;
+    }
+    
+    footer {
+      text-align: center;
+      color: #666;
+      margin-top: 40px;
+    }
+    
+    footer a {
+      color: #3498db;
+      text-decoration: none;
+    }
+    
+    footer a:hover {
+      text-decoration: underline;
     }
     
     .rtl {
       direction: rtl;
-      text-align: right;
     }
     
-    .ltr {
-      direction: ltr;
-      text-align: left;
+    .rtl .language-switcher {
+      flex-direction: row-reverse;
     }
     
-    .welcome-message {
-      font-size: 1.25rem;
-      font-weight: 500;
-      color: #27ae60;
-      margin: 1rem 0;
-      padding: 1rem;
-      background: #d5f4e6;
-      border-radius: 8px;
-    }
-    
-    .date-time {
-      color: #7f8c8d;
-      font-size: 0.9rem;
-      margin-top: 0.5rem;
-    }
-    
-    .error {
-      color: #e74c3c;
-      font-size: 0.9rem;
-      margin-top: 0.5rem;
+    .rtl li {
+      border-left: none;
+      border-right: 4px solid #3498db;
     }
   </style>
 </head>
 <body>
   <div id="app" uus-state="{
-    // Language data
+    // i18n setup
     languages: [
-      { code: 'en', name: 'English', flag: '🇺🇸' },
-      { code: 'tr', name: 'Türkçe', flag: '🇹🇷' },
-      { code: 'ar', name: 'العربية', flag: '🇸🇦' },
-      { code: 'es', name: 'Español', flag: '🇪🇸' }
+      { code: 'en', name: 'English', dir: 'ltr' },
+      { code: 'es', name: 'Español', dir: 'ltr' },
+      { code: 'fr', name: 'Français', dir: 'ltr' },
+      { code: 'de', name: 'Deutsch', dir: 'ltr' },
+      { code: 'ar', name: 'العربية', dir: 'rtl' },
+      { code: 'ja', name: '日本語', dir: 'ltr' },
+      { code: 'zh', name: '中文', dir: 'ltr' }
     ],
     
-    // Current locale
-    currentLocale: 'en',
-    
-    // Demo data
-    userName: '',
-    messageCount: 3,
-    itemCount: 2,
-    notificationCount: 5,
-    currentDate: new Date(),
+    // App state
+    userName: 'John',
+    count: 0,
     price: 1234.56,
-    discount: 0.15,
-    largeNumber: 1234567.89,
-    
-    // Form data
-    formData: {
-      name: '',
-      email: ''
-    },
-    showValidation: false,
-    formSubmitted: false,
-    
-    // Translation messages
-    messages: {
-      en: {
-        title: 'UUS.js Internationalization Demo',
-        subtitle: 'Experience powerful i18n features with reactive state',
-        sections: {
-          basic: 'Basic Translation',
-          interpolation: 'String Interpolation',
-          pluralization: 'Pluralization',
-          forms: 'Date & Number Formatting',
-          dynamic: 'Dynamic Content'
-        },
-        examples: {
-          hello: 'Hello World!',
-          goodbye: 'Goodbye!',
-          welcome: 'Welcome, {name}!',
-          user_greeting: 'Hello {name}, you have {count} {count, plural, one {message} other {messages}}',
-          form_validation: {
-            required: 'This field is required',
-            email: 'Please enter a valid email address'
-          },
-          login_success: 'Welcome back, {username}!'
-        },
-        labels: {
-          name: 'Your Name',
-          email: 'Email Address'
-        },
-        actions: {
-          decrease: 'Decrease',
-          increase: 'Increase', 
-          reset: 'Reset',
-          submit: 'Submit',
-          clear: 'Clear',
-          change_language: 'Change Language'
-        },
-        plurals: {
-          item: '{count, plural, =0 {No items} one {1 item} other {{count} items}}',
-          notification: '{count, plural, =0 {No notifications} one {1 notification} other {{count} notifications}}'
-        },
-        demo: {
-          current_time: 'Current Time',
-          price: 'Product Price',
-          discount: 'Discount Rate'
-        }
-      },
-      tr: {
-        title: 'UUS.js Uluslararasılaştırma Demosu',
-        subtitle: 'Reaktif durum ile güçlü i18n özelliklerini deneyimleyin',
-        sections: {
-          basic: 'Temel Çeviri',
-          interpolation: 'Metin Enterpolasyonu',
-          pluralization: 'Çoğullama',
-          forms: 'Tarih ve Sayı Formatı',
-          dynamic: 'Dinamik İçerik'
-        },
-        examples: {
-          hello: 'Merhaba Dünya!',
-          goodbye: 'Hoşça kal!',
-          welcome: 'Hoş geldin, {name}!',
-          user_greeting: 'Merhaba {name}, {count} {count, plural, one {mesajınız} other {mesajınız}} var',
-          form_validation: {
-            required: 'Bu alan zorunludur',
-            email: 'Lütfen geçerli bir e-posta adresi girin'
-          },
-          login_success: 'Tekrar hoş geldin, {username}!'
-        },
-        labels: {
-          name: 'Adınız',
-          email: 'E-posta Adresi'
-        },
-        actions: {
-          decrease: 'Azalt',
-          increase: 'Artır',
-          reset: 'Sıfırla',
-          submit: 'Gönder',
-          clear: 'Temizle',
-          change_language: 'Dil Değiştir'
-        },
-        plurals: {
-          item: '{count, plural, =0 {Öğe yok} one {1 öğe} other {{count} öğe}}',
-          notification: '{count, plural, =0 {Bildirim yok} one {1 bildirim} other {{count} bildirim}}'
-        },
-        demo: {
-          current_time: 'Şu Anki Zaman',
-          price: 'Ürün Fiyatı',
-          discount: 'İndirim Oranı'
-        }
-      },
-      ar: {
-        title: 'عرض دولي UUS.js',
-        subtitle: 'اختبر ميزات التدويل القوية مع الحالة التفاعلية',
-        sections: {
-          basic: 'ترجمة أساسية',
-          interpolation: 'استيفاء النص',
-          pluralization: 'الجمع',
-          forms: 'تنسيق التاريخ والرقم',
-          dynamic: 'محتوى ديناميكي'
-        },
-        examples: {
-          hello: 'مرحبا بالعالم!',
-          goodbye: 'وداعا!',
-          welcome: 'مرحبا، {name}!',
-          user_greeting: 'مرحبا {name}، لديك {count} {count, plural, zero {رسائل} one {رسالة} two {رسالتان} few {رسائل} many {رسالة} other {رسالة}}',
-          form_validation: {
-            required: 'هذا الحقل مطلوب',
-            email: 'يرجى إدخال عنوان بريد إلكتروني صحيح'
-          },
-          login_success: 'مرحبا بعودتك، {username}!'
-        },
-        labels: {
-          name: 'اسمك',
-          email: 'عنوان البريد الإلكتروني'
-        },
-        actions: {
-          decrease: 'تقليل',
-          increase: 'زيادة',
-          reset: 'إعادة تعيين',
-          submit: 'إرسال',
-          clear: 'مسح',
-          change_language: 'تغيير اللغة'
-        },
-        plurals: {
-          item: '{count, plural, =0 {لا توجد عناصر} one {عنصر واحد} two {عنصران} few {عناصر} many {عنصر} other {عنصر}}',
-          notification: '{count, plural, =0 {لا توجد إشعارات} one {إشعار واحد} two {إشعاران} few {إشعارات} many {إشعار} other {إشعار}}'
-        },
-        demo: {
-          current_time: 'الوقت الحالي',
-          price: 'سعر المنتج',
-          discount: 'معدل الخصم'
-        }
-      },
-      es: {
-        title: 'Demo de Internacionalización UUS.js',
-        subtitle: 'Experimenta poderosas características i18n con estado reactivo',
-        sections: {
-          basic: 'Traducción Básica',
-          interpolation: 'Interpolación de Cadenas',
-          pluralization: 'Pluralización',
-          forms: 'Formato de Fecha y Número',
-          dynamic: 'Contenido Dinámico'
-        },
-        examples: {
-          hello: '¡Hola Mundo!',
-          goodbye: '¡Adiós!',
-          welcome: '¡Bienvenido, {name}!',
-          user_greeting: 'Hola {name}, tienes {count} {count, plural, one {mensaje} other {mensajes}}',
-          form_validation: {
-            required: 'Este campo es obligatorio',
-            email: 'Por favor ingresa una dirección de correo válida'
-          },
-          login_success: '¡Bienvenido de vuelta, {username}!'
-        },
-        labels: {
-          name: 'Tu Nombre',
-          email: 'Dirección de Correo'
-        },
-        actions: {
-          decrease: 'Disminuir',
-          increase: 'Aumentar',
-          reset: 'Restablecer',
-          submit: 'Enviar',
-          clear: 'Limpiar',
-          change_language: 'Cambiar Idioma'
-        },
-        plurals: {
-          item: '{count, plural, =0 {Sin elementos} one {1 elemento} other {{count} elementos}}',
-          notification: '{count, plural, =0 {Sin notificaciones} one {1 notificación} other {{count} notificaciones}}'
-        },
-        demo: {
-          current_time: 'Hora Actual',
-          price: 'Precio del Producto',
-          discount: 'Tasa de Descuento'
-        }
-      }
-    },
-    
-    // Computed properties
-    get isRTL() {
-      return ['ar', 'he', 'fa'].includes(this.currentLocale);
-    },
-    
-    get currentMessages() {
-      return this.messages[this.currentLocale] || this.messages.en;
-    },
-    
-    // Translation methods
-    t(key, params = {}) {
-      const keys = key.split('.');
-      let value = this.currentMessages;
-      
-      for (const k of keys) {
-        value = value?.[k];
-        if (value === undefined) break;
-      }
-      
-      if (value === undefined) {
-        return key; // Return key if translation not found
-      }
-      
-      // Simple interpolation
-      if (typeof value === 'string' && Object.keys(params).length > 0) {
-        return value.replace(/\{(\w+)\}/g, (match, param) => {
-          return params[param] !== undefined ? params[param] : match;
-        });
-      }
-      
-      return value;
-    },
-    
-    tp(key, count) {
-      const message = this.t(key);
-      if (typeof message !== 'string') return message;
-      
-      // Simple pluralization - in real app would use proper ICU MessageFormat
-      if (message.includes('plural')) {
-        if (count === 0) {
-          return message.replace(/\{count, plural, [^}]*=0 \{([^}]*)\}[^}]*\}/g, (match, zero) => {
-            return zero.replace('{count}', count);
-          });
-        } else if (count === 1) {
-          return message.replace(/\{count, plural, [^}]*one \{([^}]*)\}[^}]*\}/g, (match, one) => {
-            return one.replace('{count}', count);
-          });
-        } else {
-          return message.replace(/\{count, plural, [^}]*other \{([^}]*)\}[^}]*\}/g, (match, other) => {
-            return other.replace('{count}', count);
-          });
-        }
-      }
-      
-      return message.replace('{count}', count);
-    },
-    
-    d(date, format) {
-      const locale = this.currentLocale;
-      if (format === 'long') {
-        return new Intl.DateTimeFormat(locale, {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-          weekday: 'long',
-          hour: '2-digit',
-          minute: '2-digit'
-        }).format(date);
-      } else {
-        return new Intl.DateTimeFormat(locale, {
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric'
-        }).format(date);
-      }
-    },
-    
-    n(number, format) {
-      const locale = this.currentLocale;
-      if (format === 'currency') {
-        return new Intl.NumberFormat(locale, {
-          style: 'currency',
-          currency: 'USD'
-        }).format(number);
-      } else if (format === 'percent') {
-        return new Intl.NumberFormat(locale, {
-          style: 'percent',
-          minimumFractionDigits: 1
-        }).format(number);
-      } else {
-        return new Intl.NumberFormat(locale).format(number);
-      }
-    },
+    currentDate: new Date(),
+    features: ['translation', 'pluralization', 'formatting', 'directives'],
     
     // Methods
-    changeLanguage(locale) {
-      this.currentLocale = locale;
-      
-      // Update document direction and language
-      document.documentElement.dir = this.isRTL ? 'rtl' : 'ltr';
-      document.documentElement.lang = locale;
+    setLanguage(code) {
+      this.$i18n.setLocale(code);
+      const lang = this.languages.find(l => l.code === code);
+      document.body.className = lang.dir === 'rtl' ? 'rtl' : '';
+      document.documentElement.lang = code;
     },
     
-    isValidEmail(email) {
-      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    updateTime() {
+      this.currentDate = new Date();
     },
     
-    validateForm() {
-      this.showValidation = true;
-      
-      if (this.formData.name && this.isValidEmail(this.formData.email)) {
-        this.formSubmitted = true;
-        this.showValidation = false;
-        
-        // Reset after 3 seconds
-        setTimeout(() => {
-          this.formSubmitted = false;
-        }, 3000);
-      }
-    },
-    
-    clearForm() {
-      this.formData.name = '';
-      this.formData.email = '';
-      this.showValidation = false;
-      this.formSubmitted = false;
+    // Lifecycle
+    mounted() {
+      // Update time every second
+      setInterval(() => this.updateTime(), 1000);
     }
-  }">
-    <!-- Header -->
-    <div class="header">
-      <h1 uus-text="t('title')"></h1>
-      <p uus-text="t('subtitle')"></p>
-      
+  }" uus-bind:class="$i18n.locale === 'ar' ? 'rtl' : ''">
+    <header>
+      <h1>🌍 UUS.js i18n Demo</h1>
       <div class="language-switcher">
         <button 
-          uus-for="lang in languages"
-          uus-on:click="changeLanguage(lang.code)"
-          class="lang-btn"
-          uus-class="{ active: currentLocale === lang.code }"
-        >
-          <span uus-text="lang.flag"></span>
-          <span uus-text="lang.name"></span>
-        </button>
+          uus-for="lang in languages" 
+          uus-text="lang.name"
+          uus-on:click="setLanguage(lang.code)"
+          uus-class="{ active: $i18n.locale === lang.code }"
+        ></button>
       </div>
-    </div>
-    
-    <!-- Basic Translation Demo -->
-    <div class="demo-section">
-      <h2 uus-text="t('sections.basic')"></h2>
-      <div class="demo-grid">
-        <div class="demo-item">
-          <h3>Simple Translation</h3>
-          <div class="result" uus-text="t('examples.hello')"></div>
-          <div class="code">t('examples.hello')</div>
+    </header>
+
+    <main>
+      <section class="greeting">
+        <h2 uus-t="greeting" :name="userName"></h2>
+        <input 
+          uus-model="userName" 
+          uus-bind:placeholder="$i18n.t('namePlaceholder')"
+        />
+      </section>
+
+      <section class="counter">
+        <h3 uus-t="counterTitle"></h3>
+        <p uus-text="$i18n.tc('itemCount', count, { count })"></p>
+        <div class="counter-controls">
+          <button uus-on:click="count--" uus-t="decrease"></button>
+          <span class="count" uus-text="count"></span>
+          <button uus-on:click="count++" uus-t="increase"></button>
         </div>
-        
-        <div class="demo-item">
-          <h3>Dynamic Direction</h3>
-          <div class="result" uus-class="isRTL ? 'rtl' : 'ltr'" uus-text="t('examples.goodbye')"></div>
-          <div class="code">Auto RTL/LTR based on locale</div>
-        </div>
-      </div>
-    </div>
-    
-    <!-- String Interpolation Demo -->
-    <div class="demo-section">
-      <h2 uus-text="t('sections.interpolation')"></h2>
-      <div class="demo-grid">
-        <div class="demo-item">
-          <h3>User Input Demo</h3>
-          <div class="user-form">
-            <input 
-              type="text" 
-              uus-model="userName"
-              uus-attr:placeholder="t('labels.name')"
-            >
-            <div uus-show="userName" class="welcome-message" uus-class="isRTL ? 'rtl' : 'ltr'">
-              <span uus-text="t('examples.welcome', { name: userName })"></span>
-            </div>
-          </div>
-          <div class="code">t('examples.welcome', { name: userName })</div>
-        </div>
-        
-        <div class="demo-item">
-          <h3>Complex Interpolation</h3>
-          <div class="result" uus-class="isRTL ? 'rtl' : 'ltr'">
-            <span uus-text="t('examples.user_greeting', { name: 'Alice', count: messageCount })"></span>
-          </div>
-          <div class="code">Multiple variables with pluralization</div>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Pluralization Demo -->
-    <div class="demo-section">
-      <h2 uus-text="t('sections.pluralization')"></h2>
-      <div class="demo-grid">
-        <div class="demo-item">
-          <h3>Interactive Counter</h3>
-          <div class="counter-controls">
-            <button uus-on:click="itemCount = Math.max(0, itemCount - 1)" uus-text="t('actions.decrease')"></button>
-            <span uus-text="itemCount"></span>
-            <button uus-on:click="itemCount++" uus-text="t('actions.increase')"></button>
-            <button uus-on:click="itemCount = 0" uus-text="t('actions.reset')"></button>
-          </div>
-          <div class="result" uus-class="isRTL ? 'rtl' : 'ltr'">
-            <span uus-text="tp('plurals.item', itemCount)"></span>
-          </div>
-          <div class="code">tp('plurals.item', itemCount)</div>
-        </div>
-        
-        <div class="demo-item">
-          <h3>Notifications</h3>
-          <div class="counter-controls">
-            <button uus-on:click="notificationCount = Math.max(0, notificationCount - 1)">-</button>
-            <span uus-text="notificationCount"></span>
-            <button uus-on:click="notificationCount++">+</button>
-          </div>
-          <div class="result" uus-class="isRTL ? 'rtl' : 'ltr'">
-            <span uus-text="tp('plurals.notification', notificationCount)"></span>
-          </div>
-          <div class="code">Complex Arabic pluralization</div>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Date & Number Formatting -->
-    <div class="demo-section">
-      <h2 uus-text="t('sections.forms')"></h2>
-      <div class="demo-grid">
-        <div class="demo-item">
-          <h3 uus-text="t('demo.current_time')"></h3>
-          <div class="result">
-            <div uus-text="d(currentDate, 'long')"></div>
-            <div class="date-time" uus-text="d(currentDate, 'short')"></div>
-          </div>
-          <div class="code">d(date, 'long') / d(date, 'short')</div>
-        </div>
-        
-        <div class="demo-item">
-          <h3 uus-text="t('demo.price')"></h3>
-          <div class="result" uus-text="n(price, 'currency')"></div>
-          <div class="code">n(price, 'currency')</div>
-        </div>
-        
-        <div class="demo-item">
-          <h3 uus-text="t('demo.discount')"></h3>
-          <div class="result" uus-text="n(discount, 'percent')"></div>
-          <div class="code">n(discount, 'percent')</div>
-        </div>
-        
-        <div class="demo-item">
-          <h3>Locale-aware Numbers</h3>
-          <div class="result">
-            <div uus-text="n(largeNumber)"></div>
-            <div class="date-time">Formatted for current locale</div>
-          </div>
-          <div class="code">n(largeNumber)</div>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Form Validation Demo -->
-    <div class="demo-section">
-      <h2 uus-text="t('sections.dynamic')"></h2>
-      <div class="demo-grid">
-        <div class="demo-item">
-          <h3>Form Validation</h3>
-          <div class="user-form">
-            <input 
-              type="text" 
-              uus-model="formData.name"
-              uus-attr:placeholder="t('labels.name')"
-            >
-            <div uus-show="!formData.name && showValidation" class="error">
-              <span uus-text="t('examples.form_validation.required')"></span>
-            </div>
-            
-            <input 
-              type="email" 
-              uus-model="formData.email"
-              uus-attr:placeholder="t('labels.email')"
-            >
-            <div uus-show="!isValidEmail(formData.email) && formData.email && showValidation" class="error">
-              <span uus-text="t('examples.form_validation.email')"></span>
-            </div>
-            
-            <button uus-on:click="validateForm()" uus-text="t('actions.submit')"></button>
-            <button uus-on:click="clearForm()" uus-text="t('actions.clear')"></button>
-          </div>
-          
-          <div uus-show="formSubmitted" class="welcome-message">
-            <span uus-text="t('examples.login_success', { username: formData.name })"></span>
-          </div>
-        </div>
-        
-        <div class="demo-item">
-          <h3>Missing Translation</h3>
-          <div class="result">
-            <span uus-text="t('this.key.does.not.exist')"></span>
-          </div>
-          <div class="code">Fallback behavior demonstration</div>
-        </div>
-      </div>
-    </div>
+      </section>
+      
+      <section class="formatting">
+        <h3 uus-t="formattingTitle"></h3>
+        <p uus-text="$i18n.t('priceLabel') + ': ' + $i18n.n(price, 'currency')"></p>
+        <div class="price-display" uus-text="$i18n.n(price * count || price, 'currency')"></div>
+        <p uus-text="$i18n.t('percentageLabel') + ': ' + $i18n.n(0.854, 'percent')"></p>
+      </section>
+
+      <section class="date-time">
+        <h3 uus-t="dateTimeTitle"></h3>
+        <p uus-text="$i18n.t('currentDate') + ': ' + $i18n.d(currentDate, 'long')"></p>
+        <p uus-text="$i18n.t('currentTime') + ': ' + $i18n.d(currentDate, 'time')"></p>
+      </section>
+
+      <section class="features">
+        <h3 uus-t="features.title"></h3>
+        <ul>
+          <li uus-for="feature in features" uus-t="'features.' + feature"></li>
+        </ul>
+      </section>
+    </main>
+
+    <footer>
+      <p uus-t-html="footer"></p>
+    </footer>
   </div>
 
-  <script type="module" src="/src/main.js"></script>
+  <script type="module">
+    import { Uus, i18nPlugin } from '@uusjs/core';
+    
+    // Create app with i18n plugin
+    const app = new Uus({
+      plugins: [i18nPlugin]
+    });
+    
+    // Setup i18n
+    app.setupI18n({
+      defaultLocale: 'en',
+      fallbackLocale: 'en',
+      detectBrowserLocale: true,
+      messages: {
+        en: {
+          greeting: 'Hello, {name}!',
+          namePlaceholder: 'Enter your name',
+          counterTitle: 'Counter Example',
+          itemCount: {
+            zero: 'No items',
+            one: 'One item',
+            other: '{count} items'
+          },
+          decrease: 'Decrease',
+          increase: 'Increase',
+          formattingTitle: 'Number & Currency Formatting',
+          priceLabel: 'Price',
+          percentageLabel: 'Completion',
+          dateTimeTitle: 'Date & Time',
+          currentDate: 'Today is',
+          currentTime: 'Current time',
+          features: {
+            title: 'i18n Features',
+            translation: 'Simple message translation',
+            pluralization: 'Smart pluralization rules',
+            formatting: 'Number, currency & date formatting',
+            directives: 'Convenient template directives'
+          },
+          footer: 'Made with ❤️ using <a href="https://uusjs.dev">UUS.js</a>'
+        },
+        es: {
+          greeting: '¡Hola, {name}!',
+          namePlaceholder: 'Ingresa tu nombre',
+          counterTitle: 'Ejemplo de Contador',
+          itemCount: {
+            zero: 'Sin elementos',
+            one: 'Un elemento',
+            other: '{count} elementos'
+          },
+          decrease: 'Disminuir',
+          increase: 'Aumentar',
+          formattingTitle: 'Formato de Números y Moneda',
+          priceLabel: 'Precio',
+          percentageLabel: 'Completado',
+          dateTimeTitle: 'Fecha y Hora',
+          currentDate: 'Hoy es',
+          currentTime: 'Hora actual',
+          features: {
+            title: 'Características de i18n',
+            translation: 'Traducción simple de mensajes',
+            pluralization: 'Reglas inteligentes de pluralización',
+            formatting: 'Formato de números, moneda y fechas',
+            directives: 'Directivas convenientes para plantillas'
+          },
+          footer: 'Hecho con ❤️ usando <a href="https://uusjs.dev">UUS.js</a>'
+        },
+        fr: {
+          greeting: 'Bonjour, {name}!',
+          namePlaceholder: 'Entrez votre nom',
+          counterTitle: 'Exemple de Compteur',
+          itemCount: {
+            zero: 'Aucun élément',
+            one: 'Un élément',
+            other: '{count} éléments'
+          },
+          decrease: 'Diminuer',
+          increase: 'Augmenter',
+          formattingTitle: 'Format des Nombres et Devises',
+          priceLabel: 'Prix',
+          percentageLabel: 'Achèvement',
+          dateTimeTitle: 'Date et Heure',
+          currentDate: 'Aujourd\'hui est le',
+          currentTime: 'Heure actuelle',
+          features: {
+            title: 'Fonctionnalités i18n',
+            translation: 'Traduction simple des messages',
+            pluralization: 'Règles de pluralisation intelligentes',
+            formatting: 'Format des nombres, devises et dates',
+            directives: 'Directives pratiques pour les modèles'
+          },
+          footer: 'Fait avec ❤️ en utilisant <a href="https://uusjs.dev">UUS.js</a>'
+        },
+        de: {
+          greeting: 'Hallo, {name}!',
+          namePlaceholder: 'Gib deinen Namen ein',
+          counterTitle: 'Zähler Beispiel',
+          itemCount: {
+            zero: 'Keine Elemente',
+            one: 'Ein Element',
+            other: '{count} Elemente'
+          },
+          decrease: 'Verringern',
+          increase: 'Erhöhen',
+          formattingTitle: 'Zahlen- und Währungsformat',
+          priceLabel: 'Preis',
+          percentageLabel: 'Fertigstellung',
+          dateTimeTitle: 'Datum und Uhrzeit',
+          currentDate: 'Heute ist',
+          currentTime: 'Aktuelle Zeit',
+          features: {
+            title: 'i18n Funktionen',
+            translation: 'Einfache Nachrichtenübersetzung',
+            pluralization: 'Intelligente Pluralisierungsregeln',
+            formatting: 'Zahlen-, Währungs- und Datumsformat',
+            directives: 'Praktische Template-Direktiven'
+          },
+          footer: 'Mit ❤️ erstellt mit <a href="https://uusjs.dev">UUS.js</a>'
+        },
+        ar: {
+          greeting: 'مرحباً، {name}!',
+          namePlaceholder: 'أدخل اسمك',
+          counterTitle: 'مثال العداد',
+          itemCount: {
+            zero: 'لا توجد عناصر',
+            one: 'عنصر واحد',
+            two: 'عنصران',
+            few: '{count} عناصر',
+            many: '{count} عنصراً',
+            other: '{count} عنصر'
+          },
+          decrease: 'إنقاص',
+          increase: 'زيادة',
+          formattingTitle: 'تنسيق الأرقام والعملات',
+          priceLabel: 'السعر',
+          percentageLabel: 'الإكمال',
+          dateTimeTitle: 'التاريخ والوقت',
+          currentDate: 'اليوم هو',
+          currentTime: 'الوقت الحالي',
+          features: {
+            title: 'مميزات i18n',
+            translation: 'ترجمة بسيطة للرسائل',
+            pluralization: 'قواعد ذكية للجمع',
+            formatting: 'تنسيق الأرقام والعملات والتواريخ',
+            directives: 'توجيهات مريحة للقوالب'
+          },
+          footer: 'صنع بـ ❤️ باستخدام <a href="https://uusjs.dev">UUS.js</a>'
+        },
+        ja: {
+          greeting: 'こんにちは、{name}さん！',
+          namePlaceholder: '名前を入力してください',
+          counterTitle: 'カウンターの例',
+          itemCount: {
+            zero: 'アイテムなし',
+            other: '{count}個のアイテム'
+          },
+          decrease: '減らす',
+          increase: '増やす',
+          formattingTitle: '数値と通貨のフォーマット',
+          priceLabel: '価格',
+          percentageLabel: '完了率',
+          dateTimeTitle: '日付と時刻',
+          currentDate: '今日は',
+          currentTime: '現在時刻',
+          features: {
+            title: 'i18n機能',
+            translation: 'シンプルなメッセージ翻訳',
+            pluralization: 'スマートな複数形ルール',
+            formatting: '数値、通貨、日付のフォーマット',
+            directives: '便利なテンプレートディレクティブ'
+          },
+          footer: '<a href="https://uusjs.dev">UUS.js</a>で❤️を込めて作成'
+        },
+        zh: {
+          greeting: '你好，{name}！',
+          namePlaceholder: '请输入您的名字',
+          counterTitle: '计数器示例',
+          itemCount: {
+            zero: '没有项目',
+            other: '{count} 个项目'
+          },
+          decrease: '减少',
+          increase: '增加',
+          formattingTitle: '数字和货币格式',
+          priceLabel: '价格',
+          percentageLabel: '完成度',
+          dateTimeTitle: '日期和时间',
+          currentDate: '今天是',
+          currentTime: '当前时间',
+          features: {
+            title: 'i18n 功能',
+            translation: '简单的消息翻译',
+            pluralization: '智能复数规则',
+            formatting: '数字、货币和日期格式',
+            directives: '便捷的模板指令'
+          },
+          footer: '使用 <a href="https://uusjs.dev">UUS.js</a> 用 ❤️ 制作'
+        }
+      },
+      numberFormats: {
+        currency: {
+          style: 'currency',
+          currency: 'USD',
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        },
+        percent: {
+          style: 'percent',
+          minimumFractionDigits: 1,
+          maximumFractionDigits: 1
+        }
+      },
+      dateFormats: {
+        long: {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        },
+        time: {
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit'
+        }
+      }
+    });
+    
+    // Mount app
+    app.mount('#app');
+    
+    // Make app available globally for debugging
+    window.app = app;
+    
+    console.log('i18n Demo loaded!');
+    console.log('Try switching languages to see the translations!');
+  </script>
 </body>
 </html>

@@ -1,20 +1,21 @@
-import type { Directive, UusInstance } from '../types';
+import type { Directive, StyleDirectiveBinding } from '../types';
 import { effect } from '../reactive';
 import { createSafeEvaluator } from '../evaluator';
+import { asDirectiveName, asExpressionString } from '../type-guards';
 
-export const classDirective: Directive = {
-  name: 'class',
+export const classDirective: Directive<StyleDirectiveBinding> = {
+  name: asDirectiveName('class'),
   bind(el, binding, uus) {
     const evaluator = createSafeEvaluator(uus.state);
     const originalClasses = el.className;
-    
+
     const cleanup = effect(() => {
       try {
-        const value = evaluator(binding.expression || '{}');
-        
+        const value = evaluator(binding.expression ? asExpressionString(binding.expression) : asExpressionString('{}'));
+
         // Reset to original classes
         el.className = originalClasses;
-        
+
         if (typeof value === 'string') {
           // String syntax: just add the classes
           el.classList.add(...value.split(' ').filter(Boolean));

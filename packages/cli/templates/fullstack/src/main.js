@@ -10,54 +10,54 @@ const api = {
     if (!response.ok) throw new Error('Network response was not ok');
     return response.json();
   },
-  
+
   async post(url, data) {
     const response = await fetch(`/api${url}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     });
     if (!response.ok) throw new Error('Network response was not ok');
     return response.json();
   },
-  
+
   async put(url, data) {
     const response = await fetch(`/api${url}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     });
     if (!response.ok) throw new Error('Network response was not ok');
     return response.json();
   },
-  
+
   async delete(url) {
     const response = await fetch(`/api${url}`, {
-      method: 'DELETE'
+      method: 'DELETE',
     });
     if (!response.ok) throw new Error('Network response was not ok');
-  }
+  },
 };
 
 // Create router
 const router = createRouter({
   routes: [
-    { 
-      path: '/', 
+    {
+      path: '/',
       component: 'home',
-      name: 'home'
+      name: 'home',
     },
-    { 
-      path: '/todos', 
+    {
+      path: '/todos',
       component: 'todos',
-      name: 'todos'
+      name: 'todos',
     },
-    { 
-      path: '/profile', 
+    {
+      path: '/profile',
       component: 'profile',
-      name: 'profile'
-    }
-  ]
+      name: 'profile',
+    },
+  ],
 });
 
 // App template
@@ -179,17 +179,20 @@ const app = new Uus({
     loading: false,
     newTodoText: '',
     user: null,
-    
+
     // Todo form
-    todoForm: createForm({
-      text: ''
-    }, {
-      text: [
-        validators.required('Todo text is required'),
-        validators.minLength(3, 'Todo must be at least 3 characters')
-      ]
-    }),
-    
+    todoForm: createForm(
+      {
+        text: '',
+      },
+      {
+        text: [
+          validators.required('Todo text is required'),
+          validators.minLength(3, 'Todo must be at least 3 characters'),
+        ],
+      }
+    ),
+
     // Methods
     async loadTodos() {
       this.loading = true;
@@ -201,7 +204,7 @@ const app = new Uus({
         this.loading = false;
       }
     },
-    
+
     async loadUser() {
       try {
         this.user = await api.get('/user');
@@ -209,13 +212,13 @@ const app = new Uus({
         console.error('Failed to load user:', error);
       }
     },
-    
+
     async addTodo() {
       this.todoForm.setValue('text', this.newTodoText);
       await this.todoForm.validate();
-      
+
       if (!this.todoForm.valid) return;
-      
+
       try {
         const newTodo = await api.post('/todos', { text: this.newTodoText });
         this.todos.push(newTodo);
@@ -225,7 +228,7 @@ const app = new Uus({
         console.error('Failed to add todo:', error);
       }
     },
-    
+
     async toggleTodo(todo) {
       try {
         await api.put(`/todos/${todo.id}`, { done: !todo.done });
@@ -234,7 +237,7 @@ const app = new Uus({
         console.error('Failed to toggle todo:', error);
       }
     },
-    
+
     async deleteTodo(todo) {
       try {
         await api.delete(`/todos/${todo.id}`);
@@ -245,8 +248,8 @@ const app = new Uus({
       } catch (error) {
         console.error('Failed to delete todo:', error);
       }
-    }
-  }
+    },
+  },
 });
 
 // Set up router

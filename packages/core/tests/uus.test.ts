@@ -51,7 +51,7 @@ describe('Uus', () => {
   describe('directives', () => {
     it('should process uus-state directive', () => {
       container.innerHTML = `
-        <div uus-state="{ message: 'Hello' }">
+        <div uus-state='{ message: "Hello" }'>
           <span uus-text="message"></span>
         </div>
       `;
@@ -115,7 +115,7 @@ describe('Uus', () => {
 
       const button = container.querySelector('#btn') as HTMLButtonElement;
       button.click();
-      
+
       const display = container.querySelector('#display');
       expect(display?.textContent).toBe('1');
 

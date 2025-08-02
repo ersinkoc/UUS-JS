@@ -19,8 +19,8 @@ const router = createRouter({
   routes: [
     { path: '/', component: 'home' },
     { path: '/about', component: 'about' },
-    { path: '/user/:id', component: 'user' }
-  ]
+    { path: '/user/:id', component: 'user' },
+  ],
 });
 
 const app = new Uus();
@@ -38,16 +38,16 @@ app.mount('#app');
     <div uus-route="/">
       <h1>Home Page</h1>
     </div>
-    
+
     <div uus-route="/about">
       <h1>About Page</h1>
     </div>
-    
+
     <div uus-route="/user/:id" uus-params="userId">
       <h1>User <span uus-text="userId"></span></h1>
     </div>
   </div>
-  
+
   <!-- Navigation links -->
   <nav>
     <a uus-link="/">Home</a>

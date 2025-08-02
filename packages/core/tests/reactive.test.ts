@@ -1,16 +1,16 @@
 import { describe, it, expect, vi } from 'vitest';
-import { 
-  createReactive, 
+import {
+  createReactive,
   reactive,
   ref,
   computed,
-  effect, 
+  effect,
   watch,
   isRef,
   isReactive,
   unref,
   toRaw,
-  markRaw
+  markRaw,
 } from '../src/reactive';
 
 describe('Reactive System', () => {
@@ -37,11 +37,11 @@ describe('Reactive System', () => {
     });
 
     it('should handle nested objects', () => {
-      const state = createReactive({ 
-        user: { 
+      const state = createReactive({
+        user: {
           name: 'John',
-          settings: { theme: 'dark' }
-        } 
+          settings: { theme: 'dark' },
+        },
       });
       const fn = vi.fn();
 
@@ -91,7 +91,7 @@ describe('Reactive System', () => {
 
       cleanup();
       state.count = 1;
-      
+
       // Should not be called after cleanup
       expect(fn).toHaveBeenCalledTimes(1);
     });
@@ -115,7 +115,7 @@ describe('Reactive System', () => {
   describe('computed', () => {
     it('should compute derived values', () => {
       const state = createReactive({ price: 100, tax: 0.1 });
-      const total = computed(() => state.price + (state.price * state.tax));
+      const total = computed(() => state.price + state.price * state.tax);
 
       expect(total.value).toBe(110);
 
@@ -150,11 +150,11 @@ describe('Reactive System', () => {
     it('should watch ref changes', () => {
       const count = ref(0);
       const cb = vi.fn();
-      
+
       watch(() => count.value, cb);
-      
+
       expect(cb).not.toHaveBeenCalled();
-      
+
       count.value++;
       expect(cb).toHaveBeenCalledWith(1, 0);
     });
@@ -162,21 +162,21 @@ describe('Reactive System', () => {
     it('should support immediate option', () => {
       const count = ref(0);
       const cb = vi.fn();
-      
+
       watch(() => count.value, cb, { immediate: true });
-      
+
       expect(cb).toHaveBeenCalledWith(0, undefined);
     });
 
     it('should return stop function', () => {
       const count = ref(0);
       const cb = vi.fn();
-      
+
       const stop = watch(() => count.value, cb);
-      
+
       count.value++;
       expect(cb).toHaveBeenCalledTimes(1);
-      
+
       stop();
       count.value++;
       expect(cb).toHaveBeenCalledTimes(1);
@@ -187,7 +187,7 @@ describe('Reactive System', () => {
     it('should unref values', () => {
       const ref1 = ref(1);
       const val = 2;
-      
+
       expect(unref(ref1)).toBe(1);
       expect(unref(val)).toBe(2);
     });
@@ -195,7 +195,7 @@ describe('Reactive System', () => {
     it('should get raw values', () => {
       const obj = { count: 0 };
       const reactiveObj = reactive(obj);
-      
+
       expect(toRaw(reactiveObj)).toBe(obj);
       expect(toRaw(obj)).toBe(obj);
     });
@@ -203,14 +203,14 @@ describe('Reactive System', () => {
     it('should mark values as raw', () => {
       const obj = markRaw({ count: 0 });
       const reactiveObj = reactive({ obj });
-      
+
       expect(isReactive(reactiveObj.obj)).toBe(false);
-      
+
       let dummy;
       effect(() => {
         dummy = reactiveObj.obj.count;
       });
-      
+
       expect(dummy).toBe(0);
       reactiveObj.obj.count = 1;
       expect(dummy).toBe(0); // Should not update
@@ -219,7 +219,7 @@ describe('Reactive System', () => {
     it('should detect reactive objects', () => {
       const obj = { count: 0 };
       const reactiveObj = reactive(obj);
-      
+
       expect(isReactive(obj)).toBe(false);
       expect(isReactive(reactiveObj)).toBe(true);
     });
@@ -227,7 +227,7 @@ describe('Reactive System', () => {
     it('should handle nested ref tracking', () => {
       const innerRef = ref(1);
       const outerRef = ref(innerRef);
-      
+
       expect(outerRef.value).toBe(1);
       innerRef.value = 2;
       expect(outerRef.value).toBe(2);
@@ -237,18 +237,18 @@ describe('Reactive System', () => {
       const arr = reactive([1, 2, 3]);
       let sum;
       let lengthValue;
-      
+
       effect(() => {
         sum = arr.reduce((a, b) => a + b, 0);
         lengthValue = arr.length;
       });
-      
+
       expect(sum).toBe(6);
       expect(lengthValue).toBe(3);
-      
+
       arr[0] = 10;
       expect(sum).toBe(15);
-      
+
       arr.push(4);
       expect(lengthValue).toBe(4);
       expect(sum).toBe(19);
@@ -257,13 +257,13 @@ describe('Reactive System', () => {
     it('should handle delete property', () => {
       const obj = reactive({ a: 1, b: 2 });
       let keys;
-      
+
       effect(() => {
         keys = Object.keys(obj);
       });
-      
+
       expect(keys).toEqual(['a', 'b']);
-      
+
       delete obj.b;
       expect(keys).toEqual(['a']);
     });
@@ -271,13 +271,13 @@ describe('Reactive System', () => {
     it('should handle has property checks', () => {
       const obj = reactive({ a: 1 });
       let hasA;
-      
+
       effect(() => {
         hasA = 'a' in obj;
       });
-      
+
       expect(hasA).toBe(true);
-      
+
       delete obj.a;
       expect(hasA).toBe(false);
     });
@@ -285,13 +285,13 @@ describe('Reactive System', () => {
     it('should handle ownKeys enumeration', () => {
       const obj = reactive({ a: 1, b: 2 });
       let keys;
-      
+
       effect(() => {
         keys = Object.keys(obj);
       });
-      
+
       expect(keys).toEqual(['a', 'b']);
-      
+
       obj.c = 3;
       expect(keys).toEqual(['a', 'b', 'c']);
     });
@@ -300,7 +300,7 @@ describe('Reactive System', () => {
       const obj = { count: 0 };
       const reactive1 = reactive(obj);
       const reactive2 = reactive(obj);
-      
+
       expect(reactive1).toBe(reactive2);
     });
 
@@ -308,20 +308,20 @@ describe('Reactive System', () => {
       const obj = { count: 0 };
       const reactiveObj = reactive(obj);
       const doubleReactive = reactive(reactiveObj);
-      
+
       expect(reactiveObj).toBe(doubleReactive);
     });
 
     it('should handle __raw property access', () => {
       const obj = { count: 0 };
       const reactiveObj = reactive(obj);
-      
+
       expect((reactiveObj as any).__raw).toBe(obj);
     });
 
     it('should handle __isReactive property access', () => {
       const reactiveObj = reactive({ count: 0 });
-      
+
       expect((reactiveObj as any).__isReactive).toBe(true);
     });
   });

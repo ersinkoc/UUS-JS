@@ -11,7 +11,7 @@ describe('Text Directive', () => {
     uus = new Uus();
     element = document.createElement('span');
     document.body.appendChild(element);
-    
+
     // Set up basic state
     uus.state.message = 'Hello World';
     uus.state.name = 'John';
@@ -25,7 +25,7 @@ describe('Text Directive', () => {
       expression: 'message',
       arg: undefined,
       modifiers: {},
-      value: 'message'
+      value: 'message',
     };
 
     textDirective.bind!(element, binding, uus);
@@ -38,7 +38,7 @@ describe('Text Directive', () => {
       expression: 'name + " is " + age + " years old"',
       arg: undefined,
       modifiers: {},
-      value: 'name + " is " + age + " years old"'
+      value: 'name + " is " + age + " years old"',
     };
 
     textDirective.bind!(element, binding, uus);
@@ -51,7 +51,7 @@ describe('Text Directive', () => {
       expression: 'isActive',
       arg: undefined,
       modifiers: {},
-      value: 'isActive'
+      value: 'isActive',
     };
 
     textDirective.bind!(element, binding, uus);
@@ -64,7 +64,7 @@ describe('Text Directive', () => {
       expression: 'count',
       arg: undefined,
       modifiers: {},
-      value: 'count'
+      value: 'count',
     };
 
     textDirective.bind!(element, binding, uus);
@@ -79,7 +79,7 @@ describe('Text Directive', () => {
       expression: 'nullValue',
       arg: undefined,
       modifiers: {},
-      value: 'nullValue'
+      value: 'nullValue',
     };
 
     textDirective.bind!(element, binding, uus);
@@ -94,7 +94,7 @@ describe('Text Directive', () => {
       expression: 'undefinedValue',
       arg: undefined,
       modifiers: {},
-      value: 'undefinedValue'
+      value: 'undefinedValue',
     };
 
     textDirective.bind!(element, binding, uus);
@@ -107,7 +107,7 @@ describe('Text Directive', () => {
       expression: '',
       arg: undefined,
       modifiers: {},
-      value: ''
+      value: '',
     };
 
     textDirective.bind!(element, binding, uus);
@@ -122,7 +122,7 @@ describe('Text Directive', () => {
       expression: 'nonExistentProperty.subProperty',
       arg: undefined,
       modifiers: {},
-      value: 'nonExistentProperty.subProperty'
+      value: 'nonExistentProperty.subProperty',
     };
 
     textDirective.bind!(element, binding, uus);
@@ -130,7 +130,9 @@ describe('Text Directive', () => {
     // The evaluator catches errors and returns undefined
     // String(undefined ?? '') results in empty string
     expect(element.textContent).toBe('');
-    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Error evaluating expression'), expect.any(Error));
+    expect(consoleSpy).toHaveBeenCalledWith(
+      expect.stringContaining('[UUS_EVALUATION_ERROR]')
+    );
 
     consoleSpy.mockRestore();
   });
@@ -140,7 +142,7 @@ describe('Text Directive', () => {
       expression: 'count * 2 + 8',
       arg: undefined,
       modifiers: {},
-      value: 'count * 2 + 8'
+      value: 'count * 2 + 8',
     };
 
     textDirective.bind!(element, binding, uus);
@@ -153,7 +155,7 @@ describe('Text Directive', () => {
       expression: 'isActive ? "Active" : "Inactive"',
       arg: undefined,
       modifiers: {},
-      value: 'isActive ? "Active" : "Inactive"'
+      value: 'isActive ? "Active" : "Inactive"',
     };
 
     textDirective.bind!(element, binding, uus);
@@ -168,7 +170,7 @@ describe('Text Directive', () => {
       expression: 'items[1]',
       arg: undefined,
       modifiers: {},
-      value: 'items[1]'
+      value: 'items[1]',
     };
 
     textDirective.bind!(element, binding, uus);
@@ -183,7 +185,7 @@ describe('Text Directive', () => {
       expression: 'user.name + " (" + user.role + ")"',
       arg: undefined,
       modifiers: {},
-      value: 'user.name + " (" + user.role + ")"'
+      value: 'user.name + " (" + user.role + ")"',
     };
 
     textDirective.bind!(element, binding, uus);
@@ -196,16 +198,16 @@ describe('Text Directive', () => {
       expression: 'message',
       arg: undefined,
       modifiers: {},
-      value: 'message'
+      value: 'message',
     };
 
     textDirective.bind!(element, binding, uus);
-    
+
     // Should have cleanup functions
     expect(uus.cleanups.has(element)).toBe(true);
-    
+
     textDirective.unbind!(element, binding, uus);
-    
+
     // Should clean up
     expect(uus.cleanups.has(element)).toBe(false);
   });
@@ -215,7 +217,7 @@ describe('Text Directive', () => {
       expression: 'message',
       arg: undefined,
       modifiers: {},
-      value: 'message'
+      value: 'message',
     };
 
     // Call unbind without bind first
@@ -231,7 +233,7 @@ describe('Text Directive', () => {
       expression: 'obj',
       arg: undefined,
       modifiers: {},
-      value: 'obj'
+      value: 'obj',
     };
 
     textDirective.bind!(element, binding, uus);
@@ -243,16 +245,16 @@ describe('Text Directive', () => {
     uus.state.data = {
       user: {
         profile: {
-          fullName: 'John Doe'
-        }
-      }
+          fullName: 'John Doe',
+        },
+      },
     };
 
     const binding = {
       expression: 'data.user.profile.fullName',
       arg: undefined,
       modifiers: {},
-      value: 'data.user.profile.fullName'
+      value: 'data.user.profile.fullName',
     };
 
     textDirective.bind!(element, binding, uus);
@@ -265,7 +267,7 @@ describe('Text Directive', () => {
       expression: 'name.toUpperCase()',
       arg: undefined,
       modifiers: {},
-      value: 'name.toUpperCase()'
+      value: 'name.toUpperCase()',
     };
 
     textDirective.bind!(element, binding, uus);
@@ -278,7 +280,7 @@ describe('Text Directive', () => {
       expression: 'message',
       arg: undefined,
       modifiers: {},
-      value: 'message'
+      value: 'message',
     };
 
     textDirective.bind!(element, binding, uus);
@@ -300,7 +302,7 @@ describe('Text Directive', () => {
       expression: 'zero',
       arg: undefined,
       modifiers: {},
-      value: 'zero'
+      value: 'zero',
     };
 
     textDirective.bind!(element, binding, uus);
@@ -315,7 +317,7 @@ describe('Text Directive', () => {
       expression: 'falseValue',
       arg: undefined,
       modifiers: {},
-      value: 'falseValue'
+      value: 'falseValue',
     };
 
     textDirective.bind!(element, binding, uus);

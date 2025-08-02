@@ -1,19 +1,19 @@
 import { createReactive } from '@uusjs/core';
-import type { 
-  I18nOptions, 
-  I18nInstance, 
-  LocaleMessages, 
+import type {
+  I18nOptions,
+  I18nInstance,
+  LocaleMessages,
   TranslationMessages,
-  TranslationResult
+  TranslationResult,
 } from './types';
-import { 
-  getNestedProperty, 
-  setNestedProperty, 
-  deepMerge, 
-  interpolate, 
+import {
+  getNestedProperty,
+  setNestedProperty,
+  deepMerge,
+  interpolate,
   escapeHtml,
   detectBrowserLanguage,
-  normalizeLocale
+  normalizeLocale,
 } from './utils';
 import { getPluralForm } from './pluralization';
 
@@ -40,13 +40,13 @@ export class I18n implements I18nInstance {
       storageKey: 'uus-i18n-locale',
       detectBrowserLanguage: true,
       escapeHtml: true,
-      ...options
+      ...options,
     } as Required<I18nOptions>;
 
     // Initialize state
     this.state = createReactive({
       locale: this.getInitialLocale(),
-      messages: { ...this.options.messages }
+      messages: { ...this.options.messages },
     });
 
     // Set initial locale if different from options
@@ -108,10 +108,12 @@ export class I18n implements I18nInstance {
    */
   d(date: Date | number, format?: string): string {
     const dateObj = typeof date === 'number' ? new Date(date) : date;
-    
+
     if (format && this.options.dateTimeFormats[format]) {
-      return new Intl.DateTimeFormat(this.state.locale, this.options.dateTimeFormats[format])
-        .format(dateObj);
+      return new Intl.DateTimeFormat(
+        this.state.locale,
+        this.options.dateTimeFormats[format]
+      ).format(dateObj);
     }
 
     return new Intl.DateTimeFormat(this.state.locale).format(dateObj);
@@ -122,8 +124,10 @@ export class I18n implements I18nInstance {
    */
   n(number: number, format?: string): string {
     if (format && this.options.numberFormats[format]) {
-      return new Intl.NumberFormat(this.state.locale, this.options.numberFormats[format])
-        .format(number);
+      return new Intl.NumberFormat(
+        this.state.locale,
+        this.options.numberFormats[format]
+      ).format(number);
     }
 
     return new Intl.NumberFormat(this.state.locale).format(number);
@@ -166,7 +170,10 @@ export class I18n implements I18nInstance {
     if (!this.state.messages[locale]) {
       this.state.messages[locale] = {};
     }
-    this.state.messages[locale] = deepMerge(this.state.messages[locale], messages);
+    this.state.messages[locale] = deepMerge(
+      this.state.messages[locale],
+      messages
+    );
   }
 
   /**
@@ -191,12 +198,13 @@ export class I18n implements I18nInstance {
     }
 
     // Start loading
-    const loadPromise = this.options.loadMessages(locale)
-      .then(messages => {
+    const loadPromise = this.options
+      .loadMessages(locale)
+      .then((messages) => {
         this.setMessages(locale, messages);
         this.loadingPromises.delete(locale);
       })
-      .catch(error => {
+      .catch((error) => {
         this.loadingPromises.delete(locale);
         throw error;
       });
@@ -208,7 +216,11 @@ export class I18n implements I18nInstance {
   /**
    * Get translation with fallback logic
    */
-  private getTranslation(key: string, locale: string, params: Record<string, any> = {}): TranslationResult {
+  private getTranslation(
+    key: string,
+    locale: string,
+    params: Record<string, any> = {}
+  ): TranslationResult {
     // Try current locale
     let value = this.getTranslationValue(key, locale);
     if (value !== undefined) {
@@ -216,7 +228,7 @@ export class I18n implements I18nInstance {
       return {
         value: processed,
         locale,
-        key
+        key,
       };
     }
 
@@ -229,7 +241,7 @@ export class I18n implements I18nInstance {
           value: processed,
           locale: this.options.fallbackLocale,
           key,
-          fallback: true
+          fallback: true,
         };
       }
     }
@@ -240,7 +252,7 @@ export class I18n implements I18nInstance {
       value: fallback,
       locale,
       key,
-      fallback: true
+      fallback: true,
     };
   }
 
@@ -272,14 +284,17 @@ export class I18n implements I18nInstance {
       if (value === null || value === undefined) {
         return '';
       }
-      
-      // If it's an object with numeric keys (pluralization array), 
+
+      // If it's an object with numeric keys (pluralization array),
       // this should have been handled earlier in getTranslation
       if (typeof value === 'object' && !Array.isArray(value)) {
-        console.warn('processTranslation received object instead of string:', value);
+        console.warn(
+          'processTranslation received object instead of string:',
+          value
+        );
         return JSON.stringify(value);
       }
-      
+
       return String(value);
     }
 
@@ -297,12 +312,12 @@ export class I18n implements I18nInstance {
    */
   private getPluralKey(key: string, count: number, locale: string): string {
     const pluralIndex = getPluralForm(count, locale);
-    
+
     // Try specific plural forms first
     const pluralKeys = [
       `${key}.${pluralIndex}`,
       `${key}_${pluralIndex}`,
-      `${key}[${pluralIndex}]`
+      `${key}[${pluralIndex}]`,
     ];
 
     for (const pluralKey of pluralKeys) {
@@ -310,10 +325,14 @@ export class I18n implements I18nInstance {
         return pluralKey;
       }
     }
-    
+
     // Check if the key exists as a nested object with plural forms
     const baseMessage = this.getTranslationValue(key, locale);
-    if (baseMessage && typeof baseMessage === 'object' && baseMessage[pluralIndex] !== undefined) {
+    if (
+      baseMessage &&
+      typeof baseMessage === 'object' &&
+      baseMessage[pluralIndex] !== undefined
+    ) {
       // Return a special key that will be handled in getTranslation
       return `${key}[${pluralIndex}]`;
     }
@@ -342,9 +361,12 @@ export class I18n implements I18nInstance {
     if (this.options.detectBrowserLanguage) {
       const browserLang = detectBrowserLanguage();
       const normalized = normalizeLocale(browserLang);
-      
+
       // Check if we have messages for this locale
-      if (this.options.messages[normalized] || this.options.messages[browserLang]) {
+      if (
+        this.options.messages[normalized] ||
+        this.options.messages[browserLang]
+      ) {
         return this.options.messages[browserLang] ? browserLang : normalized;
       }
     }

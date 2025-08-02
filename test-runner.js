@@ -13,11 +13,11 @@ const packages = ['core', 'router', 'animate', 'forms'];
 async function runTest(pkg) {
   return new Promise((resolve) => {
     console.log(`📦 Testing @uusjs/${pkg}...`);
-    
+
     const testProcess = spawn('pnpm', ['test'], {
       cwd: join(__dirname, 'packages', pkg),
       shell: true,
-      stdio: 'inherit'
+      stdio: 'inherit',
     });
 
     testProcess.on('close', (code) => {
@@ -33,12 +33,12 @@ async function runTest(pkg) {
 
 async function runAllTests() {
   let failed = false;
-  
+
   for (const pkg of packages) {
     const code = await runTest(pkg);
     if (code !== 0) failed = true;
   }
-  
+
   if (failed) {
     console.log('❌ Some tests failed!');
     process.exit(1);

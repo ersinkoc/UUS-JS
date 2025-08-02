@@ -26,22 +26,22 @@ UUS.js (Estonian for "new") is a lightweight, reactive HTML framework that bring
 ```html
 <!DOCTYPE html>
 <html>
-<head>
-  <script src="https://unpkg.com/@uusjs/core"></script>
-</head>
-<body>
-  <div id="app" uus-state="{ count: 0, message: 'Hello UUS!' }">
-    <h1 uus-text="message"></h1>
-    <p>Count: <span uus-text="count"></span></p>
-    <button uus-on:click="count++">Increment</button>
-    <button uus-on:click="count = 0" uus-show="count > 0">Reset</button>
-  </div>
-  
-  <script>
-    const app = new Uus();
-    app.mount('#app');
-  </script>
-</body>
+  <head>
+    <script src="https://unpkg.com/@uusjs/core"></script>
+  </head>
+  <body>
+    <div id="app" uus-state="{ count: 0, message: 'Hello UUS!' }">
+      <h1 uus-text="message"></h1>
+      <p>Count: <span uus-text="count"></span></p>
+      <button uus-on:click="count++">Increment</button>
+      <button uus-on:click="count = 0" uus-show="count > 0">Reset</button>
+    </div>
+
+    <script>
+      const app = new Uus();
+      app.mount('#app');
+    </script>
+  </body>
 </html>
 ```
 
@@ -61,25 +61,29 @@ app.mount('#app');
 ## Core Concepts
 
 ### 📊 Reactive State
+
 ```html
 <div uus-state="{ user: { name: 'John', age: 30 } }">
   <p>Hello <span uus-text="user.name"></span></p>
-  <input uus-model="user.name" placeholder="Edit name">
+  <input uus-model="user.name" placeholder="Edit name" />
 </div>
 ```
 
 ### 🎯 Event Handling
+
 ```html
 <!-- Basic events -->
 <button uus-on:click="count++">Click</button>
 
 <!-- With modifiers -->
 <form uus-on:submit.prevent="handleSubmit">
-<input uus-on:keyup.enter="search">
-<button uus-on:click.once="showWelcome">
+  <input uus-on:keyup.enter="search" />
+  <button uus-on:click.once="showWelcome"></button>
+</form>
 ```
 
 ### 🔀 Conditional Rendering
+
 ```html
 <!-- Toggle visibility -->
 <div uus-show="isVisible">Toggleable content</div>
@@ -91,6 +95,7 @@ app.mount('#app');
 ```
 
 ### 📃 List Rendering
+
 ```html
 <ul>
   <li uus-for="task in tasks">
@@ -102,48 +107,57 @@ app.mount('#app');
 
 ## Official Packages
 
-| Package | Description | Size | Status |
-|---------|-------------|------|--------|
-| [@uusjs/core](./packages/core) | Core reactive engine | < 3KB | ✅ Stable |
-| [@uusjs/router](./packages/router) | SPA routing with guards | < 2KB | ✅ Stable |
-| [@uusjs/animate](./packages/animate) | Animations & transitions | < 4KB | ✅ Stable |
-| [@uusjs/forms](./packages/forms) | Form handling & validation | < 3KB | ✅ Stable |
-| [@uusjs/i18n](./packages/i18n) | Internationalization | < 2KB | ✅ Stable |
-| [@uusjs/realtime](./packages/realtime) | WebSocket & SSE | < 2KB | ✅ Stable |
+| Package                                | Description                | Size  | Status    |
+| -------------------------------------- | -------------------------- | ----- | --------- |
+| [@uusjs/core](./packages/core)         | Core reactive engine       | < 3KB | ✅ Stable |
+| [@uusjs/router](./packages/router)     | SPA routing with guards    | < 2KB | ✅ Stable |
+| [@uusjs/animate](./packages/animate)   | Animations & transitions   | < 4KB | ✅ Stable |
+| [@uusjs/forms](./packages/forms)       | Form handling & validation | < 3KB | ✅ Stable |
+| [@uusjs/i18n](./packages/i18n)         | Internationalization       | < 2KB | ✅ Stable |
+| [@uusjs/realtime](./packages/realtime) | WebSocket & SSE            | < 2KB | ✅ Stable |
 
 ## Live Examples
 
 Explore complete applications built with UUS.js:
 
 ### 📊 [Analytics Dashboard](./examples/dashboard)
+
 Full-featured dashboard with real-time data, interactive charts, and responsive design.
+
 - Live metrics and KPI tracking
 - Custom chart rendering with Canvas API
 - Multi-page navigation
 - Mobile-responsive interface
 
 ### 🛍️ [E-commerce Store](./examples/ecommerce)
+
 Complete online store with shopping cart, product filtering, and checkout flow.
+
 - Product catalog with search and filters
 - Shopping cart with persistent storage
 - Multi-step checkout process
 - Responsive design for all devices
 
 ### 🌍 [i18n Demo](./examples/i18n-demo)
+
 Comprehensive internationalization example with multiple languages.
+
 - English, Turkish, Arabic, and Spanish support
 - RTL/LTR text direction switching
 - Complex pluralization rules
 - Locale-aware number and date formatting
 
 ### 💬 [Realtime Chat](./examples/realtime-chat)
+
 Live chat application with WebSocket communication.
+
 - Real-time messaging
 - Online user list
 - Typing indicators
 - Auto-reconnection
 
 ### Example: Simple App Setup
+
 ```javascript
 import { Uus } from '@uusjs/core';
 
@@ -169,6 +183,7 @@ app.mount('#app');
 ## Examples & Tutorials
 
 Get started with our comprehensive examples:
+
 - 📊 **Dashboard**: Analytics dashboard with charts ([examples/dashboard](./examples/dashboard))
 - 🛍️ **E-commerce**: Full online store ([examples/ecommerce](./examples/ecommerce))
 - 🌍 **i18n**: Multi-language support ([examples/i18n-demo](./examples/i18n-demo))
@@ -205,6 +220,7 @@ pnpm size
 ```
 
 ### Project Structure
+
 ```
 uus/
 ├── packages/

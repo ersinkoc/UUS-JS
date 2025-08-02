@@ -18,7 +18,7 @@ describe('Component Directive', () => {
       expression: '{ state: { count: 0, message: "hello" } }',
       arg: undefined,
       modifiers: {},
-      value: '{ state: { count: 0, message: "hello" } }'
+      value: '{ state: { count: 0, message: "hello" } }',
     };
 
     componentDirective.init!(element, binding, uus);
@@ -32,18 +32,15 @@ describe('Component Directive', () => {
     const createdSpy = vi.fn();
     const mountedSpy = vi.fn();
 
-    // We need to set these on the window/global scope so they can be evaluated
-    (global as any).createdHook = createdSpy;
-    (global as any).mountedHook = mountedSpy;
+    // Add the hook functions to UUS state so they can be accessed by the evaluator
+    uus.state.createdHook = createdSpy;
+    uus.state.mountedHook = mountedSpy;
 
     const binding = {
-      expression: `{ 
-        created: createdHook,
-        mounted: mountedHook
-      }`,
+      expression: '{ created: createdHook, mounted: mountedHook }',
       arg: undefined,
       modifiers: {},
-      value: '{ created: createdHook, mounted: mountedHook }'
+      value: '{ created: createdHook, mounted: mountedHook }',
     };
 
     componentDirective.init!(element, binding, uus);
@@ -51,7 +48,7 @@ describe('Component Directive', () => {
     expect(createdSpy).toHaveBeenCalledTimes(1);
 
     // Wait for requestAnimationFrame
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       requestAnimationFrame(() => {
         setTimeout(resolve, 0);
       });
@@ -71,7 +68,7 @@ describe('Component Directive', () => {
       expression: '{ state: { value: 42 }, created: created }',
       arg: undefined,
       modifiers: {},
-      value: '{ state: { value: 42 }, created: created }'
+      value: '{ state: { value: 42 }, created: created }',
     };
 
     componentDirective.init!(element, binding, uus);
@@ -88,7 +85,7 @@ describe('Component Directive', () => {
       expression: '{}',
       arg: undefined,
       modifiers: {},
-      value: '{}'
+      value: '{}',
     };
 
     // Should not throw
@@ -102,7 +99,7 @@ describe('Component Directive', () => {
       expression: '{ state: { active: true } }',
       arg: undefined,
       modifiers: {},
-      value: '{ state: { active: true } }'
+      value: '{ state: { active: true } }',
     };
 
     componentDirective.init!(element, binding, uus);
@@ -119,7 +116,7 @@ describe('Component Directive', () => {
       expression: '{ created: onCreated }',
       arg: undefined,
       modifiers: {},
-      value: '{ created: onCreated }'
+      value: '{ created: onCreated }',
     };
 
     componentDirective.init!(element, binding, uus);
@@ -137,7 +134,7 @@ describe('Component Directive', () => {
       expression: '"not an object"',
       arg: undefined,
       modifiers: {},
-      value: '"not an object"'
+      value: '"not an object"',
     };
 
     componentDirective.init!(element, binding, uus);
@@ -155,7 +152,7 @@ describe('Component Directive', () => {
       expression: 'null',
       arg: undefined,
       modifiers: {},
-      value: 'null'
+      value: 'null',
     };
 
     componentDirective.init!(element, binding, uus);
@@ -173,13 +170,15 @@ describe('Component Directive', () => {
       expression: 'invalid.syntax[',
       arg: undefined,
       modifiers: {},
-      value: 'invalid.syntax['
+      value: 'invalid.syntax[',
     };
 
     componentDirective.init!(element, binding, uus);
 
     // The evaluator catches and logs errors first, then component error handler
-    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Error evaluating expression'), expect.any(Error));
+    expect(consoleSpy).toHaveBeenCalledWith(
+      expect.stringContaining('[UUS_EVALUATION_ERROR]')
+    );
 
     consoleSpy.mockRestore();
   });
@@ -191,7 +190,7 @@ describe('Component Directive', () => {
       expression: '{ state: { newProp: "new value" } }',
       arg: undefined,
       modifiers: {},
-      value: '{ state: { newProp: "new value" } }'
+      value: '{ state: { newProp: "new value" } }',
     };
 
     componentDirective.init!(element, binding, uus);
@@ -205,7 +204,7 @@ describe('Component Directive', () => {
       expression: '{ state: { count: 0 } }',
       arg: undefined,
       modifiers: {},
-      value: '{ state: { count: 0 } }'
+      value: '{ state: { count: 0 } }',
     };
 
     componentDirective.init!(element, binding, uus);
@@ -233,7 +232,7 @@ describe('Component Directive', () => {
       expression: '',
       arg: undefined,
       modifiers: {},
-      value: ''
+      value: '',
     };
 
     // Should use default '{}' when expression is empty

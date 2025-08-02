@@ -2,7 +2,13 @@
   "name": "@uusjs/animate",
   "version": "0.0.1",
   "description": "Animation system for Uus.js",
-  "keywords": ["uus", "uusjs", "animation", "transitions", "motion"],
+  "keywords": [
+    "uus",
+    "uusjs",
+    "animation",
+    "transitions",
+    "motion"
+  ],
   "homepage": "https://uusjs.dev",
   "bugs": {
     "url": "https://github.com/uus-js/uus/issues",

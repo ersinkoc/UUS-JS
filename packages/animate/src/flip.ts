@@ -17,7 +17,7 @@ export const flipDirective: Directive = {
       duration: parseInt(el.getAttribute('uus-flip-duration') || '300'),
       easing: el.getAttribute('uus-flip-easing') || 'ease-out',
       scale: el.hasAttribute('uus-flip-scale'),
-      opacity: el.hasAttribute('uus-flip-opacity')
+      opacity: el.hasAttribute('uus-flip-opacity'),
     };
 
     // Observe DOM changes
@@ -29,7 +29,7 @@ export const flipDirective: Directive = {
       childList: true,
       subtree: true,
       attributes: true,
-      attributeFilter: ['style', 'class']
+      attributeFilter: ['style', 'class'],
     });
 
     // Store initial state
@@ -39,13 +39,13 @@ export const flipDirective: Directive = {
     const cleanups = uus.cleanups.get(el) || new Set();
     cleanups.add(() => observer.disconnect());
     uus.cleanups.set(el, cleanups);
-  }
+  },
 };
 
 function saveFlipState(el: HTMLElement): void {
   const rect = el.getBoundingClientRect();
   const opacity = window.getComputedStyle(el).opacity;
-  
+
   flipStates.set(el, { rect, opacity });
 }
 
@@ -80,7 +80,7 @@ function performFlip(el: HTMLElement, options: FlipOptions): void {
   // Invert
   el.style.transform = transform;
   el.style.transformOrigin = 'top left';
-  
+
   if (options.opacity && firstState.opacity !== lastOpacity) {
     el.style.opacity = firstState.opacity;
   }
@@ -93,7 +93,7 @@ function performFlip(el: HTMLElement, options: FlipOptions): void {
   if (options.opacity) {
     el.style.transition += `, opacity ${options.duration}ms ${options.easing}`;
   }
-  
+
   el.style.transform = '';
   if (options.opacity) {
     el.style.opacity = lastOpacity;
@@ -112,11 +112,12 @@ export const layoutDirective: Directive = {
   name: 'layout',
   bind(el, binding, uus) {
     const layoutType = binding.expression || 'flex';
-    
+
     // Apply layout styles
     if (layoutType === 'grid') {
       el.style.display = 'grid';
-      el.style.gridTemplateColumns = el.getAttribute('uus-cols') || 'repeat(auto-fill, minmax(200px, 1fr))';
+      el.style.gridTemplateColumns =
+        el.getAttribute('uus-cols') || 'repeat(auto-fill, minmax(200px, 1fr))';
       el.style.gap = el.getAttribute('uus-gap') || '1rem';
     } else if (layoutType === 'flex') {
       el.style.display = 'flex';
@@ -126,7 +127,11 @@ export const layoutDirective: Directive = {
 
     // Enable FLIP if specified
     if (el.hasAttribute('uus-flip')) {
-      flipDirective.init?.(el, { expression: 'true', value: true, modifiers: {} }, uus);
+      flipDirective.init?.(
+        el,
+        { expression: 'true', value: true, modifiers: {} },
+        uus
+      );
     }
-  }
+  },
 };

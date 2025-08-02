@@ -1,11 +1,11 @@
-import type { 
-  FormState, 
-  FormField, 
-  FormOptions, 
+import type {
+  FormState,
+  FormField,
+  FormOptions,
   FormController,
   Validator,
   AsyncValidator,
-  ValidationErrors
+  ValidationErrors,
 } from './types';
 import { createReactive } from '@uusjs/core';
 
@@ -20,7 +20,7 @@ export class Form implements FormController {
     this.options = {
       validateOn: 'change',
       revalidateOn: 'change',
-      ...options
+      ...options,
     };
 
     this.state = createReactive<FormState>({
@@ -31,7 +31,7 @@ export class Form implements FormController {
       submitting: false,
       submitted: false,
       errors: {},
-      values: {}
+      values: {},
     });
 
     // Initialize with provided values
@@ -40,17 +40,21 @@ export class Form implements FormController {
         this.registerField(name, value, options.validators?.[name] || []);
       });
       // Run initial validation
-      Object.keys(options.initialValues).forEach(name => {
+      Object.keys(options.initialValues).forEach((name) => {
         this.validateField(name);
       });
     }
   }
 
-  private registerField(name: string, value: any, validatorConfig: Validator[] | any = []): void {
+  private registerField(
+    name: string,
+    value: any,
+    validatorConfig: Validator[] | any = []
+  ): void {
     let validators: Validator[] = [];
     let asyncValidators: AsyncValidator[] = [];
     let debounceTime: number = 0;
-    
+
     if (Array.isArray(validatorConfig)) {
       validators = validatorConfig;
     } else if (validatorConfig && typeof validatorConfig === 'object') {
@@ -67,7 +71,7 @@ export class Form implements FormController {
         validators = validatorConfig;
       }
     }
-    
+
     const field: FormField = createReactive({
       name,
       value,
@@ -75,12 +79,12 @@ export class Form implements FormController {
       touched: false,
       dirty: false,
       valid: true,
-      validators
+      validators,
     });
 
     this.state.fields[name] = field;
     this.state.values[name] = value;
-    
+
     // Store async validators separately with debounce info
     if (asyncValidators.length > 0) {
       this.asyncValidators.set(name, asyncValidators);
@@ -97,7 +101,7 @@ export class Form implements FormController {
 
   setFieldValue(name: string, value: any): void {
     let field = this.getField(name);
-    
+
     if (!field) {
       this.registerField(name, value);
       field = this.getField(name)!;
@@ -117,7 +121,9 @@ export class Form implements FormController {
     if (!field) return;
 
     field.touched = touched;
-    this.state.touched = Object.values(this.state.fields).some(f => f.touched);
+    this.state.touched = Object.values(this.state.fields).some(
+      (f) => f.touched
+    );
 
     if (touched && this.options.validateOn === 'blur') {
       this.validateField(name);
@@ -149,15 +155,15 @@ export class Form implements FormController {
     if (asyncValidators.length > 0 && !firstError) {
       // Set pending state
       this.pendingValidations.set(name, true);
-      
+
       // Get debounce time for this field
       const debounceTime = this.validationTimeouts.get(`${name}_debounce`) || 0;
-      
+
       if (debounceTime > 0) {
         // Use debouncing
         const existingTimeout = this.validationTimeouts.get(name);
         if (existingTimeout) clearTimeout(existingTimeout);
-        
+
         const timeoutId = setTimeout(async () => {
           try {
             for (const validator of asyncValidators) {
@@ -173,17 +179,17 @@ export class Form implements FormController {
             this.pendingValidations.delete(name);
             field.errors = firstError ? [firstError] : [];
             field.valid = firstError === null;
-            
+
             if (firstError === null) {
               delete this.state.errors[name];
             } else {
               this.state.errors[name] = firstError;
             }
-            
+
             this.updateFormValidity();
           }
         }, debounceTime);
-        
+
         this.validationTimeouts.set(name, timeoutId);
       } else {
         // Immediate execution for non-debounced async validators
@@ -202,13 +208,13 @@ export class Form implements FormController {
             this.pendingValidations.delete(name);
             field.errors = firstError ? [firstError] : [];
             field.valid = firstError === null;
-            
+
             if (firstError === null) {
               delete this.state.errors[name];
             } else {
               this.state.errors[name] = firstError;
             }
-            
+
             this.updateFormValidity();
           }
         })();
@@ -217,27 +223,27 @@ export class Form implements FormController {
 
     field.errors = firstError ? [firstError] : [];
     field.valid = firstError === null;
-    
+
     // Set error to undefined when validation passes for test compatibility
     if (firstError === null) {
       delete this.state.errors[name];
     } else {
       this.state.errors[name] = firstError;
     }
-    
+
     // Update form validity
     this.updateFormValidity();
-    
+
     return field.valid;
   }
 
   async validateForm(): Promise<boolean> {
-    const validations = Array.from(this.state.fields.keys()).map(name => 
+    const validations = Array.from(this.state.fields.keys()).map((name) =>
       this.validateField(name)
     );
-    
+
     const results = await Promise.all(validations);
-    return results.every(valid => valid);
+    return results.every((valid) => valid);
   }
 
   resetField(name: string): void {
@@ -250,10 +256,10 @@ export class Form implements FormController {
     field.touched = false;
     field.dirty = false;
     field.valid = true;
-    
+
     this.state.values[name] = initialValue;
     delete this.state.errors[name];
-    
+
     this.updateFormState();
   }
 
@@ -261,26 +267,28 @@ export class Form implements FormController {
     Object.keys(this.state.fields).forEach((name) => {
       this.resetField(name);
     });
-    
+
     this.state.submitted = false;
     this.state.submitting = false;
   }
 
-  async submitForm(handler: (values: Record<string, any>) => void | Promise<void>): Promise<void> {
+  async submitForm(
+    handler: (values: Record<string, any>) => void | Promise<void>
+  ): Promise<void> {
     if (this.state.submitting) return;
 
     this.state.submitting = true;
     this.state.submitted = true;
 
     // Touch all fields
-    Object.values(this.state.fields).forEach(field => {
+    Object.values(this.state.fields).forEach((field) => {
       field.touched = true;
     });
     this.state.touched = true;
 
     // Validate all fields
     const isValid = await this.validateForm();
-    
+
     if (!isValid) {
       this.state.submitting = false;
       return;
@@ -310,51 +318,79 @@ export class Form implements FormController {
   }
 
   private updateFormValidity(): void {
-    this.state.valid = Object.values(this.state.fields).every(field => field.valid);
+    this.state.valid = Object.values(this.state.fields).every(
+      (field) => field.valid
+    );
   }
 
   private updateFormState(): void {
-    this.state.dirty = Object.values(this.state.fields).some(field => field.dirty);
-    this.state.touched = Object.values(this.state.fields).some(field => field.touched);
+    this.state.dirty = Object.values(this.state.fields).some(
+      (field) => field.dirty
+    );
+    this.state.touched = Object.values(this.state.fields).some(
+      (field) => field.touched
+    );
     this.updateFormValidity();
   }
 }
 
 // Helper functions for test compatibility
-export function createForm(initialValues?: Record<string, any>, validators?: Record<string, Validator[]>) {
+export function createForm(
+  initialValues?: Record<string, any>,
+  validators?: Record<string, Validator[]>
+) {
   const form = new Form({
     initialValues,
-    validators
+    validators,
   });
-  
+
   // Create reactive wrapper for test compatibility
   const wrapper = {
     // Reactive properties expected by tests
-    values: { get value() { return form.state.values; } },
-    isDirty: { get value() { return form.state.dirty; } },
-    isValid: { get value() { return form.state.valid; } },
-    touched: { 
-      get value() { 
+    values: {
+      get value() {
+        return form.state.values;
+      },
+    },
+    isDirty: {
+      get value() {
+        return form.state.dirty;
+      },
+    },
+    isValid: {
+      get value() {
+        return form.state.valid;
+      },
+    },
+    touched: {
+      get value() {
         // Convert fields to touched boolean map
         const touchedMap: Record<string, boolean> = {};
         Object.entries(form.state.fields).forEach(([name, field]) => {
           touchedMap[name] = field.touched;
         });
         return touchedMap;
-      } 
+      },
     },
-    errors: { get value() { return form.state.errors; } },
-    pending: { get value() { 
-      const pendingMap: Record<string, boolean> = {};
-      Object.entries(form.state.fields).forEach(([name, field]) => {
-        pendingMap[name] = form.pendingValidations.has(name);
-      });
-      return pendingMap;
-    } },
-    
+    errors: {
+      get value() {
+        return form.state.errors;
+      },
+    },
+    pending: {
+      get value() {
+        const pendingMap: Record<string, boolean> = {};
+        Object.entries(form.state.fields).forEach(([name, field]) => {
+          pendingMap[name] = form.pendingValidations.has(name);
+        });
+        return pendingMap;
+      },
+    },
+
     // Methods expected by tests
     setValue: (name: string, value: any) => form.setFieldValue(name, value),
-    setTouched: (name: string, touched = true) => form.setFieldTouched(name, touched),
+    setTouched: (name: string, touched = true) =>
+      form.setFieldTouched(name, touched),
     reset: (newValues?: Record<string, any>) => {
       if (newValues) {
         // Reset with new values
@@ -363,7 +399,7 @@ export function createForm(initialValues?: Record<string, any>, validators?: Rec
           form.setFieldValue(name, value);
         });
         // Reset dirty state after setting values
-        Object.values(form.state.fields).forEach(field => {
+        Object.values(form.state.fields).forEach((field) => {
           field.dirty = false;
         });
         form.state.dirty = false;
@@ -376,23 +412,23 @@ export function createForm(initialValues?: Record<string, any>, validators?: Rec
         if (event && event.preventDefault) {
           event.preventDefault();
         }
-        
+
         // Touch all fields to trigger validation
-        Object.keys(form.state.fields).forEach(name => {
+        Object.keys(form.state.fields).forEach((name) => {
           form.setFieldTouched(name, true);
         });
-        
+
         // Only call handler if form is valid
         if (form.state.valid) {
           handler(form.state.values);
         }
       };
     },
-    
+
     // Direct access to form instance
-    _form: form
+    _form: form,
   };
-  
+
   return wrapper;
 }
 
@@ -408,17 +444,17 @@ export function createFormGroup(forms: Record<string, any>) {
           values[key] = form.values.value;
         });
         return values;
-      }
+      },
     },
     isValid: {
       get value() {
         return Object.values(forms).every((form: any) => form.isValid.value);
-      }
+      },
     },
     isDirty: {
       get value() {
         return Object.values(forms).some((form: any) => form.isDirty.value);
-      }
+      },
     },
     errors: {
       get value() {
@@ -430,10 +466,10 @@ export function createFormGroup(forms: Record<string, any>) {
           }
         });
         return errors;
-      }
+      },
     },
     reset() {
       Object.values(forms).forEach((form: any) => form.reset());
-    }
+    },
   };
 }

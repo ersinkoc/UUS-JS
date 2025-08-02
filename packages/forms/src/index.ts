@@ -1,10 +1,10 @@
 import type { UusPlugin } from '@uusjs/core';
-import { 
+import {
   formDirective,
   fieldDirective,
   errorDirective,
   submitDirective,
-  disabledDirective
+  disabledDirective,
 } from './directives';
 import { Form } from './form';
 import * as validators from './validators';
@@ -24,13 +24,13 @@ export function createForms(): UusPlugin {
       uus.registerDirective(errorDirective);
       uus.registerDirective(submitDirective);
       uus.registerDirective(disabledDirective);
-      
+
       // Add form utilities to state
       uus.state.$forms = {
         create: (options?: any) => new Form(options),
-        validators
+        validators,
       };
-    }
+    },
   };
 }
 
@@ -53,5 +53,5 @@ export {
   custom,
   asyncEmailAvailable,
   debounceAsync,
-  compose
+  compose,
 } from './validators';

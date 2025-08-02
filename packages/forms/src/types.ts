@@ -19,9 +19,17 @@ export interface FormState {
   values: Record<string, any>;
 }
 
-export type Validator = (value: any, field?: FormField, form?: FormState) => ValidationErrors | null;
+export type Validator = (
+  value: any,
+  field?: FormField,
+  form?: FormState
+) => ValidationErrors | null;
 
-export type AsyncValidator = (value: any, field?: FormField, form?: FormState) => Promise<ValidationErrors | null>;
+export type AsyncValidator = (
+  value: any,
+  field?: FormField,
+  form?: FormState
+) => Promise<ValidationErrors | null>;
 
 export type ValidationErrors = Record<string, any>;
 
@@ -54,5 +62,7 @@ export interface FormController {
   validateForm(): Promise<boolean>;
   resetField(name: string): void;
   resetForm(): void;
-  submitForm(handler: (values: Record<string, any>) => void | Promise<void>): Promise<void>;
+  submitForm(
+    handler: (values: Record<string, any>) => void | Promise<void>
+  ): Promise<void>;
 }

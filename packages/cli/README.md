@@ -23,6 +23,7 @@ npx @uusjs/cli create my-app
 ```
 
 Follow the interactive prompts to customize your project:
+
 - Choose a template (Basic, Vite, TypeScript, SSR, Full Stack)
 - Select features (Router, Animations, Forms, i18n, PWA, Testing)
 - Pick a package manager (npm, yarn, pnpm)
@@ -54,18 +55,23 @@ uus build
 ## Templates
 
 ### Basic (HTML + CDN)
+
 Simple HTML template with Uus.js loaded from CDN. Perfect for quick prototypes and learning.
 
 ### Vite
+
 Modern development with HMR, optimized builds, and ES modules.
 
 ### TypeScript
+
 Full TypeScript support with type safety and IntelliSense.
 
 ### SSR
+
 Server-side rendering with Express.js and client hydration.
 
 ### Full Stack
+
 Complete setup with Express.js API backend and Uus.js frontend.
 
 ## Features

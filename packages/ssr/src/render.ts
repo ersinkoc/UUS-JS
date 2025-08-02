@@ -16,7 +16,7 @@ export async function renderToString(
   const dom = new JSDOM(options?.template || DEFAULT_TEMPLATE, {
     url: options?.url || 'http://localhost',
     pretendToBeVisual: true,
-    resources: 'usable'
+    resources: 'usable',
   });
 
   // Set up globals
@@ -28,7 +28,7 @@ export async function renderToString(
   try {
     // Create or get app instance
     const appInstance = typeof app === 'function' ? app() : app;
-    
+
     // Set SSR context
     if (options?.context) {
       (appInstance as any).__SSR_CONTEXT__ = options.context;
@@ -79,22 +79,22 @@ export function renderToStream(
   }
 ): ReadableStream {
   const encoder = new TextEncoder();
-  
+
   return new ReadableStream({
     async start(controller) {
       try {
         const html = await renderToString(app, options);
         const chunks = splitIntoChunks(html, 4096); // 4KB chunks
-        
+
         for (const chunk of chunks) {
           controller.enqueue(encoder.encode(chunk));
         }
-        
+
         controller.close();
       } catch (error) {
         controller.error(error);
       }
-    }
+    },
   });
 }
 
@@ -103,25 +103,25 @@ export function renderToStream(
  */
 async function waitForAsyncOps(app: Uus, timeout = 5000): Promise<void> {
   const start = Date.now();
-  
+
   return new Promise((resolve, reject) => {
     const check = () => {
       // Check if there are pending async operations
       const pending = (app as any).__pendingAsync;
-      
+
       if (!pending || pending.size === 0) {
         resolve();
         return;
       }
-      
+
       if (Date.now() - start > timeout) {
         reject(new Error('SSR timeout: async operations did not complete'));
         return;
       }
-      
+
       setTimeout(check, 10);
     };
-    
+
     check();
   });
 }
@@ -133,10 +133,10 @@ function serializeState(app: Uus): string | null {
   try {
     const state = (app as any).state;
     if (!state) return null;
-    
+
     // Convert to plain object
     const plain = toPlainObject(state);
-    
+
     return JSON.stringify(plain);
   } catch (error) {
     console.error('Failed to serialize state:', error);
@@ -152,18 +152,18 @@ function toPlainObject(obj: any): any {
   if (typeof obj !== 'object') return obj;
   if (obj instanceof Date) return obj.toISOString();
   if (obj instanceof RegExp) return obj.toString();
-  
+
   if (Array.isArray(obj)) {
     return obj.map(toPlainObject);
   }
-  
+
   const plain: any = {};
   for (const key in obj) {
     if (obj.hasOwnProperty(key)) {
       plain[key] = toPlainObject(obj[key]);
     }
   }
-  
+
   return plain;
 }
 
@@ -172,15 +172,12 @@ function toPlainObject(obj: any): any {
  */
 function addHydrationMarkers(html: string): string {
   // Add data-uus-ssr attribute to elements with directives
-  return html.replace(
-    /(<[^>]+(?:uus-|:[@])[\s\S]*?>)/g,
-    (match) => {
-      if (!match.includes('data-uus-ssr')) {
-        return match.replace('>', ' data-uus-ssr>');
-      }
-      return match;
+  return html.replace(/(<[^>]+(?:uus-|:[@])[\s\S]*?>)/g, (match) => {
+    if (!match.includes('data-uus-ssr')) {
+      return match.replace('>', ' data-uus-ssr>');
     }
-  );
+    return match;
+  });
 }
 
 /**
@@ -189,11 +186,11 @@ function addHydrationMarkers(html: string): string {
 function splitIntoChunks(html: string, chunkSize: number): string[] {
   const chunks: string[] = [];
   let current = 0;
-  
+
   while (current < html.length) {
     // Try to break at a tag boundary
     let end = current + chunkSize;
-    
+
     if (end < html.length) {
       // Look for a good break point
       const lastTag = html.lastIndexOf('>', end);
@@ -201,11 +198,11 @@ function splitIntoChunks(html: string, chunkSize: number): string[] {
         end = lastTag + 1;
       }
     }
-    
+
     chunks.push(html.slice(current, end));
     current = end;
   }
-  
+
   return chunks;
 }
 

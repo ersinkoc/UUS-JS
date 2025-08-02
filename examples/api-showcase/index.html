@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UUS.js API Showcase</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    
+    h1 {
+      color: #333;
+      border-bottom: 2px solid #3498db;
+      padding-bottom: 10px;
+    }
+    
+    .section {
+      background: white;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .section h2 {
+      margin-top: 0;
+      color: #3498db;
+    }
+    
+    button {
+      background: #3498db;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin: 4px;
+    }
+    
+    button:hover {
+      background: #2980b9;
+    }
+    
+    button:disabled {
+      background: #95a5a6;
+      cursor: not-allowed;
+    }
+    
+    input, select, textarea {
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      margin: 4px;
+    }
+    
+    .item {
+      padding: 10px;
+      margin: 5px 0;
+      background: #f8f9fa;
+      border-radius: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .completed {
+      text-decoration: line-through;
+      opacity: 0.6;
+    }
+    
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+    
+    .stat-card {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 4px;
+      text-align: center;
+    }
+    
+    .stat-value {
+      font-size: 24px;
+      font-weight: bold;
+      color: #3498db;
+    }
+    
+    .error {
+      color: #e74c3c;
+      padding: 10px;
+      background: #ffe6e6;
+      border-radius: 4px;
+      margin: 10px 0;
+    }
+    
+    .success {
+      color: #27ae60;
+      padding: 10px;
+      background: #e8f5e9;
+      border-radius: 4px;
+      margin: 10px 0;
+    }
+    
+    pre {
+      background: #f4f4f4;
+      padding: 10px;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+    
+    .tab-buttons {
+      display: flex;
+      gap: 5px;
+      margin-bottom: 10px;
+    }
+    
+    .tab-button {
+      background: #ecf0f1;
+      color: #333;
+    }
+    
+    .tab-button.active {
+      background: #3498db;
+      color: white;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <h1>UUS.js API Showcase</h1>
+  
+  <div id="app" uus-state="{
+    // Basic state
+    count: 0,
+    message: 'Hello UUS.js!',
+    
+    // Todo list state
+    todos: [
+      { id: 1, text: 'Learn UUS.js', completed: false },
+      { id: 2, text: 'Build an app', completed: false }
+    ],
+    newTodo: '',
+    filter: 'all',
+    
+    // Form state
+    formData: {
+      name: '',
+      email: '',
+      message: ''
+    },
+    
+    // UI state
+    showAdvanced: false,
+    activeTab: 'basic',
+    notification: null,
+    
+    // Memory stats
+    memoryStats: null,
+    
+    // Computed properties
+    get filteredTodos() {
+      if (this.filter === 'all') return this.todos;
+      if (this.filter === 'active') return this.todos.filter(t => !t.completed);
+      if (this.filter === 'completed') return this.todos.filter(t => t.completed);
+      return this.todos;
+    },
+    
+    get todoStats() {
+      const total = this.todos.length;
+      const completed = this.todos.filter(t => t.completed).length;
+      const active = total - completed;
+      const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+      
+      return { total, completed, active, percentage };
+    },
+    
+    get isFormValid() {
+      return this.formData.name && 
+             this.formData.email && 
+             this.formData.email.includes('@') &&
+             this.formData.message;
+    },
+    
+    // Methods
+    increment() {
+      this.count++;
+      this.showNotification('Count incremented!', 'success');
+    },
+    
+    decrement() {
+      this.count--;
+      this.showNotification('Count decremented!', 'success');
+    },
+    
+    addTodo() {
+      if (!this.newTodo.trim()) return;
+      
+      this.todos.push({
+        id: Date.now(),
+        text: this.newTodo.trim(),
+        completed: false
+      });
+      
+      this.newTodo = '';
+      this.showNotification('Todo added!', 'success');
+    },
+    
+    toggleTodo(id) {
+      const todo = this.todos.find(t => t.id === id);
+      if (todo) {
+        todo.completed = !todo.completed;
+      }
+    },
+    
+    deleteTodo(id) {
+      const index = this.todos.findIndex(t => t.id === id);
+      if (index > -1) {
+        this.todos.splice(index, 1);
+        this.showNotification('Todo deleted!', 'success');
+      }
+    },
+    
+    submitForm() {
+      console.log('Form submitted:', this.formData);
+      this.showNotification('Form submitted successfully!', 'success');
+      
+      // Reset form
+      this.formData = {
+        name: '',
+        email: '',
+        message: ''
+      };
+    },
+    
+    showNotification(message, type = 'info') {
+      this.notification = { message, type };
+      
+      setTimeout(() => {
+        this.notification = null;
+      }, 3000);
+    },
+    
+    updateMemoryStats() {
+      if (window.app && window.app.getMemoryStats) {
+        this.memoryStats = window.app.getMemoryStats();
+      }
+    },
+    
+    cleanupMemory() {
+      if (window.app && window.app.cleanupDeadReferences) {
+        const cleaned = window.app.cleanupDeadReferences();
+        this.showNotification(`Cleaned ${cleaned} dead references`, 'success');
+        this.updateMemoryStats();
+      }
+    },
+    
+    setActiveTab(tab) {
+      this.activeTab = tab;
+    },
+    
+    // Lifecycle
+    mounted() {
+      console.log('App mounted!');
+      this.updateMemoryStats();
+      
+      // Update memory stats every 5 seconds
+      setInterval(() => {
+        this.updateMemoryStats();
+      }, 5000);
+    }
+  }">
+    
+    <!-- Notifications -->
+    <div uus-if="notification" 
+         uus-class="notification.type === 'error' ? 'error' : 'success'"
+         uus-text="notification.message">
+    </div>
+    
+    <!-- Tab Navigation -->
+    <div class="tab-buttons">
+      <button uus-for="tab in ['basic', 'directives', 'reactive', 'memory']"
+              class="tab-button"
+              uus-class="{ active: activeTab === tab }"
+              uus-on:click="setActiveTab(tab)"
+              uus-text="tab.charAt(0).toUpperCase() + tab.slice(1)">
+      </button>
+    </div>
+    
+    <!-- Basic Features Tab -->
+    <div class="section tab-content" uus-class="{ active: activeTab === 'basic' }">
+      <h2>Basic Features</h2>
+      
+      <!-- Counter Example -->
+      <div>
+        <h3>Counter (uus-text, uus-on)</h3>
+        <p>Count: <span uus-text="count"></span></p>
+        <button uus-on:click="increment()">Increment</button>
+        <button uus-on:click="decrement()">Decrement</button>
+        <button uus-on:click="count = 0">Reset</button>
+      </div>
+      
+      <!-- Two-way Binding -->
+      <div>
+        <h3>Two-way Binding (uus-model)</h3>
+        <input uus-model="message" placeholder="Type something...">
+        <p>You typed: <strong uus-text="message"></strong></p>
+      </div>
+    </div>
+    
+    <!-- Directives Tab -->
+    <div class="section tab-content" uus-class="{ active: activeTab === 'directives' }">
+      <h2>Directives Showcase</h2>
+      
+      <!-- List Rendering -->
+      <div>
+        <h3>List Rendering (uus-for)</h3>
+        <input uus-model="newTodo" 
+               placeholder="Add a todo..." 
+               uus-on:keyup.enter="addTodo()">
+        <button uus-on:click="addTodo()">Add Todo</button>
+        
+        <div style="margin: 10px 0;">
+          Filter:
+          <label>
+            <input type="radio" uus-model="filter" value="all"> All
+          </label>
+          <label>
+            <input type="radio" uus-model="filter" value="active"> Active
+          </label>
+          <label>
+            <input type="radio" uus-model="filter" value="completed"> Completed
+          </label>
+        </div>
+        
+        <div uus-for="todo in filteredTodos" class="item">
+          <label uus-class="{ completed: todo.completed }">
+            <input type="checkbox" 
+                   uus-on:change="toggleTodo(todo.id)"
+                   uus-bind:checked="todo.completed">
+            <span uus-text="todo.text"></span>
+          </label>
+          <button uus-on:click="deleteTodo(todo.id)">Delete</button>
+        </div>
+        
+        <p uus-show="filteredTodos.length === 0">
+          No todos to show!
+        </p>
+      </div>
+      
+      <!-- Conditional Rendering -->
+      <div>
+        <h3>Conditional Rendering (uus-show, uus-if)</h3>
+        <button uus-on:click="showAdvanced = !showAdvanced">
+          <span uus-text="showAdvanced ? 'Hide' : 'Show'"></span> Advanced Options
+        </button>
+        
+        <div uus-show="showAdvanced" style="margin-top: 10px;">
+          <p>These options are shown/hidden with uus-show (display: none)</p>
+        </div>
+        
+        <div uus-if="showAdvanced" style="margin-top: 10px; padding: 10px; background: #e3f2fd;">
+          <p>This element is added/removed from DOM with uus-if</p>
+        </div>
+      </div>
+      
+      <!-- Attribute Binding -->
+      <div>
+        <h3>Attribute Binding (uus-bind, :)</h3>
+        <input uus-model="formData.name" placeholder="Enter your name">
+        <button uus-bind:disabled="!formData.name">
+          Submit (disabled when name is empty)
+        </button>
+        
+        <p>
+          <a :href="'https://www.google.com/search?q=' + encodeURIComponent(message)"
+             target="_blank">
+            Search Google for "<span uus-text="message"></span>"
+          </a>
+        </p>
+      </div>
+    </div>
+    
+    <!-- Reactive System Tab -->
+    <div class="section tab-content" uus-class="{ active: activeTab === 'reactive' }">
+      <h2>Reactive System</h2>
+      
+      <!-- Computed Properties -->
+      <div>
+        <h3>Computed Properties</h3>
+        <div class="stats">
+          <div class="stat-card">
+            <div class="stat-value" uus-text="todoStats.total"></div>
+            <div>Total Todos</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" uus-text="todoStats.active"></div>
+            <div>Active</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" uus-text="todoStats.completed"></div>
+            <div>Completed</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">
+              <span uus-text="todoStats.percentage"></span>%
+            </div>
+            <div>Progress</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Form Validation -->
+      <div>
+        <h3>Reactive Form Validation</h3>
+        <form uus-on:submit.prevent="submitForm()">
+          <div>
+            <input uus-model="formData.name" 
+                   placeholder="Name" 
+                   required>
+          </div>
+          <div>
+            <input uus-model="formData.email" 
+                   type="email" 
+                   placeholder="Email" 
+                   required>
+          </div>
+          <div>
+            <textarea uus-model="formData.message" 
+                      placeholder="Message" 
+                      rows="3" 
+                      required></textarea>
+          </div>
+          <button type="submit" 
+                  uus-bind:disabled="!isFormValid">
+            Submit (enabled when form is valid)
+          </button>
+        </form>
+        
+        <div uus-show="!isFormValid" class="error">
+          Please fill out all fields with valid data.
+        </div>
+      </div>
+    </div>
+    
+    <!-- Memory Management Tab -->
+    <div class="section tab-content" uus-class="{ active: activeTab === 'memory' }">
+      <h2>Memory Management</h2>
+      
+      <button uus-on:click="updateMemoryStats()">Update Stats</button>
+      <button uus-on:click="cleanupMemory()">Run Cleanup</button>
+      
+      <div uus-if="memoryStats">
+        <h3>Memory Statistics</h3>
+        <pre uus-text="JSON.stringify(memoryStats, null, 2)"></pre>
+      </div>
+      
+      <p uus-if="!memoryStats">
+        Click "Update Stats" to see memory statistics.
+      </p>
+    </div>
+    
+  </div>
+  
+  <script type="module">
+    import { Uus, initDevTools } from '@uusjs/core';
+    
+    // Create app instance
+    const app = new Uus({
+      debug: true,
+      onError: (error) => {
+        console.error('App error:', error);
+      }
+    });
+    
+    // Initialize DevTools in development
+    if (import.meta.env.DEV) {
+      initDevTools(app, {
+        logStateChanges: true,
+        performanceMetrics: true
+      });
+    }
+    
+    // Make app available globally for debugging
+    window.app = app;
+    
+    // Mount the app
+    app.mount('#app');
+    
+    console.log('UUS.js API Showcase loaded!');
+    console.log('Access the app instance with: window.app');
+    console.log('Access DevTools with: window.__UUS_DEVTOOLS__');
+  </script>
+</body>
+</html>

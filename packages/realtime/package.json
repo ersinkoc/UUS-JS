@@ -2,7 +2,14 @@
   "name": "@uusjs/realtime",
   "version": "0.0.1",
   "description": "Real-time WebSocket support for Uus.js",
-  "keywords": ["uus", "uusjs", "websocket", "realtime", "socket.io", "sse"],
+  "keywords": [
+    "uus",
+    "uusjs",
+    "websocket",
+    "realtime",
+    "socket.io",
+    "sse"
+  ],
   "homepage": "https://uusjs.dev",
   "bugs": {
     "url": "https://github.com/uus-js/uus/issues",

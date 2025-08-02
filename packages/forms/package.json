@@ -2,7 +2,13 @@
   "name": "@uusjs/forms",
   "version": "0.0.1",
   "description": "Form handling and validation for Uus.js",
-  "keywords": ["uus", "uusjs", "forms", "validation", "form-handling"],
+  "keywords": [
+    "uus",
+    "uusjs",
+    "forms",
+    "validation",
+    "form-handling"
+  ],
   "homepage": "https://uusjs.dev",
   "bugs": {
     "url": "https://github.com/uus-js/uus/issues",

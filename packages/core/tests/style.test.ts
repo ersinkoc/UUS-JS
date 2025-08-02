@@ -11,7 +11,7 @@ describe('Style Directive', () => {
     uus = new Uus();
     element = document.createElement('div');
     document.body.appendChild(element);
-    
+
     // Set up basic state for styling
     uus.state.color = 'red';
     uus.state.fontSize = '16px';
@@ -20,7 +20,7 @@ describe('Style Directive', () => {
     uus.state.styles = {
       backgroundColor: 'blue',
       margin: '10px',
-      padding: '5px'
+      padding: '5px',
     };
   });
 
@@ -29,7 +29,7 @@ describe('Style Directive', () => {
       expression: '{ color: "red", fontSize: "16px" }',
       arg: undefined,
       modifiers: {},
-      value: '{ color: "red", fontSize: "16px" }'
+      value: '{ color: "red", fontSize: "16px" }',
     };
 
     styleDirective.bind!(element, binding, uus);
@@ -43,7 +43,7 @@ describe('Style Directive', () => {
       expression: '"color: blue; font-size: 14px"',
       arg: undefined,
       modifiers: {},
-      value: '"color: blue; font-size: 14px"'
+      value: '"color: blue; font-size: 14px"',
     };
 
     styleDirective.bind!(element, binding, uus);
@@ -57,7 +57,7 @@ describe('Style Directive', () => {
       expression: '{ color: color, fontSize: fontSize }',
       arg: undefined,
       modifiers: {},
-      value: '{ color: color, fontSize: fontSize }'
+      value: '{ color: color, fontSize: fontSize }',
     };
 
     styleDirective.bind!(element, binding, uus);
@@ -71,7 +71,7 @@ describe('Style Directive', () => {
       expression: '{ backgroundColor: "yellow", borderRadius: "5px" }',
       arg: undefined,
       modifiers: {},
-      value: '{ backgroundColor: "yellow", borderRadius: "5px" }'
+      value: '{ backgroundColor: "yellow", borderRadius: "5px" }',
     };
 
     styleDirective.bind!(element, binding, uus);
@@ -85,7 +85,7 @@ describe('Style Directive', () => {
       expression: '{ display: isVisible ? "block" : "none" }',
       arg: undefined,
       modifiers: {},
-      value: '{ display: isVisible ? "block" : "none" }'
+      value: '{ display: isVisible ? "block" : "none" }',
     };
 
     styleDirective.bind!(element, binding, uus);
@@ -98,7 +98,7 @@ describe('Style Directive', () => {
       expression: '{ width: width + "px", zIndex: 999 }',
       arg: undefined,
       modifiers: {},
-      value: '{ width: width + "px", zIndex: 999 }'
+      value: '{ width: width + "px", zIndex: 999 }',
     };
 
     styleDirective.bind!(element, binding, uus);
@@ -116,7 +116,7 @@ describe('Style Directive', () => {
       expression: '{ color: null, fontSize: "", width: undefined }',
       arg: undefined,
       modifiers: {},
-      value: '{ color: null, fontSize: "", width: undefined }'
+      value: '{ color: null, fontSize: "", width: undefined }',
     };
 
     styleDirective.bind!(element, binding, uus);
@@ -133,7 +133,7 @@ describe('Style Directive', () => {
       expression: '{ color: "red" }',
       arg: undefined,
       modifiers: {},
-      value: '{ color: "red" }'
+      value: '{ color: "red" }',
     };
 
     styleDirective.bind!(element, binding, uus);
@@ -149,7 +149,7 @@ describe('Style Directive', () => {
       expression: 'styles',
       arg: undefined,
       modifiers: {},
-      value: 'styles'
+      value: 'styles',
     };
 
     styleDirective.bind!(element, binding, uus);
@@ -164,7 +164,7 @@ describe('Style Directive', () => {
       expression: '{}',
       arg: undefined,
       modifiers: {},
-      value: '{}'
+      value: '{}',
     };
 
     // Should not throw
@@ -180,13 +180,15 @@ describe('Style Directive', () => {
       expression: 'nonExistentProperty.styles',
       arg: undefined,
       modifiers: {},
-      value: 'nonExistentProperty.styles'
+      value: 'nonExistentProperty.styles',
     };
 
     styleDirective.bind!(element, binding, uus);
 
     // The evaluator catches errors first
-    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Error evaluating expression'), expect.any(Error));
+    expect(consoleSpy).toHaveBeenCalledWith(
+      expect.stringContaining('[UUS_EVALUATION_ERROR]')
+    );
     consoleSpy.mockRestore();
   });
 
@@ -197,7 +199,7 @@ describe('Style Directive', () => {
       expression: '"color: blue; font-weight: bold"',
       arg: undefined,
       modifiers: {},
-      value: '"color: blue; font-weight: bold"'
+      value: '"color: blue; font-weight: bold"',
     };
 
     styleDirective.bind!(element, binding, uus);
@@ -213,7 +215,7 @@ describe('Style Directive', () => {
       expression: '{ color: "red", "font-size": "14px", borderWidth: "2px" }',
       arg: undefined,
       modifiers: {},
-      value: '{ color: "red", "font-size": "14px", borderWidth: "2px" }'
+      value: '{ color: "red", "font-size": "14px", borderWidth: "2px" }',
     };
 
     styleDirective.bind!(element, binding, uus);
@@ -228,7 +230,7 @@ describe('Style Directive', () => {
       expression: '{ "--main-color": "purple", "--spacing": "20px" }',
       arg: undefined,
       modifiers: {},
-      value: '{ "--main-color": "purple", "--spacing": "20px" }'
+      value: '{ "--main-color": "purple", "--spacing": "20px" }',
     };
 
     styleDirective.bind!(element, binding, uus);
@@ -242,10 +244,12 @@ describe('Style Directive', () => {
     uus.state.size = 'large';
 
     const binding = {
-      expression: '{ color: theme === "dark" ? "white" : "black", fontSize: size === "large" ? "18px" : "14px" }',
+      expression:
+        '{ color: theme === "dark" ? "white" : "black", fontSize: size === "large" ? "18px" : "14px" }',
       arg: undefined,
       modifiers: {},
-      value: '{ color: theme === "dark" ? "white" : "black", fontSize: size === "large" ? "18px" : "14px" }'
+      value:
+        '{ color: theme === "dark" ? "white" : "black", fontSize: size === "large" ? "18px" : "14px" }',
     };
 
     styleDirective.bind!(element, binding, uus);
@@ -259,15 +263,15 @@ describe('Style Directive', () => {
       expression: '{ color: "red" }',
       arg: undefined,
       modifiers: {},
-      value: '{ color: "red" }'
+      value: '{ color: "red" }',
     };
 
     styleDirective.bind!(element, binding, uus);
-    
+
     expect(uus.cleanups.has(element)).toBe(true);
 
     styleDirective.unbind!(element, binding, uus);
-    
+
     expect(uus.cleanups.has(element)).toBe(false);
   });
 
@@ -276,7 +280,7 @@ describe('Style Directive', () => {
       expression: '{ opacity: 0, zIndex: false, visibility: null }',
       arg: undefined,
       modifiers: {},
-      value: '{ opacity: 0, zIndex: false, visibility: null }'
+      value: '{ opacity: 0, zIndex: false, visibility: null }',
     };
 
     styleDirective.bind!(element, binding, uus);
@@ -291,7 +295,7 @@ describe('Style Directive', () => {
       expression: '',
       arg: undefined,
       modifiers: {},
-      value: ''
+      value: '',
     };
 
     // Should use default '{}' when expression is empty
@@ -305,7 +309,7 @@ describe('Style Directive', () => {
       expression: '[1, 2, 3]',
       arg: undefined,
       modifiers: {},
-      value: '[1, 2, 3]'
+      value: '[1, 2, 3]',
     };
 
     // Should handle gracefully without throwing
@@ -319,7 +323,7 @@ describe('Style Directive', () => {
       expression: '{ color: color }',
       arg: undefined,
       modifiers: {},
-      value: '{ color: color }'
+      value: '{ color: color }',
     };
 
     styleDirective.bind!(element, binding, uus);

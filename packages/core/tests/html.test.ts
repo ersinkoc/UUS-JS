@@ -11,7 +11,7 @@ describe('HTML Directive', () => {
     uus = new Uus();
     element = document.createElement('div');
     document.body.appendChild(element);
-    
+
     // Set up basic state
     uus.state.htmlContent = '<p>Hello <strong>World</strong></p>';
     uus.state.plainText = 'Just plain text';
@@ -23,7 +23,7 @@ describe('HTML Directive', () => {
       expression: 'htmlContent',
       arg: undefined,
       modifiers: {},
-      value: 'htmlContent'
+      value: 'htmlContent',
     };
 
     htmlDirective.bind!(element, binding, uus);
@@ -36,7 +36,7 @@ describe('HTML Directive', () => {
       expression: 'plainText',
       arg: undefined,
       modifiers: {},
-      value: 'plainText'
+      value: 'plainText',
     };
 
     htmlDirective.bind!(element, binding, uus);
@@ -49,7 +49,7 @@ describe('HTML Directive', () => {
       expression: 'emptyContent',
       arg: undefined,
       modifiers: {},
-      value: 'emptyContent'
+      value: 'emptyContent',
     };
 
     htmlDirective.bind!(element, binding, uus);
@@ -64,7 +64,7 @@ describe('HTML Directive', () => {
       expression: 'nullContent',
       arg: undefined,
       modifiers: {},
-      value: 'nullContent'
+      value: 'nullContent',
     };
 
     htmlDirective.bind!(element, binding, uus);
@@ -79,7 +79,7 @@ describe('HTML Directive', () => {
       expression: 'undefinedContent',
       arg: undefined,
       modifiers: {},
-      value: 'undefinedContent'
+      value: 'undefinedContent',
     };
 
     htmlDirective.bind!(element, binding, uus);
@@ -88,13 +88,14 @@ describe('HTML Directive', () => {
   });
 
   it('should sanitize script tags', () => {
-    uus.state.maliciousContent = '<p>Safe content</p><script>alert("XSS")</script><p>More content</p>';
+    uus.state.maliciousContent =
+      '<p>Safe content</p><script>alert("XSS")</script><p>More content</p>';
 
     const binding = {
       expression: 'maliciousContent',
       arg: undefined,
       modifiers: {},
-      value: 'maliciousContent'
+      value: 'maliciousContent',
     };
 
     htmlDirective.bind!(element, binding, uus);
@@ -106,13 +107,14 @@ describe('HTML Directive', () => {
   });
 
   it('should remove event handlers', () => {
-    uus.state.withEventHandlers = '<div onclick="alert(\'XSS\')" onmouseover="evil()">Content</div>';
+    uus.state.withEventHandlers =
+      '<div onclick="alert(\'XSS\')" onmouseover="evil()">Content</div>';
 
     const binding = {
       expression: 'withEventHandlers',
       arg: undefined,
       modifiers: {},
-      value: 'withEventHandlers'
+      value: 'withEventHandlers',
     };
 
     htmlDirective.bind!(element, binding, uus);
@@ -132,7 +134,7 @@ describe('HTML Directive', () => {
       expression: 'withJavaScript',
       arg: undefined,
       modifiers: {},
-      value: 'withJavaScript'
+      value: 'withJavaScript',
     };
 
     htmlDirective.bind!(element, binding, uus);
@@ -158,13 +160,13 @@ describe('HTML Directive', () => {
       expression: 'complexMalicious',
       arg: undefined,
       modifiers: {},
-      value: 'complexMalicious'
+      value: 'complexMalicious',
     };
 
     htmlDirective.bind!(element, binding, uus);
 
     const innerHTML = element.innerHTML;
-    
+
     // HTML should be sanitized but rendered normally
     expect(innerHTML).toContain('<p>Normal content</p>');
     expect(innerHTML).not.toContain('<script'); // Scripts removed
@@ -172,7 +174,7 @@ describe('HTML Directive', () => {
     expect(innerHTML).not.toContain('onerror');
     expect(innerHTML).toContain('<a href='); // Link preserved but javascript: removed
     expect(innerHTML).not.toContain('javascript:');
-    expect(innerHTML).toContain('<div>Click me</div>'); // Div preserved but onclick removed  
+    expect(innerHTML).toContain('<div>Click me</div>'); // Div preserved but onclick removed
     expect(innerHTML).not.toContain('onclick');
   });
 
@@ -183,7 +185,7 @@ describe('HTML Directive', () => {
       expression: 'numberValue',
       arg: undefined,
       modifiers: {},
-      value: 'numberValue'
+      value: 'numberValue',
     };
 
     htmlDirective.bind!(element, binding, uus);
@@ -198,7 +200,7 @@ describe('HTML Directive', () => {
       expression: 'booleanValue',
       arg: undefined,
       modifiers: {},
-      value: 'booleanValue'
+      value: 'booleanValue',
     };
 
     htmlDirective.bind!(element, binding, uus);
@@ -213,7 +215,7 @@ describe('HTML Directive', () => {
       expression: 'objectValue',
       arg: undefined,
       modifiers: {},
-      value: 'objectValue'
+      value: 'objectValue',
     };
 
     htmlDirective.bind!(element, binding, uus);
@@ -229,7 +231,7 @@ describe('HTML Directive', () => {
       expression: '"<h1>" + title + "</h1><p>" + content + "</p>"',
       arg: undefined,
       modifiers: {},
-      value: '"<h1>" + title + "</h1><p>" + content + "</p>"'
+      value: '"<h1>" + title + "</h1><p>" + content + "</p>"',
     };
 
     htmlDirective.bind!(element, binding, uus);
@@ -245,7 +247,7 @@ describe('HTML Directive', () => {
       expression: 'showTitle ? "<h2>" + title + "</h2>" : "<p>No title</p>"',
       arg: undefined,
       modifiers: {},
-      value: 'showTitle ? "<h2>" + title + "</h2>" : "<p>No title</p>"'
+      value: 'showTitle ? "<h2>" + title + "</h2>" : "<p>No title</p>"',
     };
 
     htmlDirective.bind!(element, binding, uus);
@@ -260,7 +262,7 @@ describe('HTML Directive', () => {
       expression: 'items.join(", ")',
       arg: undefined,
       modifiers: {},
-      value: 'items.join(", ")'
+      value: 'items.join(", ")',
     };
 
     htmlDirective.bind!(element, binding, uus);
@@ -275,14 +277,16 @@ describe('HTML Directive', () => {
       expression: 'nonExistentProperty.htmlContent',
       arg: undefined,
       modifiers: {},
-      value: 'nonExistentProperty.htmlContent'
+      value: 'nonExistentProperty.htmlContent',
     };
 
     htmlDirective.bind!(element, binding, uus);
 
     // The evaluator catches errors and returns undefined
     expect(element.innerHTML).toBe('');
-    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Error evaluating expression'), expect.any(Error));
+    expect(consoleSpy).toHaveBeenCalledWith(
+      expect.stringContaining('[UUS_EVALUATION_ERROR]')
+    );
 
     consoleSpy.mockRestore();
   });
@@ -292,7 +296,7 @@ describe('HTML Directive', () => {
       expression: '',
       arg: undefined,
       modifiers: {},
-      value: ''
+      value: '',
     };
 
     htmlDirective.bind!(element, binding, uus);
@@ -305,15 +309,15 @@ describe('HTML Directive', () => {
       expression: 'htmlContent',
       arg: undefined,
       modifiers: {},
-      value: 'htmlContent'
+      value: 'htmlContent',
     };
 
     htmlDirective.bind!(element, binding, uus);
-    
+
     expect(uus.cleanups.has(element)).toBe(true);
-    
+
     htmlDirective.unbind!(element, binding, uus);
-    
+
     expect(uus.cleanups.has(element)).toBe(false);
   });
 
@@ -322,7 +326,7 @@ describe('HTML Directive', () => {
       expression: 'htmlContent',
       arg: undefined,
       modifiers: {},
-      value: 'htmlContent'
+      value: 'htmlContent',
     };
 
     // Call unbind without bind first
@@ -332,13 +336,14 @@ describe('HTML Directive', () => {
   });
 
   it('should handle nested script tags', () => {
-    uus.state.nestedScripts = '<div><script>alert("nested")</script>Content</div>';
+    uus.state.nestedScripts =
+      '<div><script>alert("nested")</script>Content</div>';
 
     const binding = {
       expression: 'nestedScripts',
       arg: undefined,
       modifiers: {},
-      value: 'nestedScripts'
+      value: 'nestedScripts',
     };
 
     htmlDirective.bind!(element, binding, uus);
@@ -355,7 +360,7 @@ describe('HTML Directive', () => {
       expression: 'upperCaseScript',
       arg: undefined,
       modifiers: {},
-      value: 'upperCaseScript'
+      value: 'upperCaseScript',
     };
 
     htmlDirective.bind!(element, binding, uus);
@@ -366,13 +371,14 @@ describe('HTML Directive', () => {
   });
 
   it('should handle multiple event handlers on same element', () => {
-    uus.state.multipleHandlers = '<div onclick="bad1()" onmouseover="bad2()" onload="bad3()">Safe content</div>';
+    uus.state.multipleHandlers =
+      '<div onclick="bad1()" onmouseover="bad2()" onload="bad3()">Safe content</div>';
 
     const binding = {
       expression: 'multipleHandlers',
       arg: undefined,
       modifiers: {},
-      value: 'multipleHandlers'
+      value: 'multipleHandlers',
     };
 
     htmlDirective.bind!(element, binding, uus);
@@ -386,13 +392,14 @@ describe('HTML Directive', () => {
   });
 
   it('should sanitize script tags with attributes', () => {
-    uus.state.scriptWithAttrs = '<script type="text/javascript" src="evil.js">alert("inline")</script>';
+    uus.state.scriptWithAttrs =
+      '<script type="text/javascript" src="evil.js">alert("inline")</script>';
 
     const binding = {
       expression: 'scriptWithAttrs',
       arg: undefined,
       modifiers: {},
-      value: 'scriptWithAttrs'
+      value: 'scriptWithAttrs',
     };
 
     htmlDirective.bind!(element, binding, uus);
@@ -405,13 +412,14 @@ describe('HTML Directive', () => {
   });
 
   it('should preserve safe HTML structure', () => {
-    uus.state.safeHTML = '<div class="container"><p>Paragraph</p><span>Span</span></div>';
+    uus.state.safeHTML =
+      '<div class="container"><p>Paragraph</p><span>Span</span></div>';
 
     const binding = {
       expression: 'safeHTML',
       arg: undefined,
       modifiers: {},
-      value: 'safeHTML'
+      value: 'safeHTML',
     };
 
     htmlDirective.bind!(element, binding, uus);
@@ -427,7 +435,7 @@ describe('HTML Directive', () => {
       expression: 'htmlContent',
       arg: undefined,
       modifiers: {},
-      value: 'htmlContent'
+      value: 'htmlContent',
     };
 
     htmlDirective.bind!(element, binding, uus);

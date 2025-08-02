@@ -23,12 +23,12 @@ export interface HydrationOptions {
    * Suppress hydration mismatch warnings
    */
   suppressWarnings?: boolean;
-  
+
   /**
    * Custom element matcher
    */
   matcher?: (el: Element) => boolean;
-  
+
   /**
    * Preserve existing DOM
    */

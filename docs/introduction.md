@@ -27,35 +27,42 @@ Uus.js takes a different approach:
 </div>
 
 <script src="https://unpkg.com/@uusjs/core"></script>
-<script>new Uus().mount()</script>
+<script>
+  new Uus().mount();
+</script>
 ```
 
 ## Key Features
 
 ### 🎯 Tiny Core
+
 - **< 3KB gzipped** core package
 - No dependencies
 - Modular architecture - use only what you need
 
 ### ⚡ Truly Reactive
+
 - Proxy-based reactivity system
 - Automatic dependency tracking
 - Efficient DOM updates
 - Computed values and effects
 
 ### 🎨 Declarative HTML
+
 - Express behavior directly in HTML
 - Familiar directive syntax
 - No JSX or templates required
 - Progressive enhancement friendly
 
 ### 📦 Batteries Included
+
 - **Router**: Client-side routing
 - **Animate**: Smooth animations and transitions
 - **Forms**: Form validation and handling
 - **More packages coming soon!**
 
 ### 🚀 Zero Config
+
 - No build step required
 - Works via CDN
 - TypeScript support out of the box
@@ -64,6 +71,7 @@ Uus.js takes a different approach:
 ## Core Concepts
 
 ### 1. Reactive State
+
 ```html
 <div uus-state="{ message: 'Hello World' }">
   <h1 uus-text="message"></h1>
@@ -71,18 +79,21 @@ Uus.js takes a different approach:
 ```
 
 ### 2. Event Handling
+
 ```html
 <button uus-on:click="handleClick">Click me</button>
-<input uus-on:keyup.enter="submit">
+<input uus-on:keyup.enter="submit" />
 ```
 
 ### 3. Conditional Rendering
+
 ```html
 <div uus-show="isVisible">Visible when true</div>
 <div uus-if="isLoaded">Removed from DOM when false</div>
 ```
 
 ### 4. List Rendering
+
 ```html
 <ul>
   <li uus-for="item in items" uus-text="item.name"></li>
@@ -90,22 +101,26 @@ Uus.js takes a different approach:
 ```
 
 ### 5. Two-way Binding
+
 ```html
-<input uus-model="username">
+<input uus-model="username" />
 <p>Hello, <span uus-text="username"></span>!</p>
 ```
 
 ## Comparison with Other Frameworks
 
 ### vs Alpine.js
+
 - **Uus.js**: True reactivity with automatic tracking
 - **Alpine.js**: Manual reactivity with x-data
 
 ### vs htmx
+
 - **Uus.js**: Client-side reactivity and state management
 - **htmx**: Server-side HTML fragments
 
 ### vs Vue/React
+
 - **Uus.js**: HTML-first, no build step required
 - **Vue/React**: Component-based, requires tooling
 
@@ -158,6 +173,7 @@ Ready to dive in? Check out:
 - [Core Concepts](./core/reactivity.md) - Deep dive into reactivity
 
 Join our community:
+
 - [Discord](https://discord.gg/uusjs) - Chat with us
 - [GitHub](https://github.com/uus-js/uus) - Star the project
 - [Twitter](https://twitter.com/uusjs) - Follow for updates

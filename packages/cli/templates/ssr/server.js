@@ -18,15 +18,15 @@ const createApp = createSSRApp((context) => ({
     title: 'My SSR App',
     message: 'Welcome to server-side rendered Uus.js!',
     count: 0,
-    
+
     increment() {
       this.count++;
     },
-    
+
     decrement() {
       this.count--;
-    }
-  }
+    },
+  },
 }));
 
 // HTML template
@@ -126,14 +126,14 @@ app.get('/', async (req, res) => {
   try {
     const context = {
       url: req.url,
-      title: 'Uus.js SSR Demo'
+      title: 'Uus.js SSR Demo',
     };
-    
+
     const html = await renderToString(createApp, {
       context,
-      template
+      template,
     });
-    
+
     res.send(html);
   } catch (error) {
     console.error('SSR Error:', error);

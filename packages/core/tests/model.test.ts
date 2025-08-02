@@ -8,7 +8,7 @@ describe('Model Directive', () => {
   beforeEach(() => {
     document.body.innerHTML = '';
     uus = new Uus();
-    
+
     // Set up basic state for two-way binding
     uus.state.message = 'Hello World';
     uus.state.isChecked = true;
@@ -26,7 +26,7 @@ describe('Model Directive', () => {
       expression: 'message',
       arg: undefined,
       modifiers: {},
-      value: 'message'
+      value: 'message',
     };
 
     modelDirective.bind!(input, binding, uus);
@@ -44,7 +44,7 @@ describe('Model Directive', () => {
       expression: 'message',
       arg: undefined,
       modifiers: {},
-      value: 'message'
+      value: 'message',
     };
 
     modelDirective.bind!(input, binding, uus);
@@ -65,7 +65,7 @@ describe('Model Directive', () => {
       expression: 'isChecked',
       arg: undefined,
       modifiers: {},
-      value: 'isChecked'
+      value: 'isChecked',
     };
 
     modelDirective.bind!(checkbox, binding, uus);
@@ -89,7 +89,7 @@ describe('Model Directive', () => {
       expression: 'numberValue',
       arg: undefined,
       modifiers: {},
-      value: 'numberValue'
+      value: 'numberValue',
     };
 
     modelDirective.bind!(input, binding, uus);
@@ -116,7 +116,7 @@ describe('Model Directive', () => {
       expression: 'selectedOption',
       arg: undefined,
       modifiers: {},
-      value: 'selectedOption'
+      value: 'selectedOption',
     };
 
     modelDirective.bind!(select, binding, uus);
@@ -138,7 +138,7 @@ describe('Model Directive', () => {
       expression: 'message',
       arg: undefined,
       modifiers: {},
-      value: 'message'
+      value: 'message',
     };
 
     modelDirective.bind!(textarea, binding, uus);
@@ -160,7 +160,7 @@ describe('Model Directive', () => {
       expression: 'user.name',
       arg: undefined,
       modifiers: {},
-      value: 'user.name'
+      value: 'user.name',
     };
 
     modelDirective.bind!(input, binding, uus);
@@ -185,7 +185,7 @@ describe('Model Directive', () => {
       expression: 'radioValue',
       arg: undefined,
       modifiers: {},
-      value: 'radioValue'
+      value: 'radioValue',
     };
 
     modelDirective.bind!(radio, binding, uus);
@@ -202,7 +202,7 @@ describe('Model Directive', () => {
       expression: 'message',
       arg: undefined,
       modifiers: {},
-      value: 'message'
+      value: 'message',
     };
 
     modelDirective.bind!(div as any, binding, uus);
@@ -224,7 +224,7 @@ describe('Model Directive', () => {
       expression: 'nullValue',
       arg: undefined,
       modifiers: {},
-      value: 'nullValue'
+      value: 'nullValue',
     };
 
     modelDirective.bind!(input, binding, uus);
@@ -242,13 +242,15 @@ describe('Model Directive', () => {
       expression: 'nonExistent.property',
       arg: undefined,
       modifiers: {},
-      value: 'nonExistent.property'
+      value: 'nonExistent.property',
     };
 
     modelDirective.bind!(input, binding, uus);
 
     // The evaluator catches errors first
-    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Error evaluating expression'), expect.any(Error));
+    expect(consoleSpy).toHaveBeenCalledWith(
+      expect.stringContaining('[UUS_EVALUATION_ERROR]')
+    );
     consoleSpy.mockRestore();
   });
 
@@ -262,7 +264,7 @@ describe('Model Directive', () => {
       expression: 'nonExistent.deep.property',
       arg: undefined,
       modifiers: {},
-      value: 'nonExistent.deep.property'
+      value: 'nonExistent.deep.property',
     };
 
     modelDirective.bind!(input, binding, uus);
@@ -272,7 +274,10 @@ describe('Model Directive', () => {
     input.dispatchEvent(new Event('input'));
 
     // Should have errors from both evaluator and model
-    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Error'), expect.any(Error));
+    expect(consoleSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Error'),
+      expect.any(Error)
+    );
     consoleSpy.mockRestore();
   });
 
@@ -285,7 +290,7 @@ describe('Model Directive', () => {
       expression: '',
       arg: undefined,
       modifiers: {},
-      value: ''
+      value: '',
     };
 
     // Should not throw
@@ -303,15 +308,15 @@ describe('Model Directive', () => {
       expression: 'message',
       arg: undefined,
       modifiers: {},
-      value: 'message'
+      value: 'message',
     };
 
     modelDirective.bind!(input, binding, uus);
-    
+
     expect(uus.cleanups.has(input)).toBe(true);
 
     modelDirective.unbind!(input, binding, uus);
-    
+
     expect(uus.cleanups.has(input)).toBe(false);
   });
 
@@ -324,7 +329,7 @@ describe('Model Directive', () => {
       expression: 'message',
       arg: undefined,
       modifiers: {},
-      value: 'message'
+      value: 'message',
     };
 
     modelDirective.bind!(input, binding, uus);
@@ -351,7 +356,7 @@ describe('Model Directive', () => {
       expression: 'deep.nested.property',
       arg: undefined,
       modifiers: {},
-      value: 'deep.nested.property'
+      value: 'deep.nested.property',
     };
 
     modelDirective.bind!(input, binding, uus);
@@ -375,7 +380,7 @@ describe('Model Directive', () => {
       expression: 'falsyValue',
       arg: undefined,
       modifiers: {},
-      value: 'falsyValue'
+      value: 'falsyValue',
     };
 
     modelDirective.bind!(checkbox, binding, uus);

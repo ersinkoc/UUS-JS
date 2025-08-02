@@ -1,12 +1,12 @@
 import type { UusPlugin } from '@uusjs/core';
-import { 
+import {
   animateDirective,
   durationDirective,
   delayDirective,
   easingDirective,
   triggerDirective,
   staggerDirective,
-  springDirective
+  springDirective,
 } from './animate';
 import { flipDirective, layoutDirective } from './flip';
 import { presets } from './presets';
@@ -31,23 +31,27 @@ export function createAnimate(): UusPlugin {
       uus.registerDirective(springDirective);
       uus.registerDirective(flipDirective);
       uus.registerDirective(layoutDirective);
-      
+
       // Add animation utilities to state
       uus.state.$animate = {
         presets,
         easings,
-        spring: createSpringAnimation
+        spring: createSpringAnimation,
       };
-    }
+    },
   };
 }
 
 // Convenience function to add custom presets
-export function definePreset(name: string, keyframes: Keyframe[], options?: any) {
+export function definePreset(
+  name: string,
+  keyframes: Keyframe[],
+  options?: any
+) {
   presets[name] = {
     name,
     keyframes,
-    options: options || { duration: 300, easing: 'ease-out' }
+    options: options || { duration: 300, easing: 'ease-out' },
   };
 }
 

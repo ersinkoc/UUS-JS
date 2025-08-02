@@ -1,20 +1,21 @@
-import type { Directive, UusInstance } from '../types';
+import type { Directive, StyleDirectiveBinding } from '../types';
 import { effect } from '../reactive';
 import { createSafeEvaluator } from '../evaluator';
+import { asDirectiveName, asExpressionString } from '../type-guards';
 
-export const styleDirective: Directive = {
-  name: 'style',
+export const styleDirective: Directive<StyleDirectiveBinding> = {
+  name: asDirectiveName('style'),
   bind(el, binding, uus) {
     const evaluator = createSafeEvaluator(uus.state);
     const originalStyle = el.getAttribute('style') || '';
-    
+
     const cleanup = effect(() => {
       try {
-        const value = evaluator(binding.expression || '{}');
-        
+        const value = evaluator(binding.expression ? asExpressionString(binding.expression) : asExpressionString('{}'));
+
         // Reset to original style
         el.setAttribute('style', originalStyle);
-        
+
         if (typeof value === 'string') {
           // String syntax: merge with existing style
           const currentStyle = el.getAttribute('style') || '';
@@ -24,10 +25,14 @@ export const styleDirective: Directive = {
           Object.entries(value).forEach(([prop, val]) => {
             if (val === null || val === undefined || val === '') {
               // Remove the style property
-              (el.style as any)[prop] = '';
+              (el.style as CSSStyleDeclaration & Record<string, string>)[prop] =
+                '';
             } else {
               // Convert camelCase to kebab-case for CSS properties
-              const cssProp = prop.replace(/[A-Z]/g, m => '-' + m.toLowerCase());
+              const cssProp = prop.replace(
+                /[A-Z]/g,
+                (m) => '-' + m.toLowerCase()
+              );
               el.style.setProperty(cssProp, String(val));
             }
           });

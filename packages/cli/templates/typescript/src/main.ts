@@ -14,12 +14,12 @@ interface AppState {
   todos: Todo[];
   newTodoText: string;
   filter: 'all' | 'active' | 'completed';
-  
+
   // Computed
   filteredTodos: Todo[];
   activeCount: number;
   completedCount: number;
-  
+
   // Methods
   addTodo(): void;
   toggleTodo(id: number): void;
@@ -121,27 +121,27 @@ const state = reactive<AppState>({
   todos: [],
   newTodoText: '',
   filter: 'all',
-  
+
   // Computed properties
   get filteredTodos() {
     switch (this.filter) {
       case 'active':
-        return this.todos.filter(t => !t.done);
+        return this.todos.filter((t) => !t.done);
       case 'completed':
-        return this.todos.filter(t => t.done);
+        return this.todos.filter((t) => t.done);
       default:
         return this.todos;
     }
   },
-  
+
   get activeCount() {
-    return this.todos.filter(t => !t.done).length;
+    return this.todos.filter((t) => !t.done).length;
   },
-  
+
   get completedCount() {
-    return this.todos.filter(t => t.done).length;
+    return this.todos.filter((t) => t.done).length;
   },
-  
+
   // Methods
   addTodo() {
     const text = this.newTodoText.trim();
@@ -150,30 +150,30 @@ const state = reactive<AppState>({
         id: Date.now(),
         text,
         done: false,
-        priority: 'medium'
+        priority: 'medium',
       });
       this.newTodoText = '';
     }
   },
-  
+
   toggleTodo(id: number) {
-    const todo = this.todos.find(t => t.id === id);
+    const todo = this.todos.find((t) => t.id === id);
     if (todo) {
       todo.done = !todo.done;
     }
   },
-  
+
   removeTodo(id: number) {
-    this.todos = this.todos.filter(t => t.id !== id);
+    this.todos = this.todos.filter((t) => t.id !== id);
   },
-  
+
   clearCompleted() {
-    this.todos = this.todos.filter(t => !t.done);
+    this.todos = this.todos.filter((t) => !t.done);
   },
-  
+
   setFilter(filter: AppState['filter']) {
     this.filter = filter;
-  }
+  },
 });
 
 // Create and mount app
@@ -185,5 +185,5 @@ app.mount('#app');
 state.todos = [
   { id: 1, text: 'Learn TypeScript', done: true, priority: 'high' },
   { id: 2, text: 'Build with Uus.js', done: false, priority: 'medium' },
-  { id: 3, text: 'Deploy to production', done: false, priority: 'low' }
+  { id: 3, text: 'Deploy to production', done: false, priority: 'low' },
 ];

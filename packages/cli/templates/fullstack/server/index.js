@@ -27,7 +27,7 @@ app.use('/api', apiRoutes);
 // Serve static files in production
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(join(__dirname, 'public')));
-  
+
   // Handle client-side routing
   app.get('*', (req, res) => {
     res.sendFile(join(__dirname, 'public', 'index.html'));
@@ -38,9 +38,10 @@ if (process.env.NODE_ENV === 'production') {
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({
-    error: process.env.NODE_ENV === 'production' 
-      ? 'Internal server error' 
-      : err.message
+    error:
+      process.env.NODE_ENV === 'production'
+        ? 'Internal server error'
+        : err.message,
   });
 });
 

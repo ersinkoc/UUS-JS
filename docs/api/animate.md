@@ -22,20 +22,21 @@ app.use(animate);
 Creates an animation instance.
 
 ```typescript
-function createAnimate(options?: AnimateOptions): AnimatePlugin
+function createAnimate(options?: AnimateOptions): AnimatePlugin;
 
 interface AnimateOptions {
-  duration?: number;        // Default duration (ms)
-  easing?: string;         // Default easing function
-  stagger?: number;        // Default stagger delay (ms)
+  duration?: number; // Default duration (ms)
+  easing?: string; // Default easing function
+  stagger?: number; // Default stagger delay (ms)
 }
 ```
 
 **Example:**
+
 ```javascript
 const animate = createAnimate({
   duration: 300,
-  easing: 'ease-out'
+  easing: 'ease-out',
 });
 ```
 
@@ -75,20 +76,20 @@ await animate(element, 'fadeIn');
 await animate(element, 'slideIn', {
   duration: 500,
   easing: 'ease-out',
-  delay: 100
+  delay: 100,
 });
 
 // Custom keyframes
 await animate(element, {
   from: { opacity: '0', transform: 'scale(0.8)' },
-  to: { opacity: '1', transform: 'scale(1)' }
+  to: { opacity: '1', transform: 'scale(1)' },
 });
 
 // Multiple keyframes
 await animate(element, [
   { opacity: '0', transform: 'rotate(0deg)' },
   { opacity: '1', transform: 'rotate(180deg)' },
-  { opacity: '0', transform: 'rotate(360deg)' }
+  { opacity: '0', transform: 'rotate(360deg)' },
 ]);
 ```
 
@@ -121,7 +122,7 @@ interface SpringOptions {
 spring(0, 100, {
   onUpdate: (value) => {
     element.style.transform = `translateX(${value}px)`;
-  }
+  },
 });
 
 // Bouncy spring
@@ -130,7 +131,7 @@ spring(0, 1, {
   damping: 10,
   onUpdate: (value) => {
     element.style.opacity = value;
-  }
+  },
 });
 
 // With initial velocity
@@ -138,7 +139,7 @@ spring(0, 200, {
   velocity: 1000,
   onUpdate: (value) => {
     element.style.width = `${value}px`;
-  }
+  },
 });
 ```
 
@@ -172,18 +173,22 @@ await animate.flip(element, () => {
 });
 
 // Size change
-await animate.flip(element, () => {
-  element.style.width = '300px';
-  element.style.height = '200px';
-}, {
-  scale: true
-});
+await animate.flip(
+  element,
+  () => {
+    element.style.width = '300px';
+    element.style.height = '200px';
+  },
+  {
+    scale: true,
+  }
+);
 
 // Reorder list
 await animate.flip(container, () => {
   // Reorder DOM elements
   items.sort((a, b) => b.value - a.value);
-  items.forEach(item => container.appendChild(item));
+  items.forEach((item) => container.appendChild(item));
 });
 ```
 
@@ -210,25 +215,25 @@ interface StaggerOptions extends AnimationOptions {
 // Fixed stagger
 const items = document.querySelectorAll('.item');
 await animate.stagger(items, 'fadeIn', {
-  stagger: 50 // 50ms between each
+  stagger: 50, // 50ms between each
 });
 
 // Dynamic stagger
 await animate.stagger(items, 'slideIn', {
   stagger: (index) => index * 30,
-  duration: 400
+  duration: 400,
 });
 
 // From center
 await animate.stagger(items, 'scaleIn', {
   stagger: 50,
-  from: 'center'
+  from: 'center',
 });
 
 // Random stagger
 await animate.stagger(items, 'rotateIn', {
   stagger: () => Math.random() * 100,
-  from: 'random'
+  from: 'random',
 });
 ```
 
@@ -246,7 +251,7 @@ interface Timeline {
     options?: AnimationOptions,
     position?: string | number
   ): Timeline;
-  
+
   play(): Promise<void>;
   pause(): void;
   reverse(): void;
@@ -289,36 +294,36 @@ tl.seek(500); // Jump to 500ms
 
 ```javascript
 // Fade animations
-'fadeIn'      // opacity: 0 → 1
-'fadeOut'     // opacity: 1 → 0
+'fadeIn'; // opacity: 0 → 1
+'fadeOut'; // opacity: 1 → 0
 
 // Slide animations
-'slideIn'     // translateX: -100% → 0
-'slideOut'    // translateX: 0 → 100%
-'slideInUp'   // translateY: 100% → 0
-'slideInDown' // translateY: -100% → 0
+'slideIn'; // translateX: -100% → 0
+'slideOut'; // translateX: 0 → 100%
+'slideInUp'; // translateY: 100% → 0
+'slideInDown'; // translateY: -100% → 0
 
 // Scale animations
-'scaleIn'     // scale: 0 → 1
-'scaleOut'    // scale: 1 → 0
-'scaleInUp'   // scale: 0 → 1.1 → 1
-'scaleInDown' // scale: 1.2 → 1
+'scaleIn'; // scale: 0 → 1
+'scaleOut'; // scale: 1 → 0
+'scaleInUp'; // scale: 0 → 1.1 → 1
+'scaleInDown'; // scale: 1.2 → 1
 
 // Rotate animations
-'rotateIn'    // rotate: -180deg → 0
-'rotateOut'   // rotate: 0 → 180deg
+'rotateIn'; // rotate: -180deg → 0
+'rotateOut'; // rotate: 0 → 180deg
 
 // Special effects
-'bounce'      // Bouncing animation
-'shake'       // Shake effect
-'pulse'       // Pulsing effect
-'flip'        // 3D flip
-'swing'       // Swinging motion
-'rubberBand'  // Rubber band effect
-'flash'       // Flash effect
-'headShake'   // Head shake
-'jello'       // Jello wobble
-'heartBeat'   // Heart beat pulse
+'bounce'; // Bouncing animation
+'shake'; // Shake effect
+'pulse'; // Pulsing effect
+'flip'; // 3D flip
+'swing'; // Swinging motion
+'rubberBand'; // Rubber band effect
+'flash'; // Flash effect
+'headShake'; // Head shake
+'jello'; // Jello wobble
+'heartBeat'; // Heart beat pulse
 ```
 
 ### Using Presets
@@ -330,13 +335,12 @@ await animate(element, 'fadeIn');
 // Preset with options
 await animate(element, 'bounce', {
   duration: 800,
-  iterations: 2
+  iterations: 2,
 });
 
 // Combine presets in timeline
 const tl = animate.timeline();
-tl.add(el, 'fadeIn', { duration: 300 })
-  .add(el, 'bounce', { duration: 600 });
+tl.add(el, 'fadeIn', { duration: 300 }).add(el, 'bounce', { duration: 600 });
 ```
 
 ### Custom Presets
@@ -344,14 +348,14 @@ tl.add(el, 'fadeIn', { duration: 300 })
 ```javascript
 // Register custom preset
 animate.registerPreset('customSlide', {
-  from: { 
+  from: {
     opacity: '0',
-    transform: 'translateX(-50px) rotate(-5deg)'
+    transform: 'translateX(-50px) rotate(-5deg)',
   },
-  to: { 
+  to: {
     opacity: '1',
-    transform: 'translateX(0) rotate(0)'
-  }
+    transform: 'translateX(0) rotate(0)',
+  },
 });
 
 // Use custom preset
@@ -366,12 +370,10 @@ Animates element on mount.
 
 ```html
 <!-- Simple animation -->
-<div uus-animate="fadeIn">
-  This fades in when mounted
-</div>
+<div uus-animate="fadeIn">This fades in when mounted</div>
 
 <!-- With options -->
-<div 
+<div
   uus-animate="slideIn"
   uus-duration="500"
   uus-delay="200"
@@ -386,7 +388,7 @@ Animates element on mount.
 Enter/leave animations for conditional elements.
 
 ```html
-<div 
+<div
   uus-show="isVisible"
   uus-animate-enter="fadeIn"
   uus-animate-leave="fadeOut"
@@ -395,7 +397,7 @@ Enter/leave animations for conditional elements.
 </div>
 
 <!-- With different animations -->
-<div 
+<div
   uus-if="showPanel"
   uus-animate-enter="slideInUp"
   uus-animate-leave="slideOutDown"
@@ -411,17 +413,13 @@ Staggers animations for list items.
 
 ```html
 <ul>
-  <li 
-    uus-for="item in items"
-    uus-animate="fadeIn"
-    uus-stagger="50"
-  >
+  <li uus-for="item in items" uus-animate="fadeIn" uus-stagger="50">
     <span uus-text="item"></span>
   </li>
 </ul>
 
 <!-- Dynamic stagger -->
-<div 
+<div
   uus-for="(card, index) in cards"
   uus-animate="scaleIn"
   :uus-stagger="index * 30"
@@ -436,10 +434,7 @@ FLIP animation for layout changes.
 
 ```html
 <div uus-flip="true">
-  <div 
-    uus-for="item in sortedItems"
-    :key="item.id"
-  >
+  <div uus-for="item in sortedItems" :key="item.id">
     <span uus-text="item.name"></span>
   </div>
 </div>
@@ -453,25 +448,25 @@ FLIP animation for layout changes.
 // Stiff spring (less bounce)
 spring(0, 100, {
   stiffness: 400,
-  damping: 40
+  damping: 40,
 });
 
 // Loose spring (more bounce)
 spring(0, 100, {
   stiffness: 100,
-  damping: 10
+  damping: 10,
 });
 
 // Heavy spring (slower)
 spring(0, 100, {
   mass: 2,
-  stiffness: 200
+  stiffness: 200,
 });
 
 // Critical damping (no overshoot)
 spring(0, 100, {
   stiffness: 170,
-  damping: 26
+  damping: 26,
 });
 ```
 
@@ -481,18 +476,18 @@ spring(0, 100, {
 const presets = {
   // No wobble
   stiff: { stiffness: 400, damping: 40 },
-  
+
   // Gentle wobble
   gentle: { stiffness: 120, damping: 14 },
-  
+
   // Bouncy
   wobbly: { stiffness: 180, damping: 12 },
-  
+
   // Very bouncy
   loose: { stiffness: 100, damping: 10 },
-  
+
   // Slow and smooth
-  molasses: { stiffness: 60, damping: 20 }
+  molasses: { stiffness: 60, damping: 20 },
 };
 
 // Use preset
@@ -500,7 +495,7 @@ spring(0, 100, {
   ...presets.bouncy,
   onUpdate: (value) => {
     element.style.transform = `scale(${value})`;
-  }
+  },
 });
 ```
 
@@ -510,20 +505,20 @@ spring(0, 100, {
 
 ```javascript
 // CSS easings
-'linear'
-'ease'
-'ease-in'
-'ease-out'
-'ease-in-out'
+'linear';
+'ease';
+'ease-in';
+'ease-out';
+'ease-in-out';
 
 // Cubic bezier
-'cubic-bezier(0.68, -0.55, 0.265, 1.55)'
+'cubic-bezier(0.68, -0.55, 0.265, 1.55)';
 
 // Custom easings
 animate.registerEasing('bounce', (t) => {
   const n1 = 7.5625;
   const d1 = 2.75;
-  
+
   if (t < 1 / d1) {
     return n1 * t * t;
   } else if (t < 2 / d1) {
@@ -544,7 +539,7 @@ animate.registerEasing('bounce', (t) => {
 // Properties that trigger GPU acceleration
 await animate(element, {
   from: { transform: 'translateX(0) translateZ(0)' },
-  to: { transform: 'translateX(100px) translateZ(0)' }
+  to: { transform: 'translateX(100px) translateZ(0)' },
 });
 
 // Or use will-change
@@ -557,13 +552,13 @@ element.style.willChange = 'auto'; // Clean up
 
 ```javascript
 // Batch DOM reads/writes
-const positions = elements.map(el => el.getBoundingClientRect());
+const positions = elements.map((el) => el.getBoundingClientRect());
 
 // Then batch animations
 elements.forEach((el, i) => {
   animate(el, {
     from: { transform: `translateY(${positions[i].top}px)` },
-    to: { transform: 'translateY(0)' }
+    to: { transform: 'translateY(0)' },
   });
 });
 ```
@@ -580,7 +575,7 @@ animation.cancel();
 // Or use AbortController
 const controller = new AbortController();
 animate(element, 'slideIn', {
-  signal: controller.signal
+  signal: controller.signal,
 });
 
 // Cancel
@@ -602,26 +597,26 @@ element.addEventListener('touchstart', (e) => {
 element.addEventListener('touchmove', (e) => {
   currentX = e.touches[0].clientX;
   const diff = currentX - startX;
-  
+
   element.style.transform = `translateX(${diff}px)`;
 });
 
 element.addEventListener('touchend', () => {
   const diff = currentX - startX;
-  
+
   if (Math.abs(diff) > 100) {
     // Snap to new position
     spring(diff, diff > 0 ? 300 : -300, {
       onUpdate: (value) => {
         element.style.transform = `translateX(${value}px)`;
-      }
+      },
     });
   } else {
     // Snap back
     spring(diff, 0, {
       onUpdate: (value) => {
         element.style.transform = `translateX(${value}px)`;
-      }
+      },
     });
   }
 });
@@ -631,18 +626,18 @@ element.addEventListener('touchend', () => {
 
 ```javascript
 const observer = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
+  entries.forEach((entry) => {
     if (entry.isIntersecting) {
       animate(entry.target, 'fadeIn', {
         duration: 600,
-        delay: entry.target.dataset.delay || 0
+        delay: entry.target.dataset.delay || 0,
       });
       observer.unobserve(entry.target);
     }
   });
 });
 
-document.querySelectorAll('[data-scroll-animate]').forEach(el => {
+document.querySelectorAll('[data-scroll-animate]').forEach((el) => {
   observer.observe(el);
 });
 ```
@@ -653,7 +648,7 @@ document.querySelectorAll('[data-scroll-animate]').forEach(el => {
 async function morph(from, to) {
   const fromRect = from.getBoundingClientRect();
   const toRect = to.getBoundingClientRect();
-  
+
   // Clone and position
   const clone = from.cloneNode(true);
   clone.style.position = 'fixed';
@@ -662,30 +657,34 @@ async function morph(from, to) {
   clone.style.width = `${fromRect.width}px`;
   clone.style.height = `${fromRect.height}px`;
   document.body.appendChild(clone);
-  
+
   // Hide originals
   from.style.opacity = '0';
   to.style.opacity = '0';
-  
+
   // Animate morph
-  await animate(clone, [
+  await animate(
+    clone,
+    [
+      {
+        left: `${fromRect.left}px`,
+        top: `${fromRect.top}px`,
+        width: `${fromRect.width}px`,
+        height: `${fromRect.height}px`,
+      },
+      {
+        left: `${toRect.left}px`,
+        top: `${toRect.top}px`,
+        width: `${toRect.width}px`,
+        height: `${toRect.height}px`,
+      },
+    ],
     {
-      left: `${fromRect.left}px`,
-      top: `${fromRect.top}px`,
-      width: `${fromRect.width}px`,
-      height: `${fromRect.height}px`
-    },
-    {
-      left: `${toRect.left}px`,
-      top: `${toRect.top}px`,
-      width: `${toRect.width}px`,
-      height: `${toRect.height}px`
+      duration: 600,
+      easing: 'ease-in-out',
     }
-  ], {
-    duration: 600,
-    easing: 'ease-in-out'
-  });
-  
+  );
+
   // Cleanup
   clone.remove();
   to.style.opacity = '1';
@@ -695,25 +694,25 @@ async function morph(from, to) {
 ## TypeScript Support
 
 ```typescript
-import { 
+import {
   AnimatePlugin,
   AnimationOptions,
   SpringOptions,
   Timeline,
-  Keyframes
+  Keyframes,
 } from '@uusjs/animate';
 
 // Typed animations
 const options: AnimationOptions = {
   duration: 500,
   easing: 'ease-out',
-  delay: 100
+  delay: 100,
 };
 
 // Typed keyframes
 const keyframes: Keyframes = {
   from: { opacity: '0' },
-  to: { opacity: '1' }
+  to: { opacity: '1' },
 };
 
 // Typed spring
@@ -722,7 +721,7 @@ const springOptions: SpringOptions = {
   damping: 20,
   onUpdate: (value: number) => {
     console.log(value);
-  }
+  },
 };
 ```
 

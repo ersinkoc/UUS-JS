@@ -8,16 +8,14 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'lcov', 'html'],
-      include: [
-        'packages/core/src/**/*.ts'
-      ],
+      include: ['packages/core/src/**/*.ts'],
       thresholds: {
         global: {
           statements: 100,
           branches: 100,
           functions: 100,
-          lines: 100
-        }
+          lines: 100,
+        },
       },
       exclude: [
         'node_modules',
@@ -33,9 +31,9 @@ export default defineConfig({
         'coverage/**',
         'packages/core/src/devtools.ts',
         'packages/core/src/performance.ts',
-        'packages/core/src/test-build.js'
-      ]
-    }
+        'packages/core/src/test-build.js',
+      ],
+    },
   },
   resolve: {
     alias: {
@@ -46,7 +44,7 @@ export default defineConfig({
       '@uusjs/ssr': resolve(__dirname, './packages/ssr/src'),
       '@uusjs/realtime': resolve(__dirname, './packages/realtime/src'),
       '@uusjs/cli': resolve(__dirname, './packages/cli/src'),
-      '@uusjs/i18n': resolve(__dirname, './packages/i18n/src')
-    }
-  }
+      '@uusjs/i18n': resolve(__dirname, './packages/i18n/src'),
+    },
+  },
 });

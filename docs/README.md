@@ -5,12 +5,14 @@ Welcome to the Uus.js documentation! Uus.js is a fresh, lightweight reactive HTM
 ## 📚 Documentation Structure
 
 ### Getting Started
+
 - [Introduction](./introduction.md) - What is Uus.js and why use it
 - [Quick Start](./quick-start.md) - Get up and running in 5 minutes
 - [Installation](./installation.md) - Installation options and setup
 - [Tutorial](./tutorial.md) - Build your first Uus.js app
 
 ### Core Concepts
+
 - [Reactivity](./core/reactivity.md) - Understanding the reactive system
 - [Directives](./core/directives.md) - Built-in directives reference
 - [State Management](./core/state-management.md) - Managing application state
@@ -18,12 +20,14 @@ Welcome to the Uus.js documentation! Uus.js is a fresh, lightweight reactive HTM
 - [Lifecycle](./core/lifecycle.md) - Component lifecycle hooks
 
 ### API Reference
+
 - [Core API](./api/core.md) - Core package API
 - [Router API](./api/router.md) - Router package API
 - [Animate API](./api/animate.md) - Animation package API
 - [Forms API](./api/forms.md) - Forms package API
 
 ### Guides
+
 - [Building SPAs](./guides/spa.md) - Single Page Applications with Uus.js
 - [Animations](./guides/animations.md) - Creating smooth animations
 - [Form Handling](./guides/forms.md) - Working with forms and validation
@@ -31,17 +35,20 @@ Welcome to the Uus.js documentation! Uus.js is a fresh, lightweight reactive HTM
 - [Testing](./testing.md) - Testing your Uus.js applications
 
 ### Examples
+
 - [Todo App](./examples/todo-app.md) - Classic todo application
 - [E-commerce](./examples/e-commerce.md) - Product catalog with cart
 - [Dashboard](./examples/dashboard.md) - Admin dashboard
 - [Real-time Chat](./examples/chat.md) - WebSocket-based chat
 
 ### Migration
+
 - [From Alpine.js](./migration/alpine.md) - Migrating from Alpine.js
 - [From htmx](./migration/htmx.md) - Migrating from htmx
 - [From Vue 2](./migration/vue2.md) - Migrating from Vue 2
 
 ### Community
+
 - [Contributing](../CONTRIBUTING.md) - How to contribute
 - [Code of Conduct](../CODE_OF_CONDUCT.md) - Community guidelines
 - [Resources](./community/resources.md) - Tutorials, videos, articles

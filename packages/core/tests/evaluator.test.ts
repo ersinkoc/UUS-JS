@@ -14,7 +14,7 @@ describe('Safe Evaluator', () => {
       isActive: true,
       price: 10.5,
       nullValue: null,
-      undefinedValue: undefined
+      undefinedValue: undefined,
     };
     evaluate = createSafeEvaluator(state);
   });
@@ -74,7 +74,9 @@ describe('Safe Evaluator', () => {
 
     it('should evaluate template literals', () => {
       expect(evaluate('`Hello ${name}`')).toBe('Hello test');
-      expect(evaluate('`Count: ${count}, Active: ${isActive}`')).toBe('Count: 0, Active: true');
+      expect(evaluate('`Count: ${count}, Active: ${isActive}`')).toBe(
+        'Count: 0, Active: true'
+      );
     });
 
     it('should evaluate object literal expressions', () => {
@@ -98,13 +100,13 @@ describe('Safe Evaluator', () => {
       state.count = 10;
       expect(evaluate('count += 5')).toBe(15);
       expect(state.count).toBe(15);
-      
+
       expect(evaluate('count -= 3')).toBe(12);
       expect(state.count).toBe(12);
-      
+
       expect(evaluate('count *= 2')).toBe(24);
       expect(state.count).toBe(24);
-      
+
       expect(evaluate('count /= 4')).toBe(6);
       expect(state.count).toBe(6);
     });
@@ -113,13 +115,13 @@ describe('Safe Evaluator', () => {
       state.count = 5;
       expect(evaluate('count++')).toBe(5);
       expect(state.count).toBe(6);
-      
+
       expect(evaluate('++count')).toBe(7);
       expect(state.count).toBe(7);
-      
+
       expect(evaluate('count--')).toBe(7);
       expect(state.count).toBe(6);
-      
+
       expect(evaluate('--count')).toBe(5);
       expect(state.count).toBe(5);
     });
@@ -180,11 +182,22 @@ describe('Safe Evaluator', () => {
 
   describe('Security', () => {
     it('should reject forbidden keywords', () => {
-      expect(() => evaluate('eval("alert(1)")')).toThrow('Forbidden keyword: eval');
-      expect(() => evaluate('Function("alert(1)")')).toThrow('Forbidden keyword: Function');
-      expect(() => evaluate('constructor')).toThrow('Forbidden keyword: constructor');
-      expect(() => evaluate('__proto__')).toThrow('Forbidden keyword: __proto__');
-      expect(() => evaluate('prototype')).toThrow('Forbidden keyword: prototype');
+      const evaluateStrict = createSafeEvaluator(state, { throwOnError: true });
+      expect(() => evaluateStrict('eval("alert(1)")')).toThrow(
+        'Security violation: forbidden keyword "eval"'
+      );
+      expect(() => evaluateStrict('Function("alert(1)")')).toThrow(
+        'Security violation: forbidden keyword "Function"'
+      );
+      expect(() => evaluateStrict('constructor')).toThrow(
+        'Security violation: forbidden keyword "constructor"'
+      );
+      expect(() => evaluateStrict('__proto__')).toThrow(
+        'Security violation: forbidden keyword "__proto__"'
+      );
+      expect(() => evaluateStrict('prototype')).toThrow(
+        'Security violation: forbidden keyword "prototype"'
+      );
     });
 
     it('should handle errors gracefully', () => {
@@ -198,11 +211,11 @@ describe('Safe Evaluator', () => {
       const specialState = {
         'special-key': 'value',
         '123': 'numeric',
-        '$var': 'dollar',
-        '_private': 'underscore'
+        $var: 'dollar',
+        _private: 'underscore',
       };
       const specialEvaluate = createSafeEvaluator(specialState);
-      
+
       // Valid JavaScript identifiers work
       expect(specialEvaluate('$var')).toBe('dollar');
       expect(specialEvaluate('_private')).toBe('underscore');
@@ -212,12 +225,12 @@ describe('Safe Evaluator', () => {
       // Create evaluator with small state
       const smallState = { x: 1 };
       const smallEvaluator = createSafeEvaluator(smallState);
-      
+
       // Generate more than 1000 unique expressions
       for (let i = 0; i < 1005; i++) {
         smallEvaluator(`x + ${i}`);
       }
-      
+
       // Cache should have been cleared and still work
       expect(smallEvaluator('x + 1')).toBe(2);
     });
@@ -226,11 +239,11 @@ describe('Safe Evaluator', () => {
       state.nested = {
         level1: {
           level2: {
-            value: 42
-          }
-        }
+            value: 42,
+          },
+        },
       };
-      
+
       expect(evaluate('nested.level1.level2.value')).toBe(42);
     });
 
@@ -242,7 +255,7 @@ describe('Safe Evaluator', () => {
     it('should handle expressions with function calls', () => {
       state.getValue = () => 100;
       expect(evaluate('getValue()')).toBe(100);
-      
+
       state.add = (a: number, b: number) => a + b;
       expect(evaluate('add(5, 3)')).toBe(8);
     });
@@ -257,7 +270,7 @@ describe('Safe Evaluator', () => {
       // Assignment with spaces
       expect(evaluate('count   =   10')).toBe(10);
       expect(state.count).toBe(10);
-      
+
       // Assignment in expression
       expect(evaluate('(count = 5) + 10')).toBe(15);
       expect(state.count).toBe(5);
@@ -279,7 +292,7 @@ describe('parseEventExpression', () => {
     const result = parseEventExpression('handleClick()');
     expect(result).toEqual({
       handler: 'handleClick',
-      args: []
+      args: [],
     });
   });
 
@@ -287,7 +300,7 @@ describe('parseEventExpression', () => {
     const result = parseEventExpression('handleClick(event)');
     expect(result).toEqual({
       handler: 'handleClick',
-      args: ['event']
+      args: ['event'],
     });
   });
 
@@ -295,7 +308,7 @@ describe('parseEventExpression', () => {
     const result = parseEventExpression('handleClick(event, index, item)');
     expect(result).toEqual({
       handler: 'handleClick',
-      args: ['event', 'index', 'item']
+      args: ['event', 'index', 'item'],
     });
   });
 
@@ -303,7 +316,7 @@ describe('parseEventExpression', () => {
     const result = parseEventExpression('handleClick( event , index )');
     expect(result).toEqual({
       handler: 'handleClick',
-      args: ['event', 'index']
+      args: ['event', 'index'],
     });
   });
 
@@ -311,7 +324,7 @@ describe('parseEventExpression', () => {
     const result = parseEventExpression('handleClick');
     expect(result).toEqual({
       handler: 'handleClick',
-      args: []
+      args: [],
     });
   });
 
@@ -319,7 +332,7 @@ describe('parseEventExpression', () => {
     const result = parseEventExpression('handleClick(,)');
     expect(result).toEqual({
       handler: 'handleClick',
-      args: []
+      args: [],
     });
   });
 
@@ -327,7 +340,7 @@ describe('parseEventExpression', () => {
     const result = parseEventExpression('count++');
     expect(result).toEqual({
       handler: 'count++',
-      args: []
+      args: [],
     });
   });
 
@@ -335,7 +348,7 @@ describe('parseEventExpression', () => {
     const result = parseEventExpression('user.save()');
     expect(result).toEqual({
       handler: 'user.save()',
-      args: []
+      args: [],
     });
   });
 });

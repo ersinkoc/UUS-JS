@@ -1,13 +1,14 @@
-import type { Directive, UusInstance } from '../types';
+import type { Directive, ContentDirectiveBinding } from '../types';
 import { effect } from '../reactive';
 import { createSafeEvaluator } from '../evaluator';
+import { asDirectiveName, asExpressionString } from '../type-guards';
 
 // Basic XSS protection - in production, consider using DOMPurify
 function sanitizeHTML(html: string): string {
   const div = document.createElement('div');
   div.textContent = html;
   const text = div.innerHTML;
-  
+
   // Allow basic tags but escape scripts
   return text
     .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
@@ -15,14 +16,14 @@ function sanitizeHTML(html: string): string {
     .replace(/javascript:/gi, '');
 }
 
-export const htmlDirective: Directive = {
-  name: 'html',
+export const htmlDirective: Directive<ContentDirectiveBinding> = {
+  name: asDirectiveName('html'),
   bind(el, binding, uus) {
     const evaluator = createSafeEvaluator(uus.state);
-    
+
     const cleanup = effect(() => {
       try {
-        const value = evaluator(binding.expression || '');
+        const value = evaluator(binding.expression ? asExpressionString(binding.expression) : asExpressionString(''));
         const sanitized = sanitizeHTML(String(value ?? ''));
         el.innerHTML = sanitized;
       } catch (error) {

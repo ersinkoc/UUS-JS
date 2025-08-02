@@ -26,17 +26,17 @@ app.mount('#app');
 <div uus-animate="fadeIn">Hello World</div>
 
 <!-- With custom timing -->
-<div uus-animate="slideInUp" 
-     uus-duration="500" 
-     uus-delay="200"
-     uus-easing="ease-out">
+<div
+  uus-animate="slideInUp"
+  uus-duration="500"
+  uus-delay="200"
+  uus-easing="ease-out"
+>
   Slide content
 </div>
 
 <!-- Triggered on scroll -->
-<div uus-animate="scaleIn" 
-     uus-trigger="visible"
-     uus-threshold="0.5">
+<div uus-animate="scaleIn" uus-trigger="visible" uus-threshold="0.5">
   Appears on scroll
 </div>
 ```
@@ -44,6 +44,7 @@ app.mount('#app');
 ### Animation Presets
 
 Built-in animations include:
+
 - **Fade**: fadeIn, fadeOut
 - **Slide**: slideInLeft, slideInRight, slideInUp, slideInDown
 - **Scale**: scaleIn, scaleOut
@@ -75,11 +76,7 @@ Physics-based animations using spring dynamics:
 
 ```html
 <div uus-state="{ x: 0 }">
-  <div uus-spring="left:x" 
-       uus-stiffness="180"
-       uus-damping="12">
-    Spring box
-  </div>
+  <div uus-spring="left:x" uus-stiffness="180" uus-damping="12">Spring box</div>
   <button uus-on:click="x = 200">Move</button>
 </div>
 ```
@@ -89,9 +86,11 @@ Physics-based animations using spring dynamics:
 Smooth layout transitions:
 
 ```html
-<div uus-layout="grid" 
-     uus-flip="true"
-     uus-cols="repeat(auto-fit, minmax(200px, 1fr))">
+<div
+  uus-layout="grid"
+  uus-flip="true"
+  uus-cols="repeat(auto-fit, minmax(200px, 1fr))"
+>
   <div uus-for="item in items">
     <!-- Items animate smoothly when reordered -->
   </div>
@@ -105,13 +104,17 @@ Define your own animation presets:
 ```javascript
 import { definePreset } from '@uusjs/animate';
 
-definePreset('customSlide', [
-  { transform: 'translateX(-50px) rotate(-5deg)', opacity: 0 },
-  { transform: 'translateX(0) rotate(0)', opacity: 1 }
-], {
-  duration: 400,
-  easing: 'ease-out'
-});
+definePreset(
+  'customSlide',
+  [
+    { transform: 'translateX(-50px) rotate(-5deg)', opacity: 0 },
+    { transform: 'translateX(0) rotate(0)', opacity: 1 },
+  ],
+  {
+    duration: 400,
+    easing: 'ease-out',
+  }
+);
 ```
 
 ### Custom Easings

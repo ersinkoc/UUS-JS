@@ -18,43 +18,43 @@ const createApp = createSSRApp((context) => ({
     title: 'SSR Demo',
     todos: [],
     newTodo: '',
-    
+
     async loadTodos() {
       // In real app, fetch from database
       this.todos = context?.data?.todos || [
         { id: 1, text: 'Learn Uus.js', done: true },
         { id: 2, text: 'Build SSR app', done: false },
-        { id: 3, text: 'Deploy to production', done: false }
+        { id: 3, text: 'Deploy to production', done: false },
       ];
     },
-    
+
     addTodo() {
       if (this.newTodo.trim()) {
         this.todos.push({
           id: Date.now(),
           text: this.newTodo.trim(),
-          done: false
+          done: false,
         });
         this.newTodo = '';
       }
     },
-    
+
     toggleTodo(id) {
-      const todo = this.todos.find(t => t.id === id);
+      const todo = this.todos.find((t) => t.id === id);
       if (todo) {
         todo.done = !todo.done;
       }
     },
-    
+
     removeTodo(id) {
-      this.todos = this.todos.filter(t => t.id !== id);
-    }
+      this.todos = this.todos.filter((t) => t.id !== id);
+    },
   },
-  
+
   setup(app) {
     // Load initial data
     app.state.loadTodos();
-  }
+  },
 }));
 
 // HTML template
@@ -212,17 +212,17 @@ app.get('/', async (req, res) => {
         // You can pass initial data here
         todos: [
           { id: 1, text: 'Server-rendered todo', done: false },
-          { id: 2, text: 'Hydrated on client', done: true }
-        ]
-      }
+          { id: 2, text: 'Hydrated on client', done: true },
+        ],
+      },
     };
-    
+
     // Render to string
     const html = await renderToString(createApp, {
       context,
-      template
+      template,
     });
-    
+
     // Send response
     res.status(context.statusCode || 200);
     res.set(context.headers || {});
@@ -237,7 +237,7 @@ app.get('/', async (req, res) => {
 app.get('/api/todos', (req, res) => {
   res.json([
     { id: 1, text: 'API todo 1', done: false },
-    { id: 2, text: 'API todo 2', done: true }
+    { id: 2, text: 'API todo 2', done: true },
   ]);
 });
 

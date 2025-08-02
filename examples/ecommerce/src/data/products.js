@@ -5,10 +5,16 @@ export const products = [
     price: 79.99,
     image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400',
     category: 'electronics',
-    description: 'Premium noise-cancelling wireless headphones with 30-hour battery life.',
+    description:
+      'Premium noise-cancelling wireless headphones with 30-hour battery life.',
     rating: 4.5,
     stock: 15,
-    features: ['Noise Cancelling', '30h Battery', 'Bluetooth 5.0', 'Foldable Design']
+    features: [
+      'Noise Cancelling',
+      '30h Battery',
+      'Bluetooth 5.0',
+      'Foldable Design',
+    ],
   },
   {
     id: 2,
@@ -19,7 +25,7 @@ export const products = [
     description: 'Advanced fitness tracking and health monitoring smartwatch.',
     rating: 4.7,
     stock: 8,
-    features: ['Heart Rate Monitor', 'GPS', 'Water Resistant', '7-day Battery']
+    features: ['Heart Rate Monitor', 'GPS', 'Water Resistant', '7-day Battery'],
   },
   {
     id: 3,
@@ -30,7 +36,12 @@ export const products = [
     description: 'Sleek and functional backpack for daily commute.',
     rating: 4.3,
     stock: 25,
-    features: ['Water Resistant', 'Laptop Compartment', 'USB Port', 'Anti-theft']
+    features: [
+      'Water Resistant',
+      'Laptop Compartment',
+      'USB Port',
+      'Anti-theft',
+    ],
   },
   {
     id: 4,
@@ -41,7 +52,12 @@ export const products = [
     description: 'Genuine leather wallet with RFID protection.',
     rating: 4.6,
     stock: 30,
-    features: ['RFID Protection', 'Genuine Leather', '12 Card Slots', 'Slim Design']
+    features: [
+      'RFID Protection',
+      'Genuine Leather',
+      '12 Card Slots',
+      'Slim Design',
+    ],
   },
   {
     id: 5,
@@ -52,7 +68,7 @@ export const products = [
     description: 'RGB mechanical keyboard with hot-swappable switches.',
     rating: 4.8,
     stock: 12,
-    features: ['RGB Lighting', 'Hot-swappable', 'Mechanical Switches', 'USB-C']
+    features: ['RGB Lighting', 'Hot-swappable', 'Mechanical Switches', 'USB-C'],
   },
   {
     id: 6,
@@ -63,7 +79,12 @@ export const products = [
     description: 'Handcrafted ceramic mug with minimalist design.',
     rating: 4.4,
     stock: 50,
-    features: ['Handmade', 'Microwave Safe', '350ml Capacity', 'Dishwasher Safe']
+    features: [
+      'Handmade',
+      'Microwave Safe',
+      '350ml Capacity',
+      'Dishwasher Safe',
+    ],
   },
   {
     id: 7,
@@ -74,7 +95,7 @@ export const products = [
     description: 'Adjustable LED desk lamp with touch controls.',
     rating: 4.5,
     stock: 20,
-    features: ['LED', 'Touch Control', 'Adjustable', 'USB Charging']
+    features: ['LED', 'Touch Control', 'Adjustable', 'USB Charging'],
   },
   {
     id: 8,
@@ -85,7 +106,12 @@ export const products = [
     description: 'Lightweight running shoes with responsive cushioning.',
     rating: 4.6,
     stock: 18,
-    features: ['Breathable Mesh', 'Responsive Cushioning', 'Non-slip', 'Lightweight']
+    features: [
+      'Breathable Mesh',
+      'Responsive Cushioning',
+      'Non-slip',
+      'Lightweight',
+    ],
   },
   {
     id: 9,
@@ -96,7 +122,7 @@ export const products = [
     description: 'Eco-friendly non-slip yoga mat with alignment guides.',
     rating: 4.7,
     stock: 35,
-    features: ['Non-slip', 'Eco-friendly', '6mm Thick', 'Alignment Guides']
+    features: ['Non-slip', 'Eco-friendly', '6mm Thick', 'Alignment Guides'],
   },
   {
     id: 10,
@@ -107,8 +133,8 @@ export const products = [
     description: '10000mAh power bank with fast charging support.',
     rating: 4.4,
     stock: 40,
-    features: ['10000mAh', 'Fast Charging', '2 USB Ports', 'LED Indicator']
-  }
+    features: ['10000mAh', 'Fast Charging', '2 USB Ports', 'LED Indicator'],
+  },
 ];
 
 export const categories = [
@@ -118,5 +144,5 @@ export const categories = [
   { id: 'accessories', name: 'Accessories', icon: '⌚' },
   { id: 'home', name: 'Home', icon: '🏠' },
   { id: 'footwear', name: 'Footwear', icon: '👟' },
-  { id: 'fitness', name: 'Fitness', icon: '💪' }
+  { id: 'fitness', name: 'Fitness', icon: '💪' },
 ];

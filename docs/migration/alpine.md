@@ -4,20 +4,21 @@ This guide helps you migrate from Alpine.js to Uus.js. While both frameworks sha
 
 ## Key Differences
 
-| Feature | Alpine.js | Uus.js |
-|---------|-----------|---------|
+| Feature    | Alpine.js            | Uus.js                 |
+| ---------- | -------------------- | ---------------------- |
 | Reactivity | Manual with `$watch` | Automatic with Proxies |
-| Size | ~15KB | ~3KB core |
-| Syntax | `x-` prefix | `uus-` prefix |
-| State | Component-scoped | True reactive state |
-| Computed | Magic properties | Real computed values |
-| TypeScript | Limited | Full support |
+| Size       | ~15KB                | ~3KB core              |
+| Syntax     | `x-` prefix          | `uus-` prefix          |
+| State      | Component-scoped     | True reactive state    |
+| Computed   | Magic properties     | Real computed values   |
+| TypeScript | Limited              | Full support           |
 
 ## Syntax Comparison
 
 ### Basic State & Text
 
 **Alpine.js:**
+
 ```html
 <div x-data="{ message: 'Hello Alpine!' }">
   <p x-text="message"></p>
@@ -25,6 +26,7 @@ This guide helps you migrate from Alpine.js to Uus.js. While both frameworks sha
 ```
 
 **Uus.js:**
+
 ```html
 <div uus-state="{ message: 'Hello Uus!' }">
   <p uus-text="message"></p>
@@ -34,38 +36,34 @@ This guide helps you migrate from Alpine.js to Uus.js. While both frameworks sha
 ### Event Handling
 
 **Alpine.js:**
+
 ```html
-<button x-on:click="count++">
-  Increment
-</button>
+<button x-on:click="count++">Increment</button>
 
 <!-- or shorthand -->
-<button @click="count++">
-  Increment
-</button>
+<button @click="count++">Increment</button>
 ```
 
 **Uus.js:**
+
 ```html
-<button uus-on:click="count++">
-  Increment
-</button>
+<button uus-on:click="count++">Increment</button>
 
 <!-- or shorthand -->
-<button @click="count++">
-  Increment
-</button>
+<button @click="count++">Increment</button>
 ```
 
 ### Two-way Binding
 
 **Alpine.js:**
+
 ```html
 <input x-model="name" />
 <p>Hello <span x-text="name"></span></p>
 ```
 
 **Uus.js:**
+
 ```html
 <input uus-model="name" />
 <p>Hello <span uus-text="name"></span></p>
@@ -74,11 +72,10 @@ This guide helps you migrate from Alpine.js to Uus.js. While both frameworks sha
 ### Conditional Rendering
 
 **Alpine.js:**
+
 ```html
 <!-- Toggle display -->
-<div x-show="isVisible">
-  Visible content
-</div>
+<div x-show="isVisible">Visible content</div>
 
 <!-- Remove from DOM -->
 <template x-if="isLoaded">
@@ -87,21 +84,19 @@ This guide helps you migrate from Alpine.js to Uus.js. While both frameworks sha
 ```
 
 **Uus.js:**
+
 ```html
 <!-- Toggle display -->
-<div uus-show="isVisible">
-  Visible content
-</div>
+<div uus-show="isVisible">Visible content</div>
 
 <!-- Remove from DOM -->
-<div uus-if="isLoaded">
-  Loaded content
-</div>
+<div uus-if="isLoaded">Loaded content</div>
 ```
 
 ### List Rendering
 
 **Alpine.js:**
+
 ```html
 <template x-for="item in items" :key="item.id">
   <li x-text="item.name"></li>
@@ -109,6 +104,7 @@ This guide helps you migrate from Alpine.js to Uus.js. While both frameworks sha
 ```
 
 **Uus.js:**
+
 ```html
 <li uus-for="item in items" :key="item.id" uus-text="item.name"></li>
 ```
@@ -116,25 +112,19 @@ This guide helps you migrate from Alpine.js to Uus.js. While both frameworks sha
 ### Class & Style Binding
 
 **Alpine.js:**
-```html
-<div :class="{ 'active': isActive, 'error': hasError }">
-  Content
-</div>
 
-<div :style="{ color: textColor, fontSize: size + 'px' }">
-  Styled
-</div>
+```html
+<div :class="{ 'active': isActive, 'error': hasError }">Content</div>
+
+<div :style="{ color: textColor, fontSize: size + 'px' }">Styled</div>
 ```
 
 **Uus.js:**
-```html
-<div uus-class="{ active: isActive, error: hasError }">
-  Content
-</div>
 
-<div uus-style="{ color: textColor, fontSize: size + 'px' }">
-  Styled
-</div>
+```html
+<div uus-class="{ active: isActive, error: hasError }">Content</div>
+
+<div uus-style="{ color: textColor, fontSize: size + 'px' }">Styled</div>
 ```
 
 ## Component Patterns
@@ -154,49 +144,51 @@ This guide helps you migrate from Alpine.js to Uus.js. While both frameworks sha
 </div>
 
 <script>
-function dropdown() {
-  return {
-    open: false,
-    selected: null,
-    options: [],
-    
-    init() {
-      this.options = [
-        { value: 1, label: 'Option 1' },
-        { value: 2, label: 'Option 2' }
-      ];
-      this.selected = this.options[0];
-    },
-    
-    toggle() {
-      this.open = !this.open;
-    },
-    
-    select(option) {
-      this.selected = option;
-      this.open = false;
-    }
+  function dropdown() {
+    return {
+      open: false,
+      selected: null,
+      options: [],
+
+      init() {
+        this.options = [
+          { value: 1, label: 'Option 1' },
+          { value: 2, label: 'Option 2' },
+        ];
+        this.selected = this.options[0];
+      },
+
+      toggle() {
+        this.open = !this.open;
+      },
+
+      select(option) {
+        this.selected = option;
+        this.open = false;
+      },
+    };
   }
-}
 </script>
 ```
 
 ### Uus.js Equivalent
 
 ```html
-<div uus-state="{ 
+<div
+  uus-state="{ 
   open: false,
   selected: options[0],
   options: [
     { value: 1, label: 'Option 1' },
     { value: 2, label: 'Option 2' }
   ]
-}">
+}"
+>
   <button @click="open = !open">
     <span uus-text="selected.label"></span>
   </button>
   <ul uus-show="open" @click.away="open = false">
-    <li 
+    <li
       uus-for="option in options"
       @click="selected = option; open = false"
       uus-text="option.label"
@@ -210,24 +202,26 @@ function dropdown() {
 ### Watching Data
 
 **Alpine.js:**
+
 ```javascript
 Alpine.data('component', () => ({
   search: '',
-  
+
   init() {
-    this.$watch('search', value => {
+    this.$watch('search', (value) => {
       console.log('Search changed:', value);
       this.performSearch(value);
     });
   },
-  
+
   performSearch(query) {
     // Search logic
-  }
+  },
 }));
 ```
 
 **Uus.js:**
+
 ```javascript
 import { watch } from '@uusjs/core';
 
@@ -254,23 +248,25 @@ uus-component="{
 ### Computed Properties
 
 **Alpine.js:**
+
 ```javascript
 Alpine.data('cart', () => ({
   items: [],
-  
+
   get total() {
     return this.items.reduce((sum, item) => sum + item.price, 0);
   },
-  
+
   get formattedTotal() {
     return `$${this.total.toFixed(2)}`;
-  }
+  },
 }));
 ```
 
 **Uus.js:**
+
 ```javascript
-uus-state="{ 
+uus-state="{
   items: [],
   total: computed(() => items.reduce((sum, item) => sum + item.price, 0)),
   formattedTotal: computed(() => '$' + total.toFixed(2))
@@ -280,38 +276,40 @@ uus-state="{
 ### Lifecycle Hooks
 
 **Alpine.js:**
+
 ```javascript
 Alpine.data('component', () => ({
   init() {
     console.log('Component initialized');
-    
+
     // Cleanup
     window.addEventListener('resize', this.handleResize);
-    
+
     this.$cleanup(() => {
       window.removeEventListener('resize', this.handleResize);
     });
   },
-  
+
   handleResize() {
     // Handle resize
-  }
+  },
 }));
 ```
 
 **Uus.js:**
+
 ```javascript
 uus-component="{
   onMount() {
     console.log('Component mounted');
-    
+
     window.addEventListener('resize', this.handleResize);
   },
-  
+
   onUnmount() {
     window.removeEventListener('resize', this.handleResize);
   },
-  
+
   handleResize() {
     // Handle resize
   }
@@ -326,24 +324,24 @@ uus-component="{
 Alpine.store('user', {
   name: '',
   email: '',
-  
+
   login(credentials) {
     // Login logic
     this.name = credentials.name;
     this.email = credentials.email;
   },
-  
+
   logout() {
     this.name = '';
     this.email = '';
-  }
+  },
 });
 
 // Usage
 Alpine.data('component', () => ({
   get user() {
     return Alpine.store('user');
-  }
+  },
 }));
 ```
 
@@ -356,20 +354,20 @@ import { reactive, computed } from '@uusjs/core';
 export const userStore = reactive({
   name: '',
   email: '',
-  
+
   get isLoggedIn() {
     return !!this.name;
   },
-  
+
   login(credentials) {
     this.name = credentials.name;
     this.email = credentials.email;
   },
-  
+
   logout() {
     this.name = '';
     this.email = '';
-  }
+  },
 });
 
 // Usage in component
@@ -378,7 +376,7 @@ import { userStore } from './store';
 app.state = {
   user: userStore,
   // Local state
-  loading: false
+  loading: false,
 };
 ```
 
@@ -390,15 +388,13 @@ app.state = {
 <div x-data="{ items: ['a', 'b', 'c'] }">
   <template x-for="(item, index) in items">
     <div>
-      <span x-text="$index"></span>: 
+      <span x-text="$index"></span>:
       <span x-text="item"></span>
       <button @click="$dispatch('remove', item)">Remove</button>
     </div>
   </template>
-  
-  <button @click="$refs.input.focus()">
-    Focus Input
-  </button>
+
+  <button @click="$refs.input.focus()">Focus Input</button>
   <input x-ref="input" />
 </div>
 ```
@@ -408,14 +404,12 @@ app.state = {
 ```html
 <div uus-state="{ items: ['a', 'b', 'c'] }">
   <div uus-for="(item, index) in items">
-    <span uus-text="index"></span>: 
+    <span uus-text="index"></span>:
     <span uus-text="item"></span>
     <button @click="$emit('remove', item)">Remove</button>
   </div>
-  
-  <button @click="$refs.input.focus()">
-    Focus Input
-  </button>
+
+  <button @click="$refs.input.focus()">Focus Input</button>
   <input ref="input" />
 </div>
 ```
@@ -425,11 +419,11 @@ app.state = {
 ### Alpine.js Plugin
 
 ```javascript
-Alpine.plugin(function(Alpine) {
+Alpine.plugin(function (Alpine) {
   Alpine.directive('tooltip', (el, { expression }) => {
     // Tooltip implementation
   });
-  
+
   Alpine.magic('now', () => {
     return new Date().toLocaleString();
   });
@@ -444,12 +438,12 @@ const tooltipPlugin = {
     app.directive('tooltip', {
       mounted(el, binding) {
         // Tooltip implementation
-      }
+      },
     });
-    
+
     // Add global property
     app.state.$now = () => new Date().toLocaleString();
-  }
+  },
 };
 
 app.use(tooltipPlugin);
@@ -490,6 +484,7 @@ app.use(tooltipPlugin);
 ### 1. True Reactivity
 
 Alpine.js requires manual dependency tracking:
+
 ```javascript
 // Alpine - Need to use $watch
 this.$watch('items', () => {
@@ -498,16 +493,16 @@ this.$watch('items', () => {
 ```
 
 Uus.js is automatically reactive:
+
 ```javascript
 // Uus - Automatic
-const total = computed(() => 
-  items.reduce((sum, item) => sum + item.price, 0)
-);
+const total = computed(() => items.reduce((sum, item) => sum + item.price, 0));
 ```
 
 ### 2. Template Differences
 
 Alpine requires `<template>` for `x-if` and `x-for`:
+
 ```html
 <!-- Alpine -->
 <template x-if="show">
@@ -516,6 +511,7 @@ Alpine requires `<template>` for `x-if` and `x-for`:
 ```
 
 Uus.js works on any element:
+
 ```html
 <!-- Uus -->
 <div uus-if="show">Content</div>
@@ -524,24 +520,27 @@ Uus.js works on any element:
 ### 3. Component Scope
 
 Alpine components are isolated:
+
 ```javascript
 // Alpine - Each component has own scope
 Alpine.data('counter', () => ({
-  count: 0
+  count: 0,
 }));
 ```
 
 Uus.js shares state by default:
+
 ```javascript
 // Uus - Shared state
 const state = reactive({
-  count: 0
+  count: 0,
 });
 ```
 
 ## Performance Benefits
 
 After migrating to Uus.js:
+
 - ⚡ **Smaller bundle** - 3KB vs 15KB
 - 🚀 **Faster updates** - True reactivity
 - 💾 **Less memory** - Efficient proxy system

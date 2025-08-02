@@ -2,8 +2,12 @@ import type { Validator, AsyncValidator } from './types';
 
 // Required validator
 export const required = (): Validator => (value) => {
-  if (value === null || value === undefined || value === '' || 
-      (Array.isArray(value) && value.length === 0)) {
+  if (
+    value === null ||
+    value === undefined ||
+    value === '' ||
+    (Array.isArray(value) && value.length === 0)
+  ) {
     return { required: true };
   }
   return null;
@@ -22,38 +26,58 @@ export const email = (): Validator => (value) => {
 };
 
 // Min length validator
-export const minLength = (min: number): Validator => (value) => {
-  if (!value) return null;
-  const length = typeof value === 'string' ? value.length : value.toString().length;
-  return length >= min ? null : { minLength: { requiredLength: min, actualLength: length } };
-};
+export const minLength =
+  (min: number): Validator =>
+  (value) => {
+    if (!value) return null;
+    const length =
+      typeof value === 'string' ? value.length : value.toString().length;
+    return length >= min
+      ? null
+      : { minLength: { requiredLength: min, actualLength: length } };
+  };
 
 // Max length validator
-export const maxLength = (max: number): Validator => (value) => {
-  if (!value) return null;
-  const length = typeof value === 'string' ? value.length : value.toString().length;
-  return length <= max ? null : { maxLength: { requiredLength: max, actualLength: length } };
-};
+export const maxLength =
+  (max: number): Validator =>
+  (value) => {
+    if (!value) return null;
+    const length =
+      typeof value === 'string' ? value.length : value.toString().length;
+    return length <= max
+      ? null
+      : { maxLength: { requiredLength: max, actualLength: length } };
+  };
 
 // Min value validator
-export const min = (minValue: number): Validator => (value) => {
-  if (!value && value !== 0) return null;
-  const num = Number(value);
-  return !isNaN(num) && num >= minValue ? null : { min: { min: minValue, actual: num } };
-};
+export const min =
+  (minValue: number): Validator =>
+  (value) => {
+    if (!value && value !== 0) return null;
+    const num = Number(value);
+    return !isNaN(num) && num >= minValue
+      ? null
+      : { min: { min: minValue, actual: num } };
+  };
 
 // Max value validator
-export const max = (maxValue: number): Validator => (value) => {
-  if (!value && value !== 0) return null;
-  const num = Number(value);
-  return !isNaN(num) && num <= maxValue ? null : { max: { max: maxValue, actual: num } };
-};
+export const max =
+  (maxValue: number): Validator =>
+  (value) => {
+    if (!value && value !== 0) return null;
+    const num = Number(value);
+    return !isNaN(num) && num <= maxValue
+      ? null
+      : { max: { max: maxValue, actual: num } };
+  };
 
 // Pattern validator
-export const pattern = (regex: RegExp, message?: string): Validator => (value) => {
-  if (!value) return null;
-  return regex.test(value) ? null : { pattern: true };
-};
+export const pattern =
+  (regex: RegExp, message?: string): Validator =>
+  (value) => {
+    if (!value) return null;
+    return regex.test(value) ? null : { pattern: true };
+  };
 
 // Number validator
 export const number: Validator = (value) => {
@@ -83,8 +107,8 @@ export const url: Validator = (value) => {
 export const phone: Validator = (value) => {
   if (!value) return null;
   const phoneRegex = /^[\d\s\-\+\(\)]+$/;
-  return phoneRegex.test(value) && value.replace(/\D/g, '').length >= 10 
-    ? null 
+  return phoneRegex.test(value) && value.replace(/\D/g, '').length >= 10
+    ? null
     : { phone: true };
 };
 
@@ -96,21 +120,27 @@ export const date: Validator = (value) => {
 };
 
 // Match validator (for confirming passwords, etc.)
-export const match = (fieldName: string, message?: string): Validator => (value, field, form) => {
-  if (!value || !form) return null;
-  const otherValue = form.values[fieldName];
-  return value === otherValue ? null : { match: { field: fieldName } };
-};
+export const match =
+  (fieldName: string, message?: string): Validator =>
+  (value, field, form) => {
+    if (!value || !form) return null;
+    const otherValue = form.values[fieldName];
+    return value === otherValue ? null : { match: { field: fieldName } };
+  };
 
 // Custom validator helper
-export const custom = (fn: (value: any) => boolean, message: string): Validator => (value) => {
-  return fn(value) ? null : { custom: message };
-};
+export const custom =
+  (fn: (value: any) => boolean, message: string): Validator =>
+  (value) => {
+    return fn(value) ? null : { custom: message };
+  };
 
 // Async validators
 
 // Async email check (example)
-export const asyncEmailAvailable = (checkFn: (email: string) => Promise<boolean>): AsyncValidator => {
+export const asyncEmailAvailable = (
+  checkFn: (email: string) => Promise<boolean>
+): AsyncValidator => {
   return async (value) => {
     if (!value || !email(value)) return null;
     const available = await checkFn(value);
@@ -120,11 +150,11 @@ export const asyncEmailAvailable = (checkFn: (email: string) => Promise<boolean>
 
 // Debounced async validator helper
 export function debounceAsync(
-  validator: AsyncValidator, 
+  validator: AsyncValidator,
   delay: number = 300
 ): AsyncValidator {
   let timeoutId: any;
-  
+
   return (value, field, form) => {
     return new Promise((resolve) => {
       clearTimeout(timeoutId);

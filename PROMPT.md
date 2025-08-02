@@ -1,4 +1,4 @@
- Build Uus.js - A Modern Reactive HTML Framework
+Build Uus.js - A Modern Reactive HTML Framework
 
 I want you to create a production-ready JavaScript framework called "Uus.js" (Estonian for "new"). This should be a lightweight, reactive HTML framework similar to htmx but focused on state management, animations, and real-time features.
 
@@ -12,28 +12,29 @@ I want you to create a production-ready JavaScript framework called "Uus.js" (Es
 ## Core Requirements
 
 ### 1. Monorepo Structure
+
 Create a monorepo at `github.com/uus-js/uus` with:
 uus/
 ├── packages/
-│   ├── core/           (@uusjs/core)
-│   ├── router/         (@uusjs/router)
-│   ├── animate/        (@uusjs/animate)
-│   ├── forms/          (@uusjs/forms)
-│   ├── i18n/           (@uusjs/i18n)
-│   ├── cli/            (@uusjs/cli)
-│   ├── create/         (@uusjs/create)
-│   ├── devtools/       (@uusjs/devtools)
-│   └── test-utils/     (@uusjs/test-utils)
+│ ├── core/ (@uusjs/core)
+│ ├── router/ (@uusjs/router)
+│ ├── animate/ (@uusjs/animate)
+│ ├── forms/ (@uusjs/forms)
+│ ├── i18n/ (@uusjs/i18n)
+│ ├── cli/ (@uusjs/cli)
+│ ├── create/ (@uusjs/create)
+│ ├── devtools/ (@uusjs/devtools)
+│ └── test-utils/ (@uusjs/test-utils)
 ├── apps/
-│   ├── docs/           (docs.uusjs.dev)
-│   ├── playground/     (play.uusjs.dev)
-│   └── examples/
+│ ├── docs/ (docs.uusjs.dev)
+│ ├── playground/ (play.uusjs.dev)
+│ └── examples/
 ├── scripts/
 ├── .github/
-│   ├── workflows/
-│   ├── CONTRIBUTING.md
-│   ├── CODE_OF_CONDUCT.md
-│   └── FUNDING.yml
+│ ├── workflows/
+│ ├── CONTRIBUTING.md
+│ ├── CODE_OF_CONDUCT.md
+│ └── FUNDING.yml
 ├── package.json
 ├── pnpm-workspace.yaml
 ├── turbo.json
@@ -47,6 +48,7 @@ Use pnpm workspaces and Turborepo for monorepo management.
 Target: **< 3KB gzipped**
 
 #### 2.1 Core Engine
+
 ```typescript
 // packages/core/src/index.ts
 export class Uus {
@@ -105,7 +107,7 @@ html<!-- Route definition -->
 <div uus-router>
   <a uus-link="/home">Home</a>
   <a uus-link="/about">About</a>
-  
+
   <div uus-route="/">Home Page</div>
   <div uus-route="/about">About Page</div>
   <div uus-route="/user/:id" uus-params="userId">
@@ -123,7 +125,7 @@ Transitions
 
 4. Animate Package (@uusjs/animate)
 html<!-- Built-in animations -->
-<div uus-animate="fadeIn" 
+<div uus-animate="fadeIn"
      uus-duration="300ms"
      uus-delay="100ms"
      uus-easing="spring">
@@ -153,20 +155,20 @@ Performance optimized
 5. Forms Package (@uusjs/forms)
 html<form uus-form="contactForm"
       uus-on:submit="handleSubmit">
-  
+
   <input uus-field="email"
          uus-validate="required|email"
          uus-on:blur="validateField">
   <span uus-error="email"></span>
-  
+
   <select uus-field="country"
           uus-validate="required">
-    <option uus-for="c in countries" 
+    <option uus-for="c in countries"
             uus-value="c.code"
             uus-text="c.name">
   </select>
-  
-  <button uus-submit 
+
+  <button uus-submit
           uus-disabled="!contactForm.valid">
     Submit
   </button>
@@ -318,11 +320,11 @@ describe('Reactive System', () => {
   it('should track dependencies', () => {
     const state = createReactive({ count: 0 });
     let computedValue = 0;
-    
+
     effect(() => {
       computedValue = state.count * 2;
     });
-    
+
     expect(computedValue).toBe(0);
     state.count = 5;
     expect(computedValue).toBe(10);
@@ -405,12 +407,12 @@ html<!DOCTYPE html>
     <p>Count: <span uus-text="count"></span></p>
     <button uus-on:click="count++">Increment</button>
     <button uus-on:click="count = 0" uus-show="count > 0">Reset</button>
-    
+
     <ul>
       <li uus-for="i in 3" uus-text="`Item ${i}`"></li>
     </ul>
   </div>
-  
+
   <script>
     const app = new Uus();
     app.mount('#app');
@@ -425,3 +427,4 @@ Setup build tools
 Implement core reactive system
 Add basic directives
 Create minimal working example
+```

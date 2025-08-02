@@ -21,9 +21,9 @@ describe('RouteMatcher', () => {
         children: [
           { path: '/list', component: 'ProductList' },
           { path: '/:id', component: 'ProductDetail' },
-          { path: '/:id/reviews', component: 'ProductReviews' }
-        ]
-      }
+          { path: '/:id/reviews', component: 'ProductReviews' },
+        ],
+      },
     ];
     matcher = new RouteMatcher(routes);
   });

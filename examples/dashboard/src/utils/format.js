@@ -13,7 +13,7 @@ export function formatCurrency(amount) {
     style: 'currency',
     currency: 'USD',
     minimumFractionDigits: 0,
-    maximumFractionDigits: 0
+    maximumFractionDigits: 0,
   }).format(amount);
 }
 
@@ -30,7 +30,7 @@ export function formatPercentage(value) {
 export function formatDate(date) {
   return new Intl.DateTimeFormat('en-US', {
     month: 'short',
-    day: 'numeric'
+    day: 'numeric',
   }).format(new Date(date));
 }
 

@@ -12,7 +12,7 @@ describe('Show Directive', () => {
     element = document.createElement('div');
     element.textContent = 'Test content';
     document.body.appendChild(element);
-    
+
     // Set up basic state
     uus.state.isVisible = true;
     uus.state.shouldShow = false;
@@ -25,7 +25,7 @@ describe('Show Directive', () => {
       expression: 'isVisible',
       arg: undefined,
       modifiers: {},
-      value: 'isVisible'
+      value: 'isVisible',
     };
 
     showDirective.bind!(element, binding, uus);
@@ -39,7 +39,7 @@ describe('Show Directive', () => {
       expression: 'shouldShow',
       arg: undefined,
       modifiers: {},
-      value: 'shouldShow'
+      value: 'shouldShow',
     };
 
     showDirective.bind!(element, binding, uus);
@@ -55,7 +55,7 @@ describe('Show Directive', () => {
       expression: 'isVisible',
       arg: undefined,
       modifiers: {},
-      value: 'isVisible'
+      value: 'isVisible',
     };
 
     showDirective.bind!(element, binding, uus);
@@ -72,7 +72,7 @@ describe('Show Directive', () => {
       expression: 'isVisible',
       arg: undefined,
       modifiers: {},
-      value: 'isVisible'
+      value: 'isVisible',
     };
 
     showDirective.bind!(element, binding, uus);
@@ -86,7 +86,7 @@ describe('Show Directive', () => {
       expression: 'count > 3 && isVisible',
       arg: undefined,
       modifiers: {},
-      value: 'count > 3 && isVisible'
+      value: 'count > 3 && isVisible',
     };
 
     showDirective.bind!(element, binding, uus);
@@ -100,7 +100,7 @@ describe('Show Directive', () => {
       expression: 'user.active',
       arg: undefined,
       modifiers: {},
-      value: 'user.active'
+      value: 'user.active',
     };
 
     showDirective.bind!(element, binding, uus);
@@ -115,7 +115,7 @@ describe('Show Directive', () => {
       expression: 'emptyString',
       arg: undefined,
       modifiers: {},
-      value: 'emptyString'
+      value: 'emptyString',
     };
 
     showDirective.bind!(element, binding, uus);
@@ -131,7 +131,7 @@ describe('Show Directive', () => {
       expression: 'nonEmptyString',
       arg: undefined,
       modifiers: {},
-      value: 'nonEmptyString'
+      value: 'nonEmptyString',
     };
 
     showDirective.bind!(element, binding, uus);
@@ -147,26 +147,26 @@ describe('Show Directive', () => {
     // Test zero (falsy) - create new element for clean test
     const zeroElement = document.createElement('div');
     document.body.appendChild(zeroElement);
-    
+
     let binding = {
       expression: 'zero',
       arg: undefined,
       modifiers: {},
-      value: 'zero'
+      value: 'zero',
     };
 
     showDirective.bind!(zeroElement, binding, uus);
     expect(zeroElement.style.display).toBe('none');
 
-    // Test non-zero (truthy) - create new element for clean test  
+    // Test non-zero (truthy) - create new element for clean test
     const nonZeroElement = document.createElement('div');
     document.body.appendChild(nonZeroElement);
-    
+
     binding = {
       expression: 'nonZero',
       arg: undefined,
       modifiers: {},
-      value: 'nonZero'
+      value: 'nonZero',
     };
 
     showDirective.bind!(nonZeroElement, binding, uus);
@@ -182,7 +182,7 @@ describe('Show Directive', () => {
       expression: 'nullValue',
       arg: undefined,
       modifiers: {},
-      value: 'nullValue'
+      value: 'nullValue',
     };
 
     showDirective.bind!(element, binding, uus);
@@ -193,7 +193,7 @@ describe('Show Directive', () => {
       expression: 'undefinedValue',
       arg: undefined,
       modifiers: {},
-      value: 'undefinedValue'
+      value: 'undefinedValue',
     };
 
     showDirective.bind!(element, binding, uus);
@@ -207,12 +207,12 @@ describe('Show Directive', () => {
     // Test empty array length (falsy) - create new element for clean test
     const emptyElement = document.createElement('div');
     document.body.appendChild(emptyElement);
-    
+
     let binding = {
       expression: 'emptyArray.length',
       arg: undefined,
       modifiers: {},
-      value: 'emptyArray.length'
+      value: 'emptyArray.length',
     };
 
     showDirective.bind!(emptyElement, binding, uus);
@@ -221,12 +221,12 @@ describe('Show Directive', () => {
     // Test filled array length (truthy) - create new element for clean test
     const filledElement = document.createElement('div');
     document.body.appendChild(filledElement);
-    
+
     binding = {
       expression: 'filledArray.length',
       arg: undefined,
       modifiers: {},
-      value: 'filledArray.length'
+      value: 'filledArray.length',
     };
 
     showDirective.bind!(filledElement, binding, uus);
@@ -238,7 +238,7 @@ describe('Show Directive', () => {
       expression: '!shouldShow',
       arg: undefined,
       modifiers: {},
-      value: '!shouldShow'
+      value: '!shouldShow',
     };
 
     showDirective.bind!(element, binding, uus);
@@ -252,7 +252,7 @@ describe('Show Directive', () => {
       expression: 'count >= 5',
       arg: undefined,
       modifiers: {},
-      value: 'count >= 5'
+      value: 'count >= 5',
     };
 
     showDirective.bind!(element, binding, uus);
@@ -266,7 +266,7 @@ describe('Show Directive', () => {
       expression: '',
       arg: undefined,
       modifiers: {},
-      value: ''
+      value: '',
     };
 
     showDirective.bind!(element, binding, uus);
@@ -283,14 +283,16 @@ describe('Show Directive', () => {
       expression: 'nonExistentProperty.subProperty',
       arg: undefined,
       modifiers: {},
-      value: 'nonExistentProperty.subProperty'
+      value: 'nonExistentProperty.subProperty',
     };
 
     showDirective.bind!(element, binding, uus);
 
     // The evaluator catches errors and returns undefined (falsy)
     expect(element.style.display).toBe('none');
-    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Error evaluating expression'), expect.any(Error));
+    expect(consoleSpy).toHaveBeenCalledWith(
+      expect.stringContaining('[UUS_EVALUATION_ERROR]')
+    );
 
     consoleSpy.mockRestore();
   });
@@ -300,16 +302,16 @@ describe('Show Directive', () => {
       expression: 'isVisible',
       arg: undefined,
       modifiers: {},
-      value: 'isVisible'
+      value: 'isVisible',
     };
 
     showDirective.bind!(element, binding, uus);
-    
+
     // Should have cleanup functions
     expect(uus.cleanups.has(element)).toBe(true);
-    
+
     showDirective.unbind!(element, binding, uus);
-    
+
     // Should clean up
     expect(uus.cleanups.has(element)).toBe(false);
   });
@@ -319,7 +321,7 @@ describe('Show Directive', () => {
       expression: 'isVisible',
       arg: undefined,
       modifiers: {},
-      value: 'isVisible'
+      value: 'isVisible',
     };
 
     // Call unbind without bind first
@@ -335,7 +337,7 @@ describe('Show Directive', () => {
       expression: 'isVisible',
       arg: undefined,
       modifiers: {},
-      value: 'isVisible'
+      value: 'isVisible',
     };
 
     showDirective.bind!(element, binding, uus);
@@ -359,7 +361,7 @@ describe('Show Directive', () => {
       expression: 'isAdmin || hasPermission',
       arg: undefined,
       modifiers: {},
-      value: 'isAdmin || hasPermission'
+      value: 'isAdmin || hasPermission',
     };
 
     showDirective.bind!(element, binding, uus);
@@ -375,7 +377,7 @@ describe('Show Directive', () => {
       expression: 'status === "active"',
       arg: undefined,
       modifiers: {},
-      value: 'status === "active"'
+      value: 'status === "active"',
     };
 
     showDirective.bind!(element, binding, uus);
@@ -390,7 +392,7 @@ describe('Show Directive', () => {
       expression: 'items.includes(3)',
       arg: undefined,
       modifiers: {},
-      value: 'items.includes(3)'
+      value: 'items.includes(3)',
     };
 
     showDirective.bind!(element, binding, uus);
@@ -406,7 +408,7 @@ describe('Show Directive', () => {
       expression: 'isVisible',
       arg: undefined,
       modifiers: {},
-      value: 'isVisible'
+      value: 'isVisible',
     };
 
     showDirective.bind!(element, binding, uus);

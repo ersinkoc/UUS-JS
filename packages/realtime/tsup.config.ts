@@ -4,7 +4,7 @@ export default defineConfig({
   entry: {
     index: 'src/index.ts',
     websocket: 'src/websocket.ts',
-    sse: 'src/sse.ts'
+    sse: 'src/sse.ts',
   },
   format: ['cjs', 'esm'],
   dts: false,
@@ -12,5 +12,5 @@ export default defineConfig({
   sourcemap: true,
   clean: true,
   minify: true,
-  external: ['@uusjs/core', 'socket.io-client', 'ws']
+  external: ['@uusjs/core', 'socket.io-client', 'ws'],
 });

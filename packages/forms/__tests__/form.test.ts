@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { 
-  createForm, 
-  createFormGroup, 
-  validators, 
-  ValidationErrors
+import {
+  createForm,
+  createFormGroup,
+  validators,
+  ValidationErrors,
 } from '../src/index';
 
 describe('Forms', () => {
@@ -12,13 +12,13 @@ describe('Forms', () => {
       const form = createForm({
         name: '',
         email: '',
-        age: 0
+        age: 0,
       });
 
       expect(form.values.value).toEqual({
         name: '',
         email: '',
-        age: 0
+        age: 0,
       });
       expect(form.isDirty.value).toBe(false);
       expect(form.isValid.value).toBe(true);
@@ -26,22 +26,22 @@ describe('Forms', () => {
 
     it('should track dirty state', () => {
       const form = createForm({
-        name: ''
+        name: '',
       });
 
       expect(form.isDirty.value).toBe(false);
-      
+
       form.setValue('name', 'John');
       expect(form.isDirty.value).toBe(true);
     });
 
     it('should track touched state', () => {
       const form = createForm({
-        name: ''
+        name: '',
       });
 
       expect(form.touched.value.name).toBe(false);
-      
+
       form.setTouched('name', true);
       expect(form.touched.value.name).toBe(true);
     });
@@ -49,7 +49,7 @@ describe('Forms', () => {
     it('should reset form', () => {
       const form = createForm({
         name: '',
-        email: ''
+        email: '',
       });
 
       form.setValue('name', 'John');
@@ -60,18 +60,18 @@ describe('Forms', () => {
 
       expect(form.values.value).toEqual({
         name: '',
-        email: ''
+        email: '',
       });
       expect(form.isDirty.value).toBe(false);
       expect(form.touched.value).toEqual({
         name: false,
-        email: false
+        email: false,
       });
     });
 
     it('should reset with new values', () => {
       const form = createForm({
-        name: ''
+        name: '',
       });
 
       form.setValue('name', 'John');
@@ -87,13 +87,13 @@ describe('Forms', () => {
       const form = createForm(
         { name: '' },
         {
-          name: [validators.required()]
+          name: [validators.required()],
         }
       );
 
       expect(form.isValid.value).toBe(false);
       expect(form.errors.value.name).toEqual({
-        required: true
+        required: true,
       });
 
       form.setValue('name', 'John');
@@ -105,14 +105,14 @@ describe('Forms', () => {
       const form = createForm(
         { email: '' },
         {
-          email: [validators.email()]
+          email: [validators.email()],
         }
       );
 
       form.setValue('email', 'invalid-email');
       expect(form.isValid.value).toBe(false);
       expect(form.errors.value.email).toEqual({
-        email: true
+        email: true,
       });
 
       form.setValue('email', 'valid@example.com');
@@ -123,14 +123,14 @@ describe('Forms', () => {
       const form = createForm(
         { password: '' },
         {
-          password: [validators.minLength(8)]
+          password: [validators.minLength(8)],
         }
       );
 
       form.setValue('password', 'short');
       expect(form.isValid.value).toBe(false);
       expect(form.errors.value.password).toEqual({
-        minLength: { requiredLength: 8, actualLength: 5 }
+        minLength: { requiredLength: 8, actualLength: 5 },
       });
 
       form.setValue('password', 'longenough');
@@ -141,14 +141,14 @@ describe('Forms', () => {
       const form = createForm(
         { username: '' },
         {
-          username: [validators.maxLength(10)]
+          username: [validators.maxLength(10)],
         }
       );
 
       form.setValue('username', 'verylongusername');
       expect(form.isValid.value).toBe(false);
       expect(form.errors.value.username).toEqual({
-        maxLength: { requiredLength: 10, actualLength: 16 }
+        maxLength: { requiredLength: 10, actualLength: 16 },
       });
     });
 
@@ -156,14 +156,14 @@ describe('Forms', () => {
       const form = createForm(
         { age: 0 },
         {
-          age: [validators.min(18)]
+          age: [validators.min(18)],
         }
       );
 
       form.setValue('age', 16);
       expect(form.isValid.value).toBe(false);
       expect(form.errors.value.age).toEqual({
-        min: { min: 18, actual: 16 }
+        min: { min: 18, actual: 16 },
       });
     });
 
@@ -171,14 +171,14 @@ describe('Forms', () => {
       const form = createForm(
         { score: 0 },
         {
-          score: [validators.max(100)]
+          score: [validators.max(100)],
         }
       );
 
       form.setValue('score', 150);
       expect(form.isValid.value).toBe(false);
       expect(form.errors.value.score).toEqual({
-        max: { max: 100, actual: 150 }
+        max: { max: 100, actual: 150 },
       });
     });
 
@@ -186,7 +186,7 @@ describe('Forms', () => {
       const form = createForm(
         { phone: '' },
         {
-          phone: [validators.pattern(/^\d{3}-\d{3}-\d{4}$/)]
+          phone: [validators.pattern(/^\d{3}-\d{3}-\d{4}$/)],
         }
       );
 
@@ -201,20 +201,17 @@ describe('Forms', () => {
       const form = createForm(
         { email: '' },
         {
-          email: [
-            validators.required(),
-            validators.email()
-          ]
+          email: [validators.required(), validators.email()],
         }
       );
 
       expect(form.errors.value.email).toEqual({
-        required: true
+        required: true,
       });
 
       form.setValue('email', 'invalid');
       expect(form.errors.value.email).toEqual({
-        email: true
+        email: true,
       });
 
       form.setValue('email', 'valid@example.com');
@@ -232,12 +229,12 @@ describe('Forms', () => {
       const form = createForm(
         { field: '' },
         {
-          field: [customValidator]
+          field: [customValidator],
         }
       );
 
       expect(form.errors.value.field).toEqual({
-        custom: 'Must be specific-value'
+        custom: 'Must be specific-value',
       });
 
       form.setValue('field', 'specific-value');
@@ -246,7 +243,7 @@ describe('Forms', () => {
 
     it('should support async validators', async () => {
       const asyncValidator = vi.fn(async (value: string) => {
-        await new Promise(resolve => setTimeout(resolve, 10));
+        await new Promise((resolve) => setTimeout(resolve, 10));
         if (value === 'taken') {
           return { taken: true };
         }
@@ -256,14 +253,14 @@ describe('Forms', () => {
       const form = createForm(
         { username: '' },
         {
-          username: { asyncValidators: [asyncValidator] }
+          username: { asyncValidators: [asyncValidator] },
         }
       );
 
       form.setValue('username', 'taken');
       expect(form.pending.value.username).toBe(true);
 
-      await new Promise(resolve => setTimeout(resolve, 20));
+      await new Promise((resolve) => setTimeout(resolve, 20));
 
       expect(form.pending.value.username).toBe(false);
       expect(form.errors.value.username).toEqual({ taken: true });
@@ -276,10 +273,10 @@ describe('Forms', () => {
       const form = createForm(
         { field: '' },
         {
-          field: { 
+          field: {
             asyncValidators: [asyncValidator],
-            debounce: 50
-          }
+            debounce: 50,
+          },
         }
       );
 
@@ -287,7 +284,7 @@ describe('Forms', () => {
       form.setValue('field', 'ab');
       form.setValue('field', 'abc');
 
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       // Should only be called once due to debouncing
       expect(asyncValidator).toHaveBeenCalledTimes(1);
@@ -300,33 +297,30 @@ describe('Forms', () => {
       const form = createFormGroup({
         user: createForm({
           name: '',
-          email: ''
+          email: '',
         }),
         settings: createForm({
           theme: 'light',
-          notifications: true
-        })
+          notifications: true,
+        }),
       });
 
       expect(form.values.value).toEqual({
         user: {
           name: '',
-          email: ''
+          email: '',
         },
         settings: {
           theme: 'light',
-          notifications: true
-        }
+          notifications: true,
+        },
       });
     });
 
     it('should track group validity', () => {
       const form = createFormGroup({
-        user: createForm(
-          { name: '' },
-          { name: [validators.required()] }
-        ),
-        settings: createForm({ theme: 'light' })
+        user: createForm({ name: '' }, { name: [validators.required()] }),
+        settings: createForm({ theme: 'light' }),
       });
 
       expect(form.isValid.value).toBe(false);
@@ -338,7 +332,7 @@ describe('Forms', () => {
     it('should track group dirty state', () => {
       const form = createFormGroup({
         user: createForm({ name: '' }),
-        settings: createForm({ theme: 'light' })
+        settings: createForm({ theme: 'light' }),
       });
 
       expect(form.isDirty.value).toBe(false);
@@ -350,7 +344,7 @@ describe('Forms', () => {
     it('should reset entire group', () => {
       const form = createFormGroup({
         user: createForm({ name: '' }),
-        settings: createForm({ theme: 'light' })
+        settings: createForm({ theme: 'light' }),
       });
 
       form.controls.user.setValue('name', 'John');
@@ -360,7 +354,7 @@ describe('Forms', () => {
 
       expect(form.values.value).toEqual({
         user: { name: '' },
-        settings: { theme: 'light' }
+        settings: { theme: 'light' },
       });
       expect(form.isDirty.value).toBe(false);
     });
@@ -371,9 +365,9 @@ describe('Forms', () => {
           { name: '', email: '' },
           {
             name: [validators.required()],
-            email: [validators.email()]
+            email: [validators.email()],
           }
-        )
+        ),
       });
 
       form.controls.user.setValue('email', 'invalid');
@@ -381,8 +375,8 @@ describe('Forms', () => {
       expect(form.errors.value).toEqual({
         user: {
           name: { required: true },
-          email: { email: true }
-        }
+          email: { email: true },
+        },
       });
     });
   });
@@ -391,7 +385,7 @@ describe('Forms', () => {
     it('should handle form submission', () => {
       const form = createForm({
         name: '',
-        email: ''
+        email: '',
       });
 
       const onSubmit = vi.fn();
@@ -399,15 +393,12 @@ describe('Forms', () => {
 
       expect(onSubmit).toHaveBeenCalledWith({
         name: '',
-        email: ''
+        email: '',
       });
     });
 
     it('should prevent submission if invalid', () => {
-      const form = createForm(
-        { name: '' },
-        { name: [validators.required()] }
-      );
+      const form = createForm({ name: '' }, { name: [validators.required()] });
 
       const onSubmit = vi.fn();
       form.handleSubmit(onSubmit)({ preventDefault: vi.fn() } as any);
@@ -420,7 +411,7 @@ describe('Forms', () => {
         { name: '', email: '' },
         {
           name: [validators.required()],
-          email: [validators.required()]
+          email: [validators.required()],
         }
       );
 
@@ -429,7 +420,7 @@ describe('Forms', () => {
 
       expect(form.touched.value).toEqual({
         name: true,
-        email: true
+        email: true,
       });
     });
   });
@@ -437,7 +428,7 @@ describe('Forms', () => {
   describe('Built-in Validators', () => {
     it('should validate requiredTrue', () => {
       const validator = validators.requiredTrue();
-      
+
       expect(validator(true)).toBeNull();
       expect(validator(false)).toEqual({ requiredTrue: true });
       expect(validator(null)).toEqual({ requiredTrue: true });
@@ -445,7 +436,7 @@ describe('Forms', () => {
 
     it('should validate custom email patterns', () => {
       const validator = validators.email();
-      
+
       expect(validator('test@example.com')).toBeNull();
       expect(validator('test.name+tag@example.co.uk')).toBeNull();
       expect(validator('invalid@')).toEqual({ email: true });
@@ -460,8 +451,8 @@ describe('Forms', () => {
           password: [
             validators.required(),
             validators.minLength(8),
-            validators.pattern(/[A-Z]/)
-          ]
+            validators.pattern(/[A-Z]/),
+          ],
         }
       );
 
@@ -470,7 +461,7 @@ describe('Forms', () => {
 
       form.setValue('password', 'short');
       expect(form.errors.value.password).toEqual({
-        minLength: { requiredLength: 8, actualLength: 5 }
+        minLength: { requiredLength: 8, actualLength: 5 },
       });
 
       form.setValue('password', 'longenough');
