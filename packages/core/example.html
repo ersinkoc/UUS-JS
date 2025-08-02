@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Uus.js Core Example</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+    }
+    .card {
+      border: 1px solid #ddd;
+      padding: 20px;
+      margin: 10px 0;
+      border-radius: 8px;
+    }
+    .hidden {
+      display: none;
+    }
+    .highlight {
+      background-color: yellow;
+    }
+    button {
+      padding: 8px 16px;
+      margin: 5px;
+      cursor: pointer;
+    }
+    input, select {
+      padding: 5px;
+      margin: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div id="app" uus-state="{ 
+    count: 0, 
+    message: 'Hello Uus!',
+    showSection: true,
+    items: ['Apple', 'Banana', 'Orange'],
+    newItem: '',
+    selectedColor: 'blue',
+    isHighlighted: false,
+    user: { name: 'John Doe', age: 30 }
+  }">
+    <h1 uus-text="message"></h1>
+    
+    <div class="card">
+      <h2>Counter Example</h2>
+      <p>Count: <span uus-text="count"></span></p>
+      <button uus-on:click="count++">Increment</button>
+      <button uus-on:click="count--">Decrement</button>
+      <button uus-on:click="count = 0" uus-show="count !== 0">Reset</button>
+    </div>
+
+    <div class="card">
+      <h2>Visibility Examples</h2>
+      <button uus-on:click="showSection = !showSection">
+        <span uus-text="showSection ? 'Hide' : 'Show'"></span> Section
+      </button>
+      <div uus-show="showSection" style="border: 1px solid #ccc; padding: 10px; margin-top: 10px;">
+        This section can be toggled with uus-show
+      </div>
+      
+      <div uus-if="count > 5" style="color: green; margin-top: 10px;">
+        Count is greater than 5! (using uus-if)
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>List Rendering</h2>
+      <ul>
+        <li uus-for="(item, index) in items" uus-bind:key="index">
+          <span uus-text="`${index + 1}. ${item}`"></span>
+        </li>
+      </ul>
+      <input uus-model="newItem" placeholder="Add new item" uus-on:keyup.enter="items.push(newItem); newItem = ''">
+      <button uus-on:click="items.push(newItem); newItem = ''" uus-bind:disabled="!newItem">Add Item</button>
+    </div>
+
+    <div class="card">
+      <h2>Two-way Binding</h2>
+      <input uus-model="message" placeholder="Edit message">
+      <p>Message: <span uus-text="message"></span></p>
+      
+      <select uus-model="selectedColor">
+        <option value="red">Red</option>
+        <option value="green">Green</option>
+        <option value="blue">Blue</option>
+      </select>
+      <p uus-style="{ color: selectedColor }">
+        This text is <span uus-text="selectedColor"></span>
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>Class and Style Binding</h2>
+      <button uus-on:click="isHighlighted = !isHighlighted">Toggle Highlight</button>
+      <p uus-class="{ highlight: isHighlighted }">
+        This text can be highlighted
+      </p>
+      
+      <div uus-style="{ 
+        padding: '10px', 
+        backgroundColor: count % 2 === 0 ? '#f0f0f0' : '#e0e0e0',
+        borderRadius: '5px'
+      }">
+        Background changes based on count being even/odd
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Complex Data</h2>
+      <p>User: <span uus-text="user.name"></span> (Age: <span uus-text="user.age"></span>)</p>
+      <input uus-model="user.name" placeholder="Edit name">
+      <input type="number" uus-model="user.age" placeholder="Edit age">
+    </div>
+  </div>
+
+  <script type="module">
+    // For development - using the built file
+    import { Uus } from './dist/index.js';
+    
+    const app = new Uus({ debug: true });
+    app.mount('#app');
+    
+    // Make it available globally for debugging
+    window.app = app;
+  </script>
+</body>
+</html>

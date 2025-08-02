@@ -1,0 +1,62 @@
+{
+  "title": "Uluslararasılaştırma Demosu",
+  "subtitle": "Uus.js i18n Paketi Vitrin",
+  "sections": {
+    "basic": "Temel Çeviri",
+    "interpolation": "Metin İnterpolasyonu",
+    "pluralization": "Çoğul Formlar",
+    "forms": "Tarih ve Sayı Formatları",
+    "dynamic": "Dinamik İçerik"
+  },
+  "examples": {
+    "hello": "Merhaba Dünya!",
+    "goodbye": "Hoşçakal!",
+    "welcome": "Hoş geldin {name}!",
+    "user_greeting": "Merhaba {name}, {count} {count, plural, =0 {mesajın} =1 {mesajın} other {mesajın}} var",
+    "login_success": "{username} olarak başarıyla giriş yapıldı",
+    "form_validation": {
+      "required": "Bu alan zorunludur",
+      "email": "Lütfen geçerli bir e-posta adresi girin",
+      "min_length": "En az {min} karakter uzunluğunda olmalı"
+    }
+  },
+  "plurals": {
+    "item": {
+      "0": "Öğe yok",
+      "1": "Bir öğe",
+      "2": "{count} öğe"
+    },
+    "message": {
+      "0": "Mesaj yok",
+      "1": "Bir mesaj",
+      "2": "{count} mesaj"
+    },
+    "notification": {
+      "0": "Bildirim yok",
+      "1": "1 bildirimin var",
+      "2": "{count} bildirimin var"
+    }
+  },
+  "actions": {
+    "increase": "Artır",
+    "decrease": "Azalt",
+    "reset": "Sıfırla",
+    "submit": "Gönder",
+    "clear": "Temizle"
+  },
+  "labels": {
+    "name": "Ad",
+    "email": "E-posta",
+    "message": "Mesaj",
+    "count": "Sayı",
+    "language": "Dil"
+  },
+  "demo": {
+    "current_time": "Şu anki zaman",
+    "price": "Fiyat",
+    "discount": "İndirim yüzdesi",
+    "user_input": "Kişiselleştirilmiş karşılama görmek için adınızı girin",
+    "counter_demo": "Çoğul formları görmek için butonları kullanın",
+    "form_demo": "Doğrulama mesajlarını görmek için formu doldurun"
+  }
+}

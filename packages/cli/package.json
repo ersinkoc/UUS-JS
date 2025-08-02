@@ -1,0 +1,62 @@
+{
+  "name": "@uusjs/cli",
+  "version": "0.0.1",
+  "description": "CLI tool for Uus.js project scaffolding",
+  "keywords": [
+    "uus",
+    "uusjs",
+    "cli",
+    "scaffold",
+    "create-app"
+  ],
+  "homepage": "https://uusjs.dev",
+  "bugs": {
+    "url": "https://github.com/uus-js/uus/issues",
+    "email": "bugs@uusjs.dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/uus-js/uus.git",
+    "directory": "packages/cli"
+  },
+  "license": "MIT",
+  "author": "Uus.js Team",
+  "type": "module",
+  "bin": {
+    "uus": "./dist/cli.js",
+    "create-uus": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "templates",
+    "README.md"
+  ],
+  "scripts": {
+    "dev": "tsx watch src/cli.ts",
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint src --ext .ts",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^11.1.0",
+    "execa": "^8.0.1",
+    "fs-extra": "^11.2.0",
+    "inquirer": "^9.2.12",
+    "ora": "^8.0.1",
+    "validate-npm-package-name": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/inquirer": "^9.0.7",
+    "@types/node": "^20.11.5",
+    "@types/validate-npm-package-name": "^4.0.2",
+    "eslint": "^8.56.0",
+    "tsx": "^4.20.3",
+    "typescript": "^5.3.3",
+    "vitest": "^1.2.1"
+  }
+}

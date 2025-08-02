@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Uus.js - Examples</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    .examples {
+      max-width: 800px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+    }
+    .card {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      transition: transform 0.2s;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+    .card h3 {
+      margin-top: 0;
+      color: #007bff;
+    }
+    .card a {
+      display: inline-block;
+      margin-top: 10px;
+      color: #007bff;
+      text-decoration: none;
+    }
+    .card a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <h1>Uus.js Examples</h1>
+  
+  <div class="examples">
+    <div class="card">
+      <h3>Basic Counter</h3>
+      <p>Simple reactive counter demonstrating state management and event handling.</p>
+      <a href="basic.html">View Example →</a>
+    </div>
+    
+    <div class="card">
+      <h3>Todo List</h3>
+      <p>Interactive todo list with add, remove, and toggle functionality.</p>
+      <a href="todo.html">View Example →</a>
+    </div>
+    
+    <div class="card">
+      <h3>Form Handling</h3>
+      <p>Form with two-way binding and validation.</p>
+      <a href="form.html">View Example →</a>
+    </div>
+    
+    <div class="card">
+      <h3>Animations</h3>
+      <p>Smooth animations and transitions with the animate package.</p>
+      <a href="animations.html">View Example →</a>
+    </div>
+    
+    <div class="card">
+      <h3>Router Demo</h3>
+      <p>Client-side routing with the router package.</p>
+      <a href="router.html">View Example →</a>
+    </div>
+    
+    <div class="card">
+      <h3>Real-time Chat</h3>
+      <p>Simple chat application demonstrating real-time updates.</p>
+      <a href="chat.html">View Example →</a>
+    </div>
+  </div>
+</body>
+</html>

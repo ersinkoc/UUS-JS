@@ -1,0 +1,17 @@
+{
+  "name": "my-uus-app",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@uusjs/core": "^0.0.1"
+  },
+  "devDependencies": {
+    "vite": "^5.0.12"
+  }
+}

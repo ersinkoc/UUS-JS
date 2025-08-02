@@ -1,0 +1,57 @@
+{
+  "name": "@uusjs/forms",
+  "version": "0.0.1",
+  "description": "Form handling and validation for Uus.js",
+  "keywords": ["uus", "uusjs", "forms", "validation", "form-handling"],
+  "homepage": "https://uusjs.dev",
+  "bugs": {
+    "url": "https://github.com/uus-js/uus/issues",
+    "email": "bugs@uusjs.dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/uus-js/uus.git",
+    "directory": "packages/forms"
+  },
+  "license": "MIT",
+  "author": "Uus.js Team",
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "dev": "vite serve --config vite.config.ts",
+    "build": "vite build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint src --ext .ts",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "@uusjs/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.5",
+    "@vitest/coverage-v8": "^1.2.1",
+    "eslint": "^8.56.0",
+    "happy-dom": "^13.3.1",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.12",
+    "vitest": "^1.2.1"
+  }
+}

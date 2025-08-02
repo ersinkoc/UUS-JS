@@ -1,0 +1,78 @@
+{
+  "name": "@uusjs/realtime",
+  "version": "0.0.1",
+  "description": "Real-time WebSocket support for Uus.js",
+  "keywords": ["uus", "uusjs", "websocket", "realtime", "socket.io", "sse"],
+  "homepage": "https://uusjs.dev",
+  "bugs": {
+    "url": "https://github.com/uus-js/uus/issues",
+    "email": "bugs@uusjs.dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/uus-js/uus.git",
+    "directory": "packages/realtime"
+  },
+  "license": "MIT",
+  "author": "Uus.js Team",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./websocket": {
+      "types": "./dist/websocket.d.ts",
+      "import": "./dist/websocket.js",
+      "require": "./dist/websocket.cjs"
+    },
+    "./sse": {
+      "types": "./dist/sse.d.ts",
+      "import": "./dist/sse.js",
+      "require": "./dist/sse.cjs"
+    }
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "dev": "tsup --watch",
+    "build": "tsup",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint src --ext .ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@uusjs/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.5",
+    "@types/ws": "^8.5.10",
+    "eslint": "^8.56.0",
+    "tsup": "^8.0.1",
+    "typescript": "^5.3.3",
+    "vitest": "^1.2.1",
+    "ws": "^8.16.0"
+  },
+  "peerDependencies": {
+    "socket.io-client": "^4.0.0",
+    "ws": "^8.0.0"
+  },
+  "peerDependenciesMeta": {
+    "socket.io-client": {
+      "optional": true
+    },
+    "ws": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Uus.js Todo App</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #f4f4f4;
+    }
+    
+    .app {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      padding: 30px;
+    }
+    
+    h1 {
+      color: #2c3e50;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    
+    .add-todo {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    
+    input[type="text"] {
+      flex: 1;
+      padding: 12px;
+      border: 2px solid #ddd;
+      border-radius: 4px;
+      font-size: 16px;
+      transition: border-color 0.3s;
+    }
+    
+    input[type="text"]:focus {
+      outline: none;
+      border-color: #3498db;
+    }
+    
+    button {
+      padding: 12px 24px;
+      background: #3498db;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    
+    button:hover {
+      background: #2980b9;
+    }
+    
+    button:disabled {
+      background: #bdc3c7;
+      cursor: not-allowed;
+    }
+    
+    .filters {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      justify-content: center;
+    }
+    
+    .filter-btn {
+      padding: 8px 16px;
+      background: #ecf0f1;
+      color: #2c3e50;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .filter-btn:hover {
+      background: #bdc3c7;
+    }
+    
+    .filter-btn.active {
+      background: #3498db;
+      color: white;
+    }
+    
+    .todo-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .todo-item {
+      display: flex;
+      align-items: center;
+      padding: 15px;
+      background: #f8f9fa;
+      margin-bottom: 8px;
+      border-radius: 4px;
+      transition: all 0.3s;
+    }
+    
+    .todo-item:hover {
+      background: #e9ecef;
+    }
+    
+    .todo-item.completed {
+      opacity: 0.6;
+    }
+    
+    .todo-item.completed .todo-text {
+      text-decoration: line-through;
+      color: #7f8c8d;
+    }
+    
+    .todo-checkbox {
+      margin-right: 15px;
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+    
+    .todo-text {
+      flex: 1;
+      font-size: 16px;
+    }
+    
+    .todo-delete {
+      padding: 6px 12px;
+      background: #e74c3c;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    
+    .todo-delete:hover {
+      background: #c0392b;
+    }
+    
+    .stats {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #ecf0f1;
+      color: #7f8c8d;
+    }
+    
+    .empty-state {
+      text-align: center;
+      color: #95a5a6;
+      padding: 40px 0;
+    }
+    
+    .clear-completed {
+      padding: 8px 16px;
+      background: #95a5a6;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    
+    .clear-completed:hover {
+      background: #7f8c8d;
+    }
+  </style>
+</head>
+<body>
+  <div id="app" uus-state="{ 
+    todos: [
+      { id: 1, text: 'Learn Uus.js', completed: true },
+      { id: 2, text: 'Build an awesome app', completed: false },
+      { id: 3, text: 'Share with the world', completed: false }
+    ],
+    newTodo: '',
+    filter: 'all'
+  }">
+    <div class="app" uus-animate="fadeIn">
+      <h1>Todo App with Uus.js</h1>
+      
+      <!-- Add Todo Form -->
+      <form class="add-todo" uus-on:submit.prevent="
+        if (newTodo.trim()) {
+          todos.push({
+            id: Date.now(),
+            text: newTodo.trim(),
+            completed: false
+          });
+          newTodo = '';
+        }
+      ">
+        <input 
+          type="text"
+          uus-model="newTodo"
+          placeholder="What needs to be done?"
+          uus-on:keyup.escape="newTodo = ''"
+        >
+        <button type="submit" uus-bind:disabled="!newTodo.trim()">
+          Add Todo
+        </button>
+      </form>
+      
+      <!-- Filters -->
+      <div class="filters">
+        <button 
+          class="filter-btn"
+          uus-class="{ active: filter === 'all' }"
+          uus-on:click="filter = 'all'">
+          All
+        </button>
+        <button 
+          class="filter-btn"
+          uus-class="{ active: filter === 'active' }"
+          uus-on:click="filter = 'active'">
+          Active
+        </button>
+        <button 
+          class="filter-btn"
+          uus-class="{ active: filter === 'completed' }"
+          uus-on:click="filter = 'completed'">
+          Completed
+        </button>
+      </div>
+      
+      <!-- Todo List -->
+      <ul class="todo-list">
+        <li 
+          uus-for="todo in todos.filter(t => 
+            filter === 'all' || 
+            (filter === 'active' && !t.completed) || 
+            (filter === 'completed' && t.completed)
+          )"
+          uus-bind:key="todo.id"
+          class="todo-item"
+          uus-class="{ completed: todo.completed }"
+          uus-animate="fadeIn"
+          uus-stagger="50">
+          <input 
+            type="checkbox"
+            class="todo-checkbox"
+            uus-model="todo.completed"
+          >
+          <span class="todo-text" uus-text="todo.text"></span>
+          <button 
+            class="todo-delete"
+            uus-on:click="todos = todos.filter(t => t.id !== todo.id)">
+            Delete
+          </button>
+        </li>
+      </ul>
+      
+      <!-- Empty State -->
+      <div 
+        class="empty-state" 
+        uus-show="todos.filter(t => 
+          filter === 'all' || 
+          (filter === 'active' && !t.completed) || 
+          (filter === 'completed' && t.completed)
+        ).length === 0">
+        <p uus-text="filter === 'completed' ? 'No completed todos' : 'No todos yet'"></p>
+      </div>
+      
+      <!-- Stats -->
+      <div class="stats">
+        <span>
+          <strong uus-text="todos.filter(t => !t.completed).length"></strong>
+          <span uus-text="todos.filter(t => !t.completed).length === 1 ? ' item' : ' items'"></span> left
+        </span>
+        <button 
+          class="clear-completed"
+          uus-show="todos.some(t => t.completed)"
+          uus-on:click="todos = todos.filter(t => !t.completed)">
+          Clear completed
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Using CDN for simplicity -->
+  <script src="https://unpkg.com/@uusjs/core"></script>
+  <script src="https://unpkg.com/@uusjs/animate"></script>
+  <script>
+    // Create and mount the app
+    const app = new Uus();
+    
+    // Add animation support
+    const animate = createAnimate();
+    app.use(animate);
+    
+    // Mount the app
+    app.mount('#app');
+    
+    // Save todos to localStorage
+    app.state.$watch('todos', (newTodos) => {
+      localStorage.setItem('uus-todos', JSON.stringify(newTodos));
+    });
+    
+    // Load todos from localStorage
+    const savedTodos = localStorage.getItem('uus-todos');
+    if (savedTodos) {
+      app.state.todos = JSON.parse(savedTodos);
+    }
+  </script>
+</body>
+</html>

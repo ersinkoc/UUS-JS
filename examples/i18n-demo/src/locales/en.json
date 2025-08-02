@@ -1,0 +1,62 @@
+{
+  "title": "Internationalization Demo",
+  "subtitle": "Uus.js i18n Package Showcase",
+  "sections": {
+    "basic": "Basic Translation",
+    "interpolation": "String Interpolation", 
+    "pluralization": "Pluralization",
+    "forms": "Date & Number Formatting",
+    "dynamic": "Dynamic Content"
+  },
+  "examples": {
+    "hello": "Hello World!",
+    "goodbye": "Goodbye!",
+    "welcome": "Welcome {name}!",
+    "user_greeting": "Hello {name}, you have {count} {count, plural, =0 {messages} =1 {message} other {messages}}",
+    "login_success": "Successfully logged in as {username}",
+    "form_validation": {
+      "required": "This field is required",
+      "email": "Please enter a valid email address",
+      "min_length": "Must be at least {min} characters long"
+    }
+  },
+  "plurals": {
+    "item": {
+      "0": "No items",
+      "1": "One item", 
+      "2": "{count} items"
+    },
+    "message": {
+      "0": "No messages",
+      "1": "One message",
+      "2": "{count} messages" 
+    },
+    "notification": {
+      "0": "No notifications",
+      "1": "You have 1 notification",
+      "2": "You have {count} notifications"
+    }
+  },
+  "actions": {
+    "increase": "Increase",
+    "decrease": "Decrease", 
+    "reset": "Reset",
+    "submit": "Submit",
+    "clear": "Clear"
+  },
+  "labels": {
+    "name": "Name",
+    "email": "Email",
+    "message": "Message",
+    "count": "Count",
+    "language": "Language"
+  },
+  "demo": {
+    "current_time": "Current time",
+    "price": "Price",
+    "discount": "Discount percentage",
+    "user_input": "Enter your name to see personalized greeting",
+    "counter_demo": "Use buttons to see pluralization in action",
+    "form_demo": "Fill out the form to see validation messages"
+  }
+}

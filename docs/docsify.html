@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Uus.js - A Fresh Reactive HTML Framework</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="description" content="Uus.js is a lightweight reactive HTML framework that makes building interactive web applications simple and enjoyable. Under 3KB gzipped.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  
+  <!-- Open Graph -->
+  <meta property="og:title" content="Uus.js Documentation">
+  <meta property="og:description" content="A fresh reactive HTML framework under 3KB">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://uusjs.dev">
+  
+  <!-- Theme -->
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
+  
+  <!-- Custom styles -->
+  <style>
+    :root {
+      --theme-color: #3498db;
+      --theme-color-dark: #2980b9;
+      --text-color-base: #2c3e50;
+      --text-color-secondary: #7f8c8d;
+      --text-color-tertiary: #95a5a6;
+    }
+    
+    .app-name {
+      font-weight: 700;
+    }
+    
+    .sidebar {
+      background-color: #f8f9fa;
+    }
+    
+    .sidebar-toggle {
+      background-color: transparent;
+    }
+    
+    .markdown-section {
+      max-width: 900px;
+    }
+    
+    .markdown-section h1 {
+      color: var(--text-color-base);
+      border-bottom: 2px solid var(--theme-color);
+      padding-bottom: 0.3em;
+    }
+    
+    .markdown-section h2 {
+      color: var(--text-color-base);
+      border-bottom: 1px solid #eee;
+      padding-bottom: 0.2em;
+    }
+    
+    .markdown-section code {
+      background-color: #f4f4f4;
+      padding: 0.2em 0.4em;
+      border-radius: 3px;
+      color: #e83e8c;
+    }
+    
+    .markdown-section pre {
+      background-color: #1e1e1e;
+      border-radius: 6px;
+    }
+    
+    .markdown-section pre code {
+      background-color: transparent;
+      color: #d4d4d4;
+      padding: 0;
+    }
+    
+    .markdown-section blockquote {
+      border-left: 4px solid var(--theme-color);
+      background-color: #f0f8ff;
+      padding: 1em;
+      margin: 1.5em 0;
+    }
+    
+    .markdown-section table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 1em 0;
+    }
+    
+    .markdown-section table th {
+      background-color: var(--theme-color);
+      color: white;
+      padding: 0.75em;
+      text-align: left;
+    }
+    
+    .markdown-section table td {
+      border: 1px solid #ddd;
+      padding: 0.75em;
+    }
+    
+    .markdown-section table tr:nth-child(even) {
+      background-color: #f8f9fa;
+    }
+    
+    /* Playground button */
+    .playground-link {
+      display: inline-block;
+      background: var(--theme-color);
+      color: white;
+      padding: 0.5em 1em;
+      border-radius: 4px;
+      text-decoration: none;
+      margin: 0.5em 0;
+      transition: background 0.2s;
+    }
+    
+    .playground-link:hover {
+      background: var(--theme-color-dark);
+      color: white;
+    }
+    
+    /* Hero section */
+    .hero {
+      text-align: center;
+      padding: 3em 0;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      margin: -1.5rem -1.5rem 2rem;
+    }
+    
+    .hero h1 {
+      font-size: 3em;
+      margin: 0.5em 0;
+      color: white !important;
+      border: none !important;
+    }
+    
+    .hero p {
+      font-size: 1.2em;
+      opacity: 0.9;
+    }
+    
+    .hero .actions {
+      margin-top: 2em;
+    }
+    
+    .hero .actions a {
+      display: inline-block;
+      padding: 0.75em 2em;
+      margin: 0 0.5em;
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      text-decoration: none;
+      border-radius: 30px;
+      border: 2px solid white;
+      transition: all 0.3s;
+    }
+    
+    .hero .actions a:hover {
+      background: white;
+      color: #667eea;
+    }
+    
+    /* Search */
+    .search {
+      border-bottom: 1px solid #eee !important;
+    }
+    
+    .search input {
+      border-radius: 20px;
+      border: 1px solid #ddd;
+    }
+    
+    /* Code highlighting */
+    .token.comment { color: #6a9955; }
+    .token.string { color: #ce9178; }
+    .token.number { color: #b5cea8; }
+    .token.keyword { color: #569cd6; }
+    .token.operator { color: #d4d4d4; }
+    .token.function { color: #dcdcaa; }
+    .token.tag { color: #569cd6; }
+    .token.attr-name { color: #9cdcfe; }
+    .token.attr-value { color: #ce9178; }
+    
+    /* Badges */
+    .badge {
+      display: inline-block;
+      padding: 0.2em 0.6em;
+      font-size: 0.8em;
+      font-weight: 600;
+      border-radius: 12px;
+      margin: 0 0.2em;
+    }
+    
+    .badge-new {
+      background: #27ae60;
+      color: white;
+    }
+    
+    .badge-beta {
+      background: #f39c12;
+      color: white;
+    }
+    
+    .badge-deprecated {
+      background: #e74c3c;
+      color: white;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero h1 {
+        font-size: 2em;
+      }
+      
+      .hero .actions a {
+        display: block;
+        margin: 0.5em auto;
+        max-width: 200px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  
+  <script>
+    window.$docsify = {
+      name: 'Uus.js',
+      repo: 'uus-js/uus',
+      logo: '',
+      loadSidebar: true,
+      loadNavbar: true,
+      coverpage: true,
+      onlyCover: false,
+      auto2top: true,
+      maxLevel: 3,
+      subMaxLevel: 2,
+      homepage: 'README.md',
+      basePath: '/docs/',
+      
+      // Search configuration
+      search: {
+        maxAge: 86400000,
+        paths: 'auto',
+        placeholder: 'Search docs...',
+        noData: 'No results found',
+        depth: 6
+      },
+      
+      // Copy code button
+      copyCode: {
+        buttonText: 'Copy',
+        errorText: 'Error',
+        successText: 'Copied!'
+      },
+      
+      // Pagination
+      pagination: {
+        previousText: 'Previous',
+        nextText: 'Next',
+        crossChapter: true,
+        crossChapterText: true
+      },
+      
+      // Custom plugins
+      plugins: [
+        function(hook, vm) {
+          // Add playground links
+          hook.beforeEach(function(content) {
+            return content.replace(/\[playground\]/g, '<a href="/playground" class="playground-link">Open in Playground →</a>');
+          });
+          
+          // Add "Edit on GitHub" link
+          hook.beforeEach(function(content) {
+            const url = 'https://github.com/uus-js/uus/edit/main/docs/' + vm.route.file;
+            const editHtml = '> [:memo: Edit on GitHub](' + url + ')\n\n';
+            return editHtml + content;
+          });
+          
+          // Add last updated time
+          hook.beforeEach(function(content) {
+            return content + '\n\n---\n\n<small>Last updated: ' + new Date().toLocaleDateString() + '</small>';
+          });
+          
+          // Syntax highlighting for uus directives
+          hook.doneEach(function() {
+            // Highlight uus-* attributes
+            document.querySelectorAll('code').forEach(el => {
+              el.innerHTML = el.innerHTML.replace(
+                /uus-([a-z-]+)(="[^"]*")?/g,
+                '<span class="token attr-name">uus-$1</span>$2'
+              );
+            });
+          });
+        }
+      ],
+      
+      // Tabs plugin
+      tabs: {
+        persist: true,
+        sync: true,
+        theme: 'material',
+        tabComments: true,
+        tabHeadings: true
+      },
+      
+      // External script files
+      remoteMarkdown: {
+        tag: 'remoteMarkdownUrl'
+      },
+      
+      // Theme
+      themeable: {
+        readyTransition: true,
+        responsiveTables: true
+      }
+    }
+  </script>
+  
+  <!-- Docsify v4 -->
+  <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
+  
+  <!-- Plugins -->
+  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify-copy-code/dist/docsify-copy-code.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify-pagination/dist/docsify-pagination.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify-tabs@1"></script>
+  
+  <!-- Syntax highlighting -->
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-bash.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-typescript.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-javascript.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-json.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-markup.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-css.min.js"></script>
+  
+  <!-- Analytics -->
+  <script>
+    // Add your analytics code here
+  </script>
+</body>
+</html>

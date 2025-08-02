@@ -1,0 +1,15 @@
+{
+  "name": "my-uus-app",
+  "version": "0.0.1",
+  "private": true,
+  "description": "A Uus.js application",
+  "scripts": {
+    "start": "npx serve ."
+  },
+  "dependencies": {
+    "@uusjs/core": "^0.0.1"
+  },
+  "devDependencies": {
+    "serve": "^14.2.1"
+  }
+}

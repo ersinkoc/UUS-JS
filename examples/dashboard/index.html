@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UUS.js Analytics Dashboard</title>
+  <link rel="stylesheet" href="/src/style.css">
+</head>
+<body>
+  <div id="app" uus-state="{
+    // Navigation state
+    currentPage: 'overview',
+    sidebarOpen: true,
+    
+    // Data state
+    stats: {
+      totalVisitors: 24532,
+      totalPageViews: 89421,
+      totalRevenue: 12456.78,
+      conversionRate: 0.0785
+    },
+    
+    // Real-time data
+    activeUsers: 127,
+    realtimeEvents: [
+      {
+        id: 1,
+        type: 'pageview',
+        page: '/dashboard',
+        user: 'Anonymous',
+        time: '2 seconds ago',
+        timestamp: Date.now() - 2000
+      },
+      {
+        id: 2,
+        type: 'conversion',
+        value: 99.99,
+        user: 'john@example.com',
+        time: '5 seconds ago',
+        timestamp: Date.now() - 5000
+      },
+      {
+        id: 3,
+        type: 'signup',
+        email: 'jane@example.com',
+        time: '12 seconds ago',
+        timestamp: Date.now() - 12000
+      }
+    ],
+    
+    // Chart data
+    visitorData: [
+      { date: '2024-01-01', visitors: 1250, pageviews: 3200 },
+      { date: '2024-01-02', visitors: 1180, pageviews: 2980 },
+      { date: '2024-01-03', visitors: 1340, pageviews: 3450 },
+      { date: '2024-01-04', visitors: 1420, pageviews: 3680 },
+      { date: '2024-01-05', visitors: 1380, pageviews: 3520 },
+      { date: '2024-01-06', visitors: 1520, pageviews: 3890 },
+      { date: '2024-01-07', visitors: 1650, pageviews: 4120 }
+    ],
+    
+    deviceData: [
+      { device: 'Desktop', sessions: 14250, percentage: 58 },
+      { device: 'Mobile', sessions: 8420, percentage: 34 },
+      { device: 'Tablet', sessions: 1962, percentage: 8 }
+    ],
+    
+    trafficSources: [
+      { source: 'Organic Search', visits: 12450, percentage: 51, trend: 'up' },
+      { source: 'Direct', visits: 7320, percentage: 30, trend: 'stable' },
+      { source: 'Social Media', visits: 3180, percentage: 13, trend: 'up' },
+      { source: 'Referral', visits: 1482, percentage: 6, trend: 'down' }
+    ],
+    
+    topPages: [
+      { page: '/home', views: 8420, avgTime: '2:34', bounceRate: 23 },
+      { page: '/products', views: 6180, avgTime: '3:12', bounceRate: 18 },
+      { page: '/about', views: 4920, avgTime: '1:45', bounceRate: 45 },
+      { page: '/contact', views: 2180, avgTime: '1:23', bounceRate: 67 }
+    ],
+    
+    // Settings
+    dateRange: '30',
+    theme: 'light',
+    notifications: {
+      email: true,
+      weekly: true,
+      realtime: false
+    },
+    
+    // Computed properties
+    get pageTitle() {
+      const titles = {
+        overview: 'Dashboard Overview',
+        analytics: 'Analytics',
+        realtime: 'Real-time Monitor',
+        reports: 'Reports',
+        settings: 'Settings'
+      };
+      return titles[this.currentPage] || 'Dashboard';
+    },
+    
+    get pageSubtitle() {
+      const subtitles = {
+        overview: 'Welcome back! Here\\'s what\\'s happening with your website.',
+        analytics: 'Deep dive into your website performance metrics.',
+        realtime: 'Monitor your website activity as it happens.',
+        reports: 'Download and generate custom reports.',
+        settings: 'Manage your dashboard preferences.'
+      };
+      return subtitles[this.currentPage] || '';
+    },
+    
+    get formattedRevenue() {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD'
+      }).format(this.stats.totalRevenue);
+    },
+    
+    get formattedConversionRate() {
+      return (this.stats.conversionRate * 100).toFixed(1) + '%';
+    },
+    
+    // Methods
+    navigateTo(page) {
+      this.currentPage = page;
+      this.initializeCharts();
+    },
+    
+    toggleSidebar() {
+      this.sidebarOpen = !this.sidebarOpen;
+    },
+    
+    formatNumber(num) {
+      return new Intl.NumberFormat('en-US').format(num);
+    },
+    
+    formatCurrency(amount) {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD'
+      }).format(amount);
+    },
+    
+    addRealtimeEvent() {
+      const eventTypes = ['pageview', 'conversion', 'signup'];
+      const pages = ['/home', '/products', '/about', '/contact'];
+      const users = ['user1@example.com', 'user2@example.com', 'Anonymous'];
+      
+      const newEvent = {
+        id: Date.now(),
+        type: eventTypes[Math.floor(Math.random() * eventTypes.length)],
+        page: pages[Math.floor(Math.random() * pages.length)],
+        user: users[Math.floor(Math.random() * users.length)],
+        value: Math.random() * 200,
+        time: 'Just now',
+        timestamp: Date.now()
+      };
+      
+      this.realtimeEvents.unshift(newEvent);
+      if (this.realtimeEvents.length > 10) {
+        this.realtimeEvents.pop();
+      }
+      
+      // Update active users count
+      this.activeUsers = Math.floor(Math.random() * 50) + 100;
+    },
+    
+    initializeCharts() {
+      // Chart initialization will be handled by the chart utility
+      setTimeout(() => {
+        if (window.initCharts) {
+          window.initCharts(this.currentPage);
+        }
+      }, 100);
+    },
+    
+    updateSettings() {
+      alert('Settings updated successfully!');
+    },
+    
+    exportReport() {
+      alert('Report export started!');
+    },
+    
+    generateReport() {
+      alert('Custom report generation started!');
+    }
+  }">
+    <!-- Sidebar -->
+    <aside class="sidebar" uus-class="{ 'sidebar-collapsed': !sidebarOpen }">
+      <div class="logo">
+        <span class="logo-icon">📊</span>
+        <span class="logo-text" uus-show="sidebarOpen">Analytics Pro</span>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <a 
+          uus-on:click="navigateTo('overview')"
+          class="nav-item"
+          uus-class="{ active: currentPage === 'overview' }"
+        >
+          <span class="nav-icon">🏠</span>
+          <span class="nav-text" uus-show="sidebarOpen">Overview</span>
+        </a>
+        
+        <a 
+          uus-on:click="navigateTo('analytics')"
+          class="nav-item"
+          uus-class="{ active: currentPage === 'analytics' }"
+        >
+          <span class="nav-icon">📈</span>
+          <span class="nav-text" uus-show="sidebarOpen">Analytics</span>
+        </a>
+        
+        <a 
+          uus-on:click="navigateTo('realtime')"
+          class="nav-item"
+          uus-class="{ active: currentPage === 'realtime' }"
+        >
+          <span class="nav-icon">⚡</span>
+          <span class="nav-text" uus-show="sidebarOpen">Real-time</span>
+        </a>
+        
+        <a 
+          uus-on:click="navigateTo('reports')"
+          class="nav-item"
+          uus-class="{ active: currentPage === 'reports' }"
+        >
+          <span class="nav-icon">📄</span>
+          <span class="nav-text" uus-show="sidebarOpen">Reports</span>
+        </a>
+        
+        <a 
+          uus-on:click="navigateTo('settings')"
+          class="nav-item"
+          uus-class="{ active: currentPage === 'settings' }"
+        >
+          <span class="nav-icon">⚙️</span>
+          <span class="nav-text" uus-show="sidebarOpen">Settings</span>
+        </a>
+      </nav>
+      
+      <div class="sidebar-footer">
+        <button uus-on:click="toggleSidebar()" class="sidebar-toggle">
+          <span uus-show="sidebarOpen">←</span>
+          <span uus-show="!sidebarOpen">→</span>
+        </button>
+      </div>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="main-content" uus-class="{ 'sidebar-collapsed': !sidebarOpen }">
+      <!-- Header -->
+      <header class="header">
+        <div class="header-left">
+          <h1 uus-text="pageTitle"></h1>
+          <p class="header-subtitle" uus-text="pageSubtitle"></p>
+        </div>
+        
+        <div class="header-right">
+          <div class="date-selector">
+            <select uus-model="dateRange" class="date-select">
+              <option value="7">Last 7 days</option>
+              <option value="30">Last 30 days</option>
+              <option value="90">Last 90 days</option>
+            </select>
+          </div>
+          
+          <button uus-on:click="exportReport()" class="btn btn-primary">
+            Export Report
+          </button>
+        </div>
+      </header>
+      
+      <!-- Overview Page -->
+      <div uus-show="currentPage === 'overview'" class="page-content">
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-content">
+              <div class="stat-label">Total Visitors</div>
+              <div class="stat-value" uus-text="formatNumber(stats.totalVisitors)"></div>
+              <div class="stat-change positive">
+                ↑ 12.3% from last period
+              </div>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon">📄</div>
+            <div class="stat-content">
+              <div class="stat-label">Page Views</div>
+              <div class="stat-value" uus-text="formatNumber(stats.totalPageViews)"></div>
+              <div class="stat-change positive">
+                ↑ 8.7% from last period
+              </div>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon">💰</div>
+            <div class="stat-content">
+              <div class="stat-label">Revenue</div>
+              <div class="stat-value" uus-text="formattedRevenue"></div>
+              <div class="stat-change negative">
+                ↓ 3.2% from last period
+              </div>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon">🎯</div>
+            <div class="stat-content">
+              <div class="stat-label">Conversion Rate</div>
+              <div class="stat-value" uus-text="formattedConversionRate"></div>
+              <div class="stat-change positive">
+                ↑ 1.5% from last period
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Charts Row -->
+        <div class="charts-row">
+          <div class="chart-container large">
+            <div class="chart-header">
+              <h3>Traffic Overview</h3>
+              <div class="chart-legend">
+                <span class="legend-item">
+                  <span class="legend-color" style="background: #3498db"></span>
+                  Visitors
+                </span>
+                <span class="legend-item">
+                  <span class="legend-color" style="background: #2ecc71"></span>
+                  Page Views
+                </span>
+              </div>
+            </div>
+            <div id="traffic-chart" class="chart"></div>
+          </div>
+          
+          <div class="chart-container small">
+            <div class="chart-header">
+              <h3>Device Breakdown</h3>
+            </div>
+            <div class="device-stats">
+              <div 
+                uus-for="device in deviceData" 
+                class="device-item"
+              >
+                <div class="device-info">
+                  <span class="device-name" uus-text="device.device"></span>
+                  <span class="device-count" uus-text="formatNumber(device.sessions)"></span>
+                </div>
+                <div class="device-bar">
+                  <div 
+                    class="device-bar-fill"
+                    uus-style="{ width: device.percentage + '%' }"
+                  ></div>
+                </div>
+                <span class="device-percentage" uus-text="device.percentage + '%'"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Tables Row -->
+        <div class="tables-row">
+          <div class="table-container">
+            <div class="table-header">
+              <h3>Traffic Sources</h3>
+            </div>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Source</th>
+                  <th>Visits</th>
+                  <th>Percentage</th>
+                  <th>Trend</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr uus-for="source in trafficSources">
+                  <td uus-text="source.source"></td>
+                  <td uus-text="formatNumber(source.visits)"></td>
+                  <td uus-text="source.percentage + '%'"></td>
+                  <td>
+                    <span 
+                      class="trend"
+                      uus-class="'trend-' + source.trend"
+                    >
+                      <span uus-show="source.trend === 'up'">↑</span>
+                      <span uus-show="source.trend === 'down'">↓</span>
+                      <span uus-show="source.trend === 'stable'">→</span>
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <div class="table-container">
+            <div class="table-header">
+              <h3>Top Pages</h3>
+            </div>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Page</th>
+                  <th>Views</th>
+                  <th>Avg Time</th>
+                  <th>Bounce Rate</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr uus-for="page in topPages">
+                  <td uus-text="page.page"></td>
+                  <td uus-text="formatNumber(page.views)"></td>
+                  <td uus-text="page.avgTime"></td>
+                  <td uus-text="page.bounceRate + '%'"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Analytics Page -->
+      <div uus-show="currentPage === 'analytics'" class="page-content">
+        <div class="analytics-grid">
+          <!-- Revenue Chart -->
+          <div class="chart-container full-width">
+            <div class="chart-header">
+              <h3>Revenue Analytics</h3>
+              <div class="chart-actions">
+                <button class="chart-btn active">Revenue</button>
+                <button class="chart-btn">Orders</button>
+                <button class="chart-btn">Customers</button>
+              </div>
+            </div>
+            <div id="revenue-chart" class="chart"></div>
+          </div>
+          
+          <!-- Conversion Funnel -->
+          <div class="chart-container">
+            <div class="chart-header">
+              <h3>Conversion Funnel</h3>
+            </div>
+            <div class="funnel">
+              <div class="funnel-step">
+                <div class="funnel-bar" style="width: 100%"></div>
+                <div class="funnel-label">
+                  <span>Visitors</span>
+                  <span>24,532</span>
+                </div>
+              </div>
+              <div class="funnel-step">
+                <div class="funnel-bar" style="width: 75%"></div>
+                <div class="funnel-label">
+                  <span>Sign-ups</span>
+                  <span>18,399</span>
+                </div>
+              </div>
+              <div class="funnel-step">
+                <div class="funnel-bar" style="width: 45%"></div>
+                <div class="funnel-label">
+                  <span>Active Users</span>
+                  <span>11,039</span>
+                </div>
+              </div>
+              <div class="funnel-step">
+                <div class="funnel-bar" style="width: 20%"></div>
+                <div class="funnel-label">
+                  <span>Paid Users</span>
+                  <span>4,906</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Real-time Page -->
+      <div uus-show="currentPage === 'realtime'" class="page-content">
+        <div class="realtime-header">
+          <div class="realtime-status">
+            <span class="status-dot pulse"></span>
+            <span>Live Data</span>
+          </div>
+          <button uus-on:click="addRealtimeEvent()" class="btn btn-secondary">
+            Simulate Event
+          </button>
+        </div>
+        
+        <div class="realtime-grid">
+          <!-- Active Users -->
+          <div class="realtime-card">
+            <div class="realtime-metric">
+              <div class="metric-value" uus-text="activeUsers"></div>
+              <div class="metric-label">Active Users</div>
+            </div>
+          </div>
+          
+          <!-- Page Views per Minute -->
+          <div class="realtime-card">
+            <div class="realtime-metric">
+              <div class="metric-value">45</div>
+              <div class="metric-label">Page Views / Min</div>
+            </div>
+          </div>
+          
+          <!-- Current Top Page -->
+          <div class="realtime-card">
+            <div class="realtime-metric">
+              <div class="metric-value small">/dashboard</div>
+              <div class="metric-label">Top Page</div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Recent Events -->
+        <div class="realtime-events">
+          <h3>Recent Events</h3>
+          <div class="events-list">
+            <div 
+              uus-for="event in realtimeEvents"
+              class="event-item"
+            >
+              <div class="event-icon" uus-class="'event-' + event.type">
+                <span uus-show="event.type === 'pageview'">👁️</span>
+                <span uus-show="event.type === 'conversion'">💰</span>
+                <span uus-show="event.type === 'signup'">✉️</span>
+              </div>
+              <div class="event-details">
+                <div class="event-title">
+                  <span uus-show="event.type === 'pageview'">Page View</span>
+                  <span uus-show="event.type === 'conversion'">Conversion</span>
+                  <span uus-show="event.type === 'signup'">New Sign-up</span>
+                </div>
+                <div class="event-info">
+                  <span uus-show="event.page" uus-text="event.page"></span>
+                  <span uus-show="event.value" uus-text="formatCurrency(event.value)"></span>
+                  <span uus-show="event.user" uus-text="event.user"></span>
+                </div>
+              </div>
+              <div class="event-time" uus-text="event.time"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Reports Page -->
+      <div uus-show="currentPage === 'reports'" class="page-content">
+        <div class="reports-grid">
+          <div class="report-card">
+            <div class="report-icon">📊</div>
+            <h3>Monthly Analytics Report</h3>
+            <p>Comprehensive overview of website performance metrics</p>
+            <div class="report-meta">
+              <span>PDF • 2.4 MB</span>
+              <span>Generated: Today</span>
+            </div>
+            <button class="btn btn-secondary">Download</button>
+          </div>
+          
+          <div class="report-card">
+            <div class="report-icon">💼</div>
+            <h3>Executive Summary</h3>
+            <p>High-level insights and KPIs for stakeholders</p>
+            <div class="report-meta">
+              <span>PDF • 1.2 MB</span>
+              <span>Generated: Yesterday</span>
+            </div>
+            <button class="btn btn-secondary">Download</button>
+          </div>
+          
+          <div class="report-card">
+            <div class="report-icon">🎯</div>
+            <h3>Conversion Analysis</h3>
+            <p>Detailed breakdown of conversion funnels and user journeys</p>
+            <div class="report-meta">
+              <span>PDF • 3.1 MB</span>
+              <span>Generated: 3 days ago</span>
+            </div>
+            <button class="btn btn-secondary">Download</button>
+          </div>
+          
+          <div class="report-card">
+            <div class="report-icon">🌍</div>
+            <h3>Geographic Insights</h3>
+            <p>Regional performance and market penetration analysis</p>
+            <div class="report-meta">
+              <span>PDF • 1.8 MB</span>
+              <span>Generated: Last week</span>
+            </div>
+            <button class="btn btn-secondary">Download</button>
+          </div>
+        </div>
+        
+        <div class="custom-report">
+          <h3>Create Custom Report</h3>
+          <p>Generate a personalized report based on your specific requirements</p>
+          <button uus-on:click="generateReport()" class="btn btn-primary">Create Report</button>
+        </div>
+      </div>
+      
+      <!-- Settings Page -->
+      <div uus-show="currentPage === 'settings'" class="page-content">
+        <div class="settings-sections">
+          <div class="settings-section">
+            <h3>General Settings</h3>
+            <div class="setting-item">
+              <label>Dashboard Name</label>
+              <input type="text" value="Analytics Pro" class="setting-input">
+            </div>
+            <div class="setting-item">
+              <label>Default Date Range</label>
+              <select uus-model="dateRange" class="setting-input">
+                <option value="30">Last 30 days</option>
+                <option value="7">Last 7 days</option>
+                <option value="90">Last 90 days</option>
+              </select>
+            </div>
+            <div class="setting-item">
+              <label>Theme</label>
+              <select uus-model="theme" class="setting-input">
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+                <option value="auto">Auto</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="settings-section">
+            <h3>Notifications</h3>
+            <div class="setting-item">
+              <label class="switch-label">
+                <input type="checkbox" uus-model="notifications.email">
+                <span class="switch"></span>
+                Email notifications
+              </label>
+            </div>
+            <div class="setting-item">
+              <label class="switch-label">
+                <input type="checkbox" uus-model="notifications.weekly">
+                <span class="switch"></span>
+                Weekly reports
+              </label>
+            </div>
+            <div class="setting-item">
+              <label class="switch-label">
+                <input type="checkbox" uus-model="notifications.realtime">
+                <span class="switch"></span>
+                Real-time alerts
+              </label>
+            </div>
+          </div>
+          
+          <div class="settings-actions">
+            <button uus-on:click="updateSettings()" class="btn btn-primary">Save Settings</button>
+            <button class="btn btn-secondary">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

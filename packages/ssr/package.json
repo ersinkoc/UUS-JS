@@ -1,0 +1,60 @@
+{
+  "name": "@uusjs/ssr",
+  "version": "0.0.1",
+  "description": "Server-side rendering for Uus.js",
+  "keywords": ["uus", "uusjs", "ssr", "server-rendering", "universal"],
+  "homepage": "https://uusjs.dev",
+  "bugs": {
+    "url": "https://github.com/uus-js/uus/issues",
+    "email": "bugs@uusjs.dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/uus-js/uus.git",
+    "directory": "packages/ssr"
+  },
+  "license": "MIT",
+  "author": "Uus.js Team",
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "dev": "vite serve --config vite.config.ts",
+    "build": "vite build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint src --ext .ts",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "@uusjs/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.5",
+    "@vitest/coverage-v8": "^1.2.1",
+    "eslint": "^8.56.0",
+    "jsdom": "^24.0.0",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.12",
+    "vitest": "^1.2.1"
+  },
+  "peerDependencies": {
+    "@uusjs/core": "^0.0.1"
+  }
+}

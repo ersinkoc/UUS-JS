@@ -1,0 +1,75 @@
+{
+  "name": "@uusjs/core",
+  "version": "0.0.1",
+  "description": "A fresh reactive HTML framework",
+  "keywords": [
+    "uus",
+    "uusjs",
+    "reactive",
+    "html",
+    "framework",
+    "frontend"
+  ],
+  "homepage": "https://uusjs.dev",
+  "bugs": {
+    "url": "https://github.com/uus-js/uus/issues",
+    "email": "bugs@uusjs.dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/uus-js/uus.git",
+    "directory": "packages/core"
+  },
+  "license": "MIT",
+  "author": "Uus.js Team",
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "browser": "./dist/uus.esm.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "unpkg": "./dist/uus.min.js",
+  "jsdelivr": "./dist/uus.min.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "dev": "vite serve --config vite.config.dev.ts",
+    "build:dev": "vite build --config vite.config.dev.ts",
+    "build": "vite build && tsc -p tsconfig.build.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint src --ext .ts",
+    "typecheck": "tsc --noEmit",
+    "size": "size-limit",
+    "prepublishOnly": "npm run build"
+  },
+  "size-limit": [
+    {
+      "path": "./dist/uus.min.js",
+      "limit": "3 KB"
+    }
+  ],
+  "devDependencies": {
+    "@size-limit/preset-small-lib": "^11.0.1",
+    "@types/node": "^20.11.5",
+    "@vitest/coverage-v8": "^1.2.1",
+    "eslint": "^8.56.0",
+    "happy-dom": "^13.3.1",
+    "size-limit": "^11.0.1",
+    "terser": "^5.43.1",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.12",
+    "vitest": "^1.2.1"
+  }
+}

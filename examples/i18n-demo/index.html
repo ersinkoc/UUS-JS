@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Uus.js i18n Demo</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f5f7fa;
+      color: #2c3e50;
+      line-height: 1.6;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    .header {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+    
+    .language-switcher {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+    
+    .lang-btn {
+      padding: 0.5rem 1rem;
+      background: #e9ecef;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 0.9rem;
+    }
+    
+    .lang-btn.active {
+      background: #3498db;
+      color: white;
+    }
+    
+    .lang-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    
+    .demo-section {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      margin-bottom: 2rem;
+    }
+    
+    .demo-section h2 {
+      color: #3498db;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 2px solid #e9ecef;
+    }
+    
+    .demo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+    
+    .demo-item {
+      padding: 1.5rem;
+      background: #f8f9fa;
+      border-radius: 8px;
+      border-left: 4px solid #3498db;
+    }
+    
+    .demo-item h3 {
+      color: #2c3e50;
+      margin-bottom: 1rem;
+      font-size: 1.1rem;
+    }
+    
+    .demo-item .result {
+      font-weight: 500;
+      color: #27ae60;
+      margin-bottom: 0.5rem;
+    }
+    
+    .demo-item .code {
+      font-family: 'Courier New', monospace;
+      background: white;
+      padding: 0.75rem;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      color: #666;
+      overflow-x: auto;
+    }
+    
+    .user-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      max-width: 400px;
+    }
+    
+    .user-form input {
+      padding: 0.75rem;
+      border: 2px solid #e9ecef;
+      border-radius: 6px;
+      font-size: 1rem;
+    }
+    
+    .user-form input:focus {
+      outline: none;
+      border-color: #3498db;
+    }
+    
+    .user-form button {
+      padding: 0.75rem 1.5rem;
+      background: #27ae60;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background 0.2s;
+    }
+    
+    .user-form button:hover {
+      background: #229954;
+    }
+    
+    .counter-controls {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+    
+    .counter-controls button {
+      padding: 0.5rem 1rem;
+      background: #3498db;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    
+    .counter-controls span {
+      font-size: 1.25rem;
+      font-weight: bold;
+      min-width: 3rem;
+      text-align: center;
+    }
+    
+    .rtl {
+      direction: rtl;
+      text-align: right;
+    }
+    
+    .ltr {
+      direction: ltr;
+      text-align: left;
+    }
+    
+    .welcome-message {
+      font-size: 1.25rem;
+      font-weight: 500;
+      color: #27ae60;
+      margin: 1rem 0;
+      padding: 1rem;
+      background: #d5f4e6;
+      border-radius: 8px;
+    }
+    
+    .date-time {
+      color: #7f8c8d;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+    }
+    
+    .error {
+      color: #e74c3c;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div id="app" uus-state="{
+    // Language data
+    languages: [
+      { code: 'en', name: 'English', flag: '🇺🇸' },
+      { code: 'tr', name: 'Türkçe', flag: '🇹🇷' },
+      { code: 'ar', name: 'العربية', flag: '🇸🇦' },
+      { code: 'es', name: 'Español', flag: '🇪🇸' }
+    ],
+    
+    // Current locale
+    currentLocale: 'en',
+    
+    // Demo data
+    userName: '',
+    messageCount: 3,
+    itemCount: 2,
+    notificationCount: 5,
+    currentDate: new Date(),
+    price: 1234.56,
+    discount: 0.15,
+    largeNumber: 1234567.89,
+    
+    // Form data
+    formData: {
+      name: '',
+      email: ''
+    },
+    showValidation: false,
+    formSubmitted: false,
+    
+    // Translation messages
+    messages: {
+      en: {
+        title: 'UUS.js Internationalization Demo',
+        subtitle: 'Experience powerful i18n features with reactive state',
+        sections: {
+          basic: 'Basic Translation',
+          interpolation: 'String Interpolation',
+          pluralization: 'Pluralization',
+          forms: 'Date & Number Formatting',
+          dynamic: 'Dynamic Content'
+        },
+        examples: {
+          hello: 'Hello World!',
+          goodbye: 'Goodbye!',
+          welcome: 'Welcome, {name}!',
+          user_greeting: 'Hello {name}, you have {count} {count, plural, one {message} other {messages}}',
+          form_validation: {
+            required: 'This field is required',
+            email: 'Please enter a valid email address'
+          },
+          login_success: 'Welcome back, {username}!'
+        },
+        labels: {
+          name: 'Your Name',
+          email: 'Email Address'
+        },
+        actions: {
+          decrease: 'Decrease',
+          increase: 'Increase', 
+          reset: 'Reset',
+          submit: 'Submit',
+          clear: 'Clear',
+          change_language: 'Change Language'
+        },
+        plurals: {
+          item: '{count, plural, =0 {No items} one {1 item} other {{count} items}}',
+          notification: '{count, plural, =0 {No notifications} one {1 notification} other {{count} notifications}}'
+        },
+        demo: {
+          current_time: 'Current Time',
+          price: 'Product Price',
+          discount: 'Discount Rate'
+        }
+      },
+      tr: {
+        title: 'UUS.js Uluslararasılaştırma Demosu',
+        subtitle: 'Reaktif durum ile güçlü i18n özelliklerini deneyimleyin',
+        sections: {
+          basic: 'Temel Çeviri',
+          interpolation: 'Metin Enterpolasyonu',
+          pluralization: 'Çoğullama',
+          forms: 'Tarih ve Sayı Formatı',
+          dynamic: 'Dinamik İçerik'
+        },
+        examples: {
+          hello: 'Merhaba Dünya!',
+          goodbye: 'Hoşça kal!',
+          welcome: 'Hoş geldin, {name}!',
+          user_greeting: 'Merhaba {name}, {count} {count, plural, one {mesajınız} other {mesajınız}} var',
+          form_validation: {
+            required: 'Bu alan zorunludur',
+            email: 'Lütfen geçerli bir e-posta adresi girin'
+          },
+          login_success: 'Tekrar hoş geldin, {username}!'
+        },
+        labels: {
+          name: 'Adınız',
+          email: 'E-posta Adresi'
+        },
+        actions: {
+          decrease: 'Azalt',
+          increase: 'Artır',
+          reset: 'Sıfırla',
+          submit: 'Gönder',
+          clear: 'Temizle',
+          change_language: 'Dil Değiştir'
+        },
+        plurals: {
+          item: '{count, plural, =0 {Öğe yok} one {1 öğe} other {{count} öğe}}',
+          notification: '{count, plural, =0 {Bildirim yok} one {1 bildirim} other {{count} bildirim}}'
+        },
+        demo: {
+          current_time: 'Şu Anki Zaman',
+          price: 'Ürün Fiyatı',
+          discount: 'İndirim Oranı'
+        }
+      },
+      ar: {
+        title: 'عرض دولي UUS.js',
+        subtitle: 'اختبر ميزات التدويل القوية مع الحالة التفاعلية',
+        sections: {
+          basic: 'ترجمة أساسية',
+          interpolation: 'استيفاء النص',
+          pluralization: 'الجمع',
+          forms: 'تنسيق التاريخ والرقم',
+          dynamic: 'محتوى ديناميكي'
+        },
+        examples: {
+          hello: 'مرحبا بالعالم!',
+          goodbye: 'وداعا!',
+          welcome: 'مرحبا، {name}!',
+          user_greeting: 'مرحبا {name}، لديك {count} {count, plural, zero {رسائل} one {رسالة} two {رسالتان} few {رسائل} many {رسالة} other {رسالة}}',
+          form_validation: {
+            required: 'هذا الحقل مطلوب',
+            email: 'يرجى إدخال عنوان بريد إلكتروني صحيح'
+          },
+          login_success: 'مرحبا بعودتك، {username}!'
+        },
+        labels: {
+          name: 'اسمك',
+          email: 'عنوان البريد الإلكتروني'
+        },
+        actions: {
+          decrease: 'تقليل',
+          increase: 'زيادة',
+          reset: 'إعادة تعيين',
+          submit: 'إرسال',
+          clear: 'مسح',
+          change_language: 'تغيير اللغة'
+        },
+        plurals: {
+          item: '{count, plural, =0 {لا توجد عناصر} one {عنصر واحد} two {عنصران} few {عناصر} many {عنصر} other {عنصر}}',
+          notification: '{count, plural, =0 {لا توجد إشعارات} one {إشعار واحد} two {إشعاران} few {إشعارات} many {إشعار} other {إشعار}}'
+        },
+        demo: {
+          current_time: 'الوقت الحالي',
+          price: 'سعر المنتج',
+          discount: 'معدل الخصم'
+        }
+      },
+      es: {
+        title: 'Demo de Internacionalización UUS.js',
+        subtitle: 'Experimenta poderosas características i18n con estado reactivo',
+        sections: {
+          basic: 'Traducción Básica',
+          interpolation: 'Interpolación de Cadenas',
+          pluralization: 'Pluralización',
+          forms: 'Formato de Fecha y Número',
+          dynamic: 'Contenido Dinámico'
+        },
+        examples: {
+          hello: '¡Hola Mundo!',
+          goodbye: '¡Adiós!',
+          welcome: '¡Bienvenido, {name}!',
+          user_greeting: 'Hola {name}, tienes {count} {count, plural, one {mensaje} other {mensajes}}',
+          form_validation: {
+            required: 'Este campo es obligatorio',
+            email: 'Por favor ingresa una dirección de correo válida'
+          },
+          login_success: '¡Bienvenido de vuelta, {username}!'
+        },
+        labels: {
+          name: 'Tu Nombre',
+          email: 'Dirección de Correo'
+        },
+        actions: {
+          decrease: 'Disminuir',
+          increase: 'Aumentar',
+          reset: 'Restablecer',
+          submit: 'Enviar',
+          clear: 'Limpiar',
+          change_language: 'Cambiar Idioma'
+        },
+        plurals: {
+          item: '{count, plural, =0 {Sin elementos} one {1 elemento} other {{count} elementos}}',
+          notification: '{count, plural, =0 {Sin notificaciones} one {1 notificación} other {{count} notificaciones}}'
+        },
+        demo: {
+          current_time: 'Hora Actual',
+          price: 'Precio del Producto',
+          discount: 'Tasa de Descuento'
+        }
+      }
+    },
+    
+    // Computed properties
+    get isRTL() {
+      return ['ar', 'he', 'fa'].includes(this.currentLocale);
+    },
+    
+    get currentMessages() {
+      return this.messages[this.currentLocale] || this.messages.en;
+    },
+    
+    // Translation methods
+    t(key, params = {}) {
+      const keys = key.split('.');
+      let value = this.currentMessages;
+      
+      for (const k of keys) {
+        value = value?.[k];
+        if (value === undefined) break;
+      }
+      
+      if (value === undefined) {
+        return key; // Return key if translation not found
+      }
+      
+      // Simple interpolation
+      if (typeof value === 'string' && Object.keys(params).length > 0) {
+        return value.replace(/\{(\w+)\}/g, (match, param) => {
+          return params[param] !== undefined ? params[param] : match;
+        });
+      }
+      
+      return value;
+    },
+    
+    tp(key, count) {
+      const message = this.t(key);
+      if (typeof message !== 'string') return message;
+      
+      // Simple pluralization - in real app would use proper ICU MessageFormat
+      if (message.includes('plural')) {
+        if (count === 0) {
+          return message.replace(/\{count, plural, [^}]*=0 \{([^}]*)\}[^}]*\}/g, (match, zero) => {
+            return zero.replace('{count}', count);
+          });
+        } else if (count === 1) {
+          return message.replace(/\{count, plural, [^}]*one \{([^}]*)\}[^}]*\}/g, (match, one) => {
+            return one.replace('{count}', count);
+          });
+        } else {
+          return message.replace(/\{count, plural, [^}]*other \{([^}]*)\}[^}]*\}/g, (match, other) => {
+            return other.replace('{count}', count);
+          });
+        }
+      }
+      
+      return message.replace('{count}', count);
+    },
+    
+    d(date, format) {
+      const locale = this.currentLocale;
+      if (format === 'long') {
+        return new Intl.DateTimeFormat(locale, {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          weekday: 'long',
+          hour: '2-digit',
+          minute: '2-digit'
+        }).format(date);
+      } else {
+        return new Intl.DateTimeFormat(locale, {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric'
+        }).format(date);
+      }
+    },
+    
+    n(number, format) {
+      const locale = this.currentLocale;
+      if (format === 'currency') {
+        return new Intl.NumberFormat(locale, {
+          style: 'currency',
+          currency: 'USD'
+        }).format(number);
+      } else if (format === 'percent') {
+        return new Intl.NumberFormat(locale, {
+          style: 'percent',
+          minimumFractionDigits: 1
+        }).format(number);
+      } else {
+        return new Intl.NumberFormat(locale).format(number);
+      }
+    },
+    
+    // Methods
+    changeLanguage(locale) {
+      this.currentLocale = locale;
+      
+      // Update document direction and language
+      document.documentElement.dir = this.isRTL ? 'rtl' : 'ltr';
+      document.documentElement.lang = locale;
+    },
+    
+    isValidEmail(email) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    },
+    
+    validateForm() {
+      this.showValidation = true;
+      
+      if (this.formData.name && this.isValidEmail(this.formData.email)) {
+        this.formSubmitted = true;
+        this.showValidation = false;
+        
+        // Reset after 3 seconds
+        setTimeout(() => {
+          this.formSubmitted = false;
+        }, 3000);
+      }
+    },
+    
+    clearForm() {
+      this.formData.name = '';
+      this.formData.email = '';
+      this.showValidation = false;
+      this.formSubmitted = false;
+    }
+  }">
+    <!-- Header -->
+    <div class="header">
+      <h1 uus-text="t('title')"></h1>
+      <p uus-text="t('subtitle')"></p>
+      
+      <div class="language-switcher">
+        <button 
+          uus-for="lang in languages"
+          uus-on:click="changeLanguage(lang.code)"
+          class="lang-btn"
+          uus-class="{ active: currentLocale === lang.code }"
+        >
+          <span uus-text="lang.flag"></span>
+          <span uus-text="lang.name"></span>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Basic Translation Demo -->
+    <div class="demo-section">
+      <h2 uus-text="t('sections.basic')"></h2>
+      <div class="demo-grid">
+        <div class="demo-item">
+          <h3>Simple Translation</h3>
+          <div class="result" uus-text="t('examples.hello')"></div>
+          <div class="code">t('examples.hello')</div>
+        </div>
+        
+        <div class="demo-item">
+          <h3>Dynamic Direction</h3>
+          <div class="result" uus-class="isRTL ? 'rtl' : 'ltr'" uus-text="t('examples.goodbye')"></div>
+          <div class="code">Auto RTL/LTR based on locale</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- String Interpolation Demo -->
+    <div class="demo-section">
+      <h2 uus-text="t('sections.interpolation')"></h2>
+      <div class="demo-grid">
+        <div class="demo-item">
+          <h3>User Input Demo</h3>
+          <div class="user-form">
+            <input 
+              type="text" 
+              uus-model="userName"
+              uus-attr:placeholder="t('labels.name')"
+            >
+            <div uus-show="userName" class="welcome-message" uus-class="isRTL ? 'rtl' : 'ltr'">
+              <span uus-text="t('examples.welcome', { name: userName })"></span>
+            </div>
+          </div>
+          <div class="code">t('examples.welcome', { name: userName })</div>
+        </div>
+        
+        <div class="demo-item">
+          <h3>Complex Interpolation</h3>
+          <div class="result" uus-class="isRTL ? 'rtl' : 'ltr'">
+            <span uus-text="t('examples.user_greeting', { name: 'Alice', count: messageCount })"></span>
+          </div>
+          <div class="code">Multiple variables with pluralization</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Pluralization Demo -->
+    <div class="demo-section">
+      <h2 uus-text="t('sections.pluralization')"></h2>
+      <div class="demo-grid">
+        <div class="demo-item">
+          <h3>Interactive Counter</h3>
+          <div class="counter-controls">
+            <button uus-on:click="itemCount = Math.max(0, itemCount - 1)" uus-text="t('actions.decrease')"></button>
+            <span uus-text="itemCount"></span>
+            <button uus-on:click="itemCount++" uus-text="t('actions.increase')"></button>
+            <button uus-on:click="itemCount = 0" uus-text="t('actions.reset')"></button>
+          </div>
+          <div class="result" uus-class="isRTL ? 'rtl' : 'ltr'">
+            <span uus-text="tp('plurals.item', itemCount)"></span>
+          </div>
+          <div class="code">tp('plurals.item', itemCount)</div>
+        </div>
+        
+        <div class="demo-item">
+          <h3>Notifications</h3>
+          <div class="counter-controls">
+            <button uus-on:click="notificationCount = Math.max(0, notificationCount - 1)">-</button>
+            <span uus-text="notificationCount"></span>
+            <button uus-on:click="notificationCount++">+</button>
+          </div>
+          <div class="result" uus-class="isRTL ? 'rtl' : 'ltr'">
+            <span uus-text="tp('plurals.notification', notificationCount)"></span>
+          </div>
+          <div class="code">Complex Arabic pluralization</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Date & Number Formatting -->
+    <div class="demo-section">
+      <h2 uus-text="t('sections.forms')"></h2>
+      <div class="demo-grid">
+        <div class="demo-item">
+          <h3 uus-text="t('demo.current_time')"></h3>
+          <div class="result">
+            <div uus-text="d(currentDate, 'long')"></div>
+            <div class="date-time" uus-text="d(currentDate, 'short')"></div>
+          </div>
+          <div class="code">d(date, 'long') / d(date, 'short')</div>
+        </div>
+        
+        <div class="demo-item">
+          <h3 uus-text="t('demo.price')"></h3>
+          <div class="result" uus-text="n(price, 'currency')"></div>
+          <div class="code">n(price, 'currency')</div>
+        </div>
+        
+        <div class="demo-item">
+          <h3 uus-text="t('demo.discount')"></h3>
+          <div class="result" uus-text="n(discount, 'percent')"></div>
+          <div class="code">n(discount, 'percent')</div>
+        </div>
+        
+        <div class="demo-item">
+          <h3>Locale-aware Numbers</h3>
+          <div class="result">
+            <div uus-text="n(largeNumber)"></div>
+            <div class="date-time">Formatted for current locale</div>
+          </div>
+          <div class="code">n(largeNumber)</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Form Validation Demo -->
+    <div class="demo-section">
+      <h2 uus-text="t('sections.dynamic')"></h2>
+      <div class="demo-grid">
+        <div class="demo-item">
+          <h3>Form Validation</h3>
+          <div class="user-form">
+            <input 
+              type="text" 
+              uus-model="formData.name"
+              uus-attr:placeholder="t('labels.name')"
+            >
+            <div uus-show="!formData.name && showValidation" class="error">
+              <span uus-text="t('examples.form_validation.required')"></span>
+            </div>
+            
+            <input 
+              type="email" 
+              uus-model="formData.email"
+              uus-attr:placeholder="t('labels.email')"
+            >
+            <div uus-show="!isValidEmail(formData.email) && formData.email && showValidation" class="error">
+              <span uus-text="t('examples.form_validation.email')"></span>
+            </div>
+            
+            <button uus-on:click="validateForm()" uus-text="t('actions.submit')"></button>
+            <button uus-on:click="clearForm()" uus-text="t('actions.clear')"></button>
+          </div>
+          
+          <div uus-show="formSubmitted" class="welcome-message">
+            <span uus-text="t('examples.login_success', { username: formData.name })"></span>
+          </div>
+        </div>
+        
+        <div class="demo-item">
+          <h3>Missing Translation</h3>
+          <div class="result">
+            <span uus-text="t('this.key.does.not.exist')"></span>
+          </div>
+          <div class="code">Fallback behavior demonstration</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

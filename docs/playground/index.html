@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Uus.js Playground</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f5f5;
+      color: #333;
+    }
+    
+    .header {
+      background: #1a1a1a;
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .header h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+    
+    .header .actions {
+      display: flex;
+      gap: 1rem;
+    }
+    
+    .btn {
+      background: #3498db;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.2s;
+    }
+    
+    .btn:hover {
+      background: #2980b9;
+    }
+    
+    .btn-secondary {
+      background: #555;
+    }
+    
+    .btn-secondary:hover {
+      background: #666;
+    }
+    
+    .container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      height: calc(100vh - 60px);
+    }
+    
+    .pane {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+    }
+    
+    .pane-header {
+      background: #2c3e50;
+      color: white;
+      padding: 0.75rem 1rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .tabs {
+      display: flex;
+      gap: 1rem;
+    }
+    
+    .tab {
+      padding: 0.25rem 0.75rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.2s;
+      font-size: 14px;
+    }
+    
+    .tab.active {
+      background: #34495e;
+    }
+    
+    .tab:hover {
+      background: #34495e;
+    }
+    
+    .editor-container {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .editor {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      height: 100%;
+      font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+      font-size: 14px;
+      line-height: 1.5;
+      padding: 1rem;
+      border: none;
+      resize: none;
+      background: #1e1e1e;
+      color: #d4d4d4;
+      outline: none;
+    }
+    
+    .preview {
+      flex: 1;
+      background: white;
+      overflow: auto;
+      position: relative;
+    }
+    
+    .preview iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    
+    .examples-menu {
+      position: absolute;
+      top: 60px;
+      right: 1rem;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      padding: 0.5rem 0;
+      min-width: 200px;
+      display: none;
+      z-index: 100;
+    }
+    
+    .examples-menu.show {
+      display: block;
+    }
+    
+    .example-item {
+      padding: 0.75rem 1rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    
+    .example-item:hover {
+      background: #f0f0f0;
+    }
+    
+    .error-panel {
+      background: #ff6b6b;
+      color: white;
+      padding: 1rem;
+      font-size: 14px;
+      display: none;
+    }
+    
+    .error-panel.show {
+      display: block;
+    }
+    
+    @media (max-width: 768px) {
+      .container {
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🧪 Uus.js Playground</h1>
+    <div class="actions">
+      <button class="btn btn-secondary" onclick="toggleExamples()">Examples</button>
+      <button class="btn" onclick="runCode()">▶ Run</button>
+    </div>
+  </div>
+  
+  <div class="examples-menu" id="examplesMenu">
+    <div class="example-item" onclick="loadExample('hello-world')">Hello World</div>
+    <div class="example-item" onclick="loadExample('counter')">Counter</div>
+    <div class="example-item" onclick="loadExample('todo-list')">Todo List</div>
+    <div class="example-item" onclick="loadExample('data-binding')">Data Binding</div>
+    <div class="example-item" onclick="loadExample('animations')">Animations</div>
+    <div class="example-item" onclick="loadExample('router')">Router</div>
+    <div class="example-item" onclick="loadExample('forms')">Forms</div>
+    <div class="example-item" onclick="loadExample('api-fetch')">API Fetch</div>
+  </div>
+  
+  <div class="container">
+    <div class="pane">
+      <div class="pane-header">
+        <div class="tabs">
+          <div class="tab active" onclick="switchTab('html')">HTML</div>
+          <div class="tab" onclick="switchTab('css')">CSS</div>
+          <div class="tab" onclick="switchTab('js')">JavaScript</div>
+        </div>
+      </div>
+      <div class="editor-container">
+        <textarea id="htmlEditor" class="editor" spellcheck="false"><!DOCTYPE html>
+<html>
+<head>
+  <title>Uus.js App</title>
+  <script src="https://unpkg.com/@uusjs/core@latest"></script>
+</head>
+<body>
+  <div id="app" uus-state="{ message: 'Hello Uus.js!' }">
+    <h1 uus-text="message"></h1>
+    <input uus-model="message" placeholder="Edit message">
+    <p>Character count: <span uus-text="message.length"></span></p>
+  </div>
+
+  <script>
+    new Uus().mount('#app');
+  </script>
+</body>
+</html></textarea>
+        <textarea id="cssEditor" class="editor" style="display: none;" spellcheck="false">/* Add your styles here */
+body {
+  font-family: system-ui, sans-serif;
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+h1 {
+  color: #2c3e50;
+}
+
+input {
+  width: 100%;
+  padding: 0.5rem;
+  font-size: 16px;
+  border: 2px solid #ddd;
+  border-radius: 4px;
+  margin: 1rem 0;
+}
+
+input:focus {
+  outline: none;
+  border-color: #3498db;
+}
+
+p {
+  color: #666;
+}</textarea>
+        <textarea id="jsEditor" class="editor" style="display: none;" spellcheck="false">// Additional JavaScript (optional)
+// The main Uus.js code should be in the HTML
+
+// Example: Add custom methods
+const app = window.app;
+if (app) {
+  // Add methods or additional logic here
+}</textarea>
+      </div>
+      <div class="error-panel" id="errorPanel"></div>
+    </div>
+    
+    <div class="pane">
+      <div class="pane-header">
+        Preview
+      </div>
+      <div class="preview">
+        <iframe id="preview"></iframe>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    let currentTab = 'html';
+    let examples = {};
+    
+    // Load examples
+    async function loadExamples() {
+      examples = {
+        'hello-world': {
+          html: `<!DOCTYPE html>
+<html>
+<head>
+  <title>Hello World</title>
+  <script src="https://unpkg.com/@uusjs/core@latest"></script>
+</head>
+<body>
+  <div id="app" uus-state="{ message: 'Hello Uus.js!' }">
+    <h1 uus-text="message"></h1>
+    <input uus-model="message" placeholder="Edit message">
+  </div>
+
+  <script>
+    new Uus().mount('#app');
+  </script>
+</body>
+</html>`,
+          css: `body {
+  font-family: system-ui, sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  margin: 0;
+  background: #f0f0f0;
+}
+
+#app {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+h1 {
+  color: #2c3e50;
+  margin-bottom: 1rem;
+}
+
+input {
+  padding: 0.5rem 1rem;
+  font-size: 16px;
+  border: 2px solid #ddd;
+  border-radius: 4px;
+  width: 300px;
+}`,
+          js: ''
+        },
+        
+        'counter': {
+          html: `<!DOCTYPE html>
+<html>
+<head>
+  <title>Counter</title>
+  <script src="https://unpkg.com/@uusjs/core@latest"></script>
+</head>
+<body>
+  <div id="app" uus-state="{ count: 0 }">
+    <h1>Counter App</h1>
+    <div class="counter">
+      <button @click="count--" :disabled="count <= 0">-</button>
+      <span class="count" uus-text="count">0</span>
+      <button @click="count++">+</button>
+    </div>
+    <button @click="count = 0" uus-show="count !== 0">Reset</button>
+    <p uus-show="count > 10" class="milestone">
+      🎉 You reached <span uus-text="count"></span>!
+    </p>
+  </div>
+
+  <script>
+    new Uus().mount('#app');
+  </script>
+</body>
+</html>`,
+          css: `body {
+  font-family: system-ui, sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  margin: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+#app {
+  background: white;
+  padding: 3rem;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  text-align: center;
+}
+
+h1 {
+  color: #2c3e50;
+  margin-bottom: 2rem;
+}
+
+.counter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+button {
+  background: #3498db;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-size: 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+button:hover:not(:disabled) {
+  background: #2980b9;
+  transform: translateY(-2px);
+}
+
+button:disabled {
+  background: #bdc3c7;
+  cursor: not-allowed;
+}
+
+.count {
+  font-size: 48px;
+  font-weight: bold;
+  color: #2c3e50;
+  min-width: 100px;
+}
+
+.milestone {
+  color: #27ae60;
+  font-size: 18px;
+  margin-top: 1rem;
+}`,
+          js: ''
+        },
+        
+        'todo-list': {
+          html: `<!DOCTYPE html>
+<html>
+<head>
+  <title>Todo List</title>
+  <script src="https://unpkg.com/@uusjs/core@latest"></script>
+  <script src="https://unpkg.com/@uusjs/animate@latest"></script>
+</head>
+<body>
+  <div id="app" uus-state="{ 
+    todos: [],
+    newTodo: '',
+    filter: 'all',
+    nextId: 1
+  }">
+    <h1>✓ Todo List</h1>
+    
+    <form @submit.prevent="
+      if (newTodo.trim()) {
+        todos.push({
+          id: nextId++,
+          text: newTodo.trim(),
+          done: false
+        });
+        newTodo = '';
+      }
+    ">
+      <input 
+        uus-model="newTodo" 
+        placeholder="What needs to be done?"
+        @keyup.escape="newTodo = ''"
+      >
+    </form>
+    
+    <div class="filters">
+      <button 
+        :class="{ active: filter === 'all' }"
+        @click="filter = 'all'">
+        All
+      </button>
+      <button 
+        :class="{ active: filter === 'active' }"
+        @click="filter = 'active'">
+        Active
+      </button>
+      <button 
+        :class="{ active: filter === 'completed' }"
+        @click="filter = 'completed'">
+        Completed
+      </button>
+    </div>
+    
+    <ul class="todos">
+      <li 
+        uus-for="todo in todos.filter(t => 
+          filter === 'all' || 
+          (filter === 'active' && !t.done) || 
+          (filter === 'completed' && t.done)
+        )"
+        :key="todo.id"
+        :class="{ done: todo.done }"
+        uus-animate="fadeIn"
+      >
+        <input 
+          type="checkbox" 
+          uus-model="todo.done"
+        >
+        <span uus-text="todo.text"></span>
+        <button 
+          class="delete"
+          @click="todos = todos.filter(t => t.id !== todo.id)"
+        >×</button>
+      </li>
+    </ul>
+    
+    <div class="stats" uus-show="todos.length > 0">
+      <span uus-text="todos.filter(t => !t.done).length"></span> items left
+      <button 
+        uus-show="todos.some(t => t.done)"
+        @click="todos = todos.filter(t => !t.done)"
+        class="clear"
+      >Clear completed</button>
+    </div>
+  </div>
+
+  <script>
+    const app = new Uus();
+    app.use(createAnimate());
+    app.mount('#app');
+  </script>
+</body>
+</html>`,
+          css: `body {
+  font-family: system-ui, sans-serif;
+  background: #f5f5f5;
+  margin: 0;
+  padding: 2rem;
+}
+
+#app {
+  max-width: 500px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  padding: 2rem;
+}
+
+h1 {
+  color: #2c3e50;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+form {
+  margin-bottom: 1.5rem;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 4px;
+  outline: none;
+}
+
+input[type="text"]:focus {
+  border-color: #3498db;
+}
+
+.filters {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  justify-content: center;
+}
+
+.filters button {
+  padding: 0.5rem 1rem;
+  border: 1px solid #ddd;
+  background: white;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filters button.active,
+.filters button:hover {
+  background: #3498db;
+  color: white;
+  border-color: #3498db;
+}
+
+.todos {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.todos li {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem;
+  border-bottom: 1px solid #f0f0f0;
+  transition: opacity 0.2s;
+}
+
+.todos li.done {
+  opacity: 0.5;
+}
+
+.todos li.done span {
+  text-decoration: line-through;
+}
+
+.todos input[type="checkbox"] {
+  margin-right: 1rem;
+  cursor: pointer;
+}
+
+.todos span {
+  flex: 1;
+}
+
+.delete {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 18px;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.delete:hover {
+  opacity: 1;
+}
+
+.stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #f0f0f0;
+  color: #666;
+}
+
+.clear {
+  background: none;
+  border: none;
+  color: #e74c3c;
+  cursor: pointer;
+  text-decoration: underline;
+}`,
+          js: ''
+        },
+        
+        'animations': {
+          html: `<!DOCTYPE html>
+<html>
+<head>
+  <title>Animations</title>
+  <script src="https://unpkg.com/@uusjs/core@latest"></script>
+  <script src="https://unpkg.com/@uusjs/animate@latest"></script>
+</head>
+<body>
+  <div id="app" uus-state="{ 
+    show: true,
+    cards: [1, 2, 3, 4],
+    springValue: 0
+  }">
+    <h1>Animation Showcase</h1>
+    
+    <section>
+      <h2>Basic Animations</h2>
+      <button @click="show = !show">Toggle</button>
+      <div 
+        uus-show="show"
+        uus-animate-enter="fadeIn"
+        uus-animate-leave="fadeOut"
+        class="box"
+      >
+        Fade In/Out
+      </div>
+    </section>
+    
+    <section>
+      <h2>Stagger Animation</h2>
+      <button @click="cards = cards.length ? [] : [1,2,3,4]">
+        Toggle Cards
+      </button>
+      <div class="cards">
+        <div 
+          uus-for="card in cards"
+          :key="card"
+          class="card"
+          uus-animate="slideInUp"
+          :uus-stagger="$index * 50"
+        >
+          Card <span uus-text="card"></span>
+        </div>
+      </div>
+    </section>
+    
+    <section>
+      <h2>Spring Physics</h2>
+      <button @click="
+        spring(springValue, springValue === 0 ? 300 : 0, {
+          stiffness: 100,
+          damping: 10,
+          onUpdate: (v) => {
+            springValue = v;
+            $refs.springBox.style.transform = 'translateX(' + v + 'px)';
+          }
+        })
+      ">Bounce</button>
+      <div ref="springBox" class="spring-box">
+        Spring Box
+      </div>
+    </section>
+    
+    <section>
+      <h2>Preset Animations</h2>
+      <div class="presets">
+        <div class="preset" uus-animate="bounce">Bounce</div>
+        <div class="preset" uus-animate="shake" uus-delay="200">Shake</div>
+        <div class="preset" uus-animate="pulse" uus-delay="400">Pulse</div>
+        <div class="preset" uus-animate="rubberBand" uus-delay="600">Rubber</div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const app = new Uus();
+    const animate = createAnimate();
+    app.use(animate);
+    
+    // Expose spring function to state
+    app.state.spring = animate.spring;
+    app.state.$refs = {};
+    
+    app.mount('#app');
+    
+    // Setup refs
+    setTimeout(() => {
+      app.state.$refs.springBox = document.querySelector('.spring-box');
+    }, 100);
+  </script>
+</body>
+</html>`,
+          css: `body {
+  font-family: system-ui, sans-serif;
+  background: #f5f5f5;
+  margin: 0;
+  padding: 2rem;
+}
+
+#app {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+h1 {
+  color: #2c3e50;
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+section {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+h2 {
+  color: #34495e;
+  margin-bottom: 1.5rem;
+}
+
+button {
+  background: #3498db;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 1rem;
+}
+
+button:hover {
+  background: #2980b9;
+}
+
+.box {
+  background: #e74c3c;
+  color: white;
+  padding: 2rem;
+  border-radius: 8px;
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.card {
+  background: #3498db;
+  color: white;
+  padding: 2rem;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.spring-box {
+  background: #27ae60;
+  color: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  text-align: center;
+  width: 150px;
+  margin-top: 1rem;
+}
+
+.presets {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.preset {
+  background: #9b59b6;
+  color: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  text-align: center;
+}`,
+          js: ''
+        }
+      };
+    }
+    
+    // Initialize
+    loadExamples();
+    runCode();
+    
+    function toggleExamples() {
+      const menu = document.getElementById('examplesMenu');
+      menu.classList.toggle('show');
+    }
+    
+    function loadExample(name) {
+      const example = examples[name];
+      if (example) {
+        document.getElementById('htmlEditor').value = example.html;
+        document.getElementById('cssEditor').value = example.css;
+        document.getElementById('jsEditor').value = example.js;
+        runCode();
+        toggleExamples();
+      }
+    }
+    
+    function switchTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.editor').forEach(e => e.style.display = 'none');
+      
+      event.target.classList.add('active');
+      document.getElementById(tab + 'Editor').style.display = 'block';
+    }
+    
+    function runCode() {
+      const html = document.getElementById('htmlEditor').value;
+      const css = document.getElementById('cssEditor').value;
+      const js = document.getElementById('jsEditor').value;
+      
+      const fullHtml = html.replace('</head>', `<style>${css}</style></head>`)
+                            .replace('</body>', `<script>${js}</script></body>`);
+      
+      const iframe = document.getElementById('preview');
+      const blob = new Blob([fullHtml], { type: 'text/html' });
+      iframe.src = URL.createObjectURL(blob);
+      
+      // Clear any errors
+      const errorPanel = document.getElementById('errorPanel');
+      errorPanel.classList.remove('show');
+      
+      // Listen for errors from iframe
+      iframe.onload = () => {
+        try {
+          iframe.contentWindow.addEventListener('error', (e) => {
+            errorPanel.textContent = `Error: ${e.message} (Line ${e.lineno})`;
+            errorPanel.classList.add('show');
+          });
+        } catch (e) {
+          // Cross-origin error
+        }
+      };
+    }
+    
+    // Auto-run on changes
+    document.querySelectorAll('.editor').forEach(editor => {
+      editor.addEventListener('input', debounce(() => {
+        runCode();
+      }, 1000));
+    });
+    
+    function debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
+    
+    // Close examples menu on outside click
+    document.addEventListener('click', (e) => {
+      const menu = document.getElementById('examplesMenu');
+      const isClickInside = menu.contains(e.target) || 
+                           e.target.textContent === 'Examples';
+      
+      if (!isClickInside) {
+        menu.classList.remove('show');
+      }
+    });
+  </script>
+</body>
+</html>

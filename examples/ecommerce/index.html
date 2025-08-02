@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UUS.js E-commerce Store</title>
+  <link rel="stylesheet" href="/src/style.css">
+</head>
+<body>
+  <div id="app" uus-state="{
+    // Navigation state
+    currentPage: 'home',
+    showMobileMenu: false,
+    showSearch: false,
+    showCart: false,
+    
+    // Product data
+    products: [
+      {
+        id: 1,
+        name: 'Wireless Headphones',
+        price: 199.99,
+        originalPrice: 249.99,
+        category: 'electronics',
+        image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300&h=300&fit=crop',
+        rating: 4.5,
+        reviews: 124,
+        stock: 15,
+        featured: true,
+        description: 'Premium wireless headphones with noise cancellation and 30-hour battery life.',
+        features: ['Active Noise Cancellation', '30-hour battery', 'Premium comfort', 'High-quality audio']
+      },
+      {
+        id: 2,
+        name: 'Smart Watch',
+        price: 299.99,
+        category: 'electronics',
+        image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300&h=300&fit=crop',
+        rating: 4.8,
+        reviews: 89,
+        stock: 8,
+        featured: true,
+        description: 'Advanced smartwatch with health monitoring and GPS.',
+        features: ['Heart rate monitor', 'GPS tracking', 'Water resistant', 'Sleep tracking']
+      },
+      {
+        id: 3,
+        name: 'Laptop Backpack',
+        price: 89.99,
+        category: 'accessories',
+        image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=300&h=300&fit=crop',
+        rating: 4.3,
+        reviews: 67,
+        stock: 25,
+        featured: false,
+        description: 'Durable laptop backpack with multiple compartments and water resistance.',
+        features: ['Water resistant', 'Multiple compartments', 'Laptop protection', 'Comfortable straps']
+      },
+      {
+        id: 4,
+        name: 'Coffee Maker',
+        price: 149.99,
+        category: 'home',
+        image: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=300&h=300&fit=crop',
+        rating: 4.6,
+        reviews: 156,
+        stock: 12,
+        featured: true,
+        description: 'Programmable coffee maker with thermal carafe and auto-brew.',
+        features: ['Programmable timer', 'Thermal carafe', 'Auto-shutoff', '12-cup capacity']
+      },
+      {
+        id: 5,
+        name: 'Bluetooth Speaker',
+        price: 79.99,
+        category: 'electronics',
+        image: 'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=300&h=300&fit=crop',
+        rating: 4.2,
+        reviews: 93,
+        stock: 20,
+        featured: false,
+        description: 'Portable Bluetooth speaker with 360-degree sound and waterproof design.',
+        features: ['360-degree sound', 'Waterproof', 'Long battery life', 'Compact design']
+      },
+      {
+        id: 6,
+        name: 'Desk Lamp',
+        price: 45.99,
+        category: 'home',
+        image: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=300&h=300&fit=crop',
+        rating: 4.1,
+        reviews: 78,
+        stock: 30,
+        featured: false,
+        description: 'LED desk lamp with adjustable brightness and USB charging port.',
+        features: ['LED lighting', 'Adjustable brightness', 'USB charging port', 'Flexible arm']
+      },
+      {
+        id: 7,
+        name: 'Wireless Mouse',
+        price: 39.99,
+        category: 'electronics',
+        image: 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=300&h=300&fit=crop',
+        rating: 4.4,
+        reviews: 112,
+        stock: 35,
+        featured: false,
+        description: 'Ergonomic wireless mouse with precision tracking and long battery life.',
+        features: ['Ergonomic design', 'Precision tracking', 'Long battery life', 'Silent clicks']
+      },
+      {
+        id: 8,
+        name: 'Plant Pot Set',
+        price: 24.99,
+        category: 'home',
+        image: 'https://images.unsplash.com/photo-1485955900006-10f4d324d411?w=300&h=300&fit=crop',
+        rating: 4.7,
+        reviews: 134,
+        stock: 18,
+        featured: true,
+        description: 'Set of 3 ceramic plant pots with drainage holes and saucers.',
+        features: ['Set of 3 pots', 'Drainage holes', 'Ceramic material', 'Includes saucers']
+      }
+    ],
+    
+    categories: [
+      { id: 'all', name: 'All Products', icon: '🛍️' },
+      { id: 'electronics', name: 'Electronics', icon: '📱' },
+      { id: 'accessories', name: 'Accessories', icon: '👜' },
+      { id: 'home', name: 'Home & Garden', icon: '🏠' }
+    ],
+    
+    // Filters
+    selectedCategory: 'all',
+    searchQuery: '',
+    sortBy: 'name',
+    maxPrice: 500,
+    
+    // Current product
+    selectedProduct: null,
+    selectedQuantity: 1,
+    
+    // Cart
+    cartItems: [],
+    
+    // Checkout
+    customerInfo: {
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+      address: '',
+      city: '',
+      zipCode: '',
+      country: 'US'
+    },
+    
+    // UI state
+    isLoading: false,
+    notifications: [],
+    
+    // Computed properties
+    get featuredProducts() {
+      return this.products.filter(p => p.featured);
+    },
+    
+    get filteredProducts() {
+      let filtered = this.products;
+      
+      // Category filter
+      if (this.selectedCategory !== 'all') {
+        filtered = filtered.filter(p => p.category === this.selectedCategory);
+      }
+      
+      // Search filter
+      if (this.searchQuery.trim()) {
+        const query = this.searchQuery.toLowerCase();
+        filtered = filtered.filter(p => 
+          p.name.toLowerCase().includes(query) ||
+          p.description.toLowerCase().includes(query)
+        );
+      }
+      
+      // Price filter
+      filtered = filtered.filter(p => p.price <= this.maxPrice);
+      
+      // Sort
+      switch (this.sortBy) {
+        case 'price-low':
+          filtered.sort((a, b) => a.price - b.price);
+          break;
+        case 'price-high':
+          filtered.sort((a, b) => b.price - a.price);
+          break;
+        case 'rating':
+          filtered.sort((a, b) => b.rating - a.rating);
+          break;
+        case 'name':
+        default:
+          filtered.sort((a, b) => a.name.localeCompare(b.name));
+      }
+      
+      return filtered;
+    },
+    
+    get cartTotal() {
+      return this.cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    },
+    
+    get cartCount() {
+      return this.cartItems.reduce((sum, item) => sum + item.quantity, 0);
+    },
+    
+    get shipping() {
+      return this.cartTotal > 50 ? 0 : 9.99;
+    },
+    
+    get tax() {
+      return this.cartTotal * 0.08;
+    },
+    
+    get orderTotal() {
+      return this.cartTotal + this.shipping + this.tax;
+    },
+    
+    get maxProductPrice() {
+      return Math.max(...this.products.map(p => p.price));
+    },
+    
+    // Methods
+    navigateTo(page, productId = null) {
+      this.currentPage = page;
+      if (page === 'product' && productId) {
+        this.selectedProduct = this.products.find(p => p.id === productId);
+        this.selectedQuantity = 1;
+      }
+      this.showMobileMenu = false;
+      window.scrollTo(0, 0);
+    },
+    
+    toggleMobileMenu() {
+      this.showMobileMenu = !this.showMobileMenu;
+    },
+    
+    toggleSearch() {
+      this.showSearch = !this.showSearch;
+      if (this.showSearch) {
+        setTimeout(() => {
+          document.querySelector('.search-input')?.focus();
+        }, 100);
+      }
+    },
+    
+    toggleCart() {
+      this.showCart = !this.showCart;
+    },
+    
+    formatCurrency(amount) {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD'
+      }).format(amount);
+    },
+    
+    getStars(rating) {
+      const fullStars = Math.floor(rating);
+      const hasHalfStar = rating % 1 >= 0.5;
+      return '★'.repeat(fullStars) + (hasHalfStar ? '☆' : '') + '☆'.repeat(5 - fullStars - (hasHalfStar ? 1 : 0));
+    },
+    
+    addToCart(product, quantity = 1) {
+      const existingItem = this.cartItems.find(item => item.id === product.id);
+      
+      if (existingItem) {
+        existingItem.quantity += quantity;
+      } else {
+        this.cartItems.push({
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          image: product.image,
+          quantity: quantity
+        });
+      }
+      
+      this.showNotification(`Added ${product.name} to cart!`, 'success');
+      this.selectedQuantity = 1;
+    },
+    
+    updateCartQuantity(productId, newQuantity) {
+      if (newQuantity <= 0) {
+        this.removeFromCart(productId);
+        return;
+      }
+      
+      const item = this.cartItems.find(item => item.id === productId);
+      if (item) {
+        item.quantity = newQuantity;
+      }
+    },
+    
+    removeFromCart(productId) {
+      const itemIndex = this.cartItems.findIndex(item => item.id === productId);
+      if (itemIndex > -1) {
+        const item = this.cartItems[itemIndex];
+        this.cartItems.splice(itemIndex, 1);
+        this.showNotification(`Removed ${item.name} from cart`, 'info');
+      }
+    },
+    
+    clearCart() {
+      this.cartItems = [];
+      this.showNotification('Cart cleared', 'info');
+    },
+    
+    filterByCategory(categoryId) {
+      this.selectedCategory = categoryId;
+      if (this.currentPage !== 'shop') {
+        this.navigateTo('shop');
+      }
+    },
+    
+    handleSearch() {
+      if (this.currentPage !== 'shop') {
+        this.navigateTo('shop');
+      }
+    },
+    
+    increaseQuantity() {
+      if (this.selectedProduct && this.selectedQuantity < this.selectedProduct.stock) {
+        this.selectedQuantity++;
+      }
+    },
+    
+    decreaseQuantity() {
+      if (this.selectedQuantity > 1) {
+        this.selectedQuantity--;
+      }
+    },
+    
+    showNotification(message, type = 'info') {
+      const id = Date.now();
+      this.notifications.push({ id, message, type });
+      
+      setTimeout(() => {
+        this.notifications = this.notifications.filter(n => n.id !== id);
+      }, 3000);
+    },
+    
+    submitOrder() {
+      // Basic validation
+      if (!this.customerInfo.firstName || !this.customerInfo.email) {
+        this.showNotification('Please fill in required fields', 'error');
+        return;
+      }
+      
+      if (this.cartItems.length === 0) {
+        this.showNotification('Your cart is empty', 'error');
+        return;
+      }
+      
+      this.isLoading = true;
+      
+      // Simulate order processing
+      setTimeout(() => {
+        this.isLoading = false;
+        this.clearCart();
+        this.customerInfo = {
+          firstName: '',
+          lastName: '',
+          email: '',
+          phone: '',
+          address: '',
+          city: '',
+          zipCode: '',
+          country: 'US'
+        };
+        this.showNotification('Order placed successfully! 🎉', 'success');
+        this.navigateTo('home');
+      }, 2000);
+    }
+  }">
+    <!-- Header -->
+    <header class="header">
+      <div class="container">
+        <div class="header-content">
+          <!-- Logo -->
+          <div class="logo" uus-on:click="window.navigateTo('home')">
+            <span class="logo-icon">🛍️</span>
+            <span class="logo-text">UUS Store</span>
+          </div>
+          
+          <!-- Desktop Navigation -->
+          <nav class="nav-desktop">
+            <button 
+              uus-on:click="window.navigateTo('home')" 
+              class="nav-link"
+            >
+              Home
+            </button>
+            <button 
+              uus-on:click="window.navigateTo('shop')" 
+              class="nav-link"
+            >
+              Shop
+            </button>
+          </nav>
+          
+          <!-- Header Actions -->
+          <div class="header-actions">
+            <button uus-on:click="window.toggleSearch()" class="action-btn">
+              🔍
+            </button>
+            
+            <button uus-on:click="window.toggleCart()" class="action-btn cart-btn">
+              🛒
+              <span uus-show="cartCount > 0" class="cart-badge" uus-text="cartCount"></span>
+            </button>
+            
+            <button uus-on:click="window.toggleMobileMenu()" class="mobile-menu-btn">
+              <span uus-show="!showMobileMenu">☰</span>
+              <span uus-show="showMobileMenu">✕</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+    
+    <!-- Mobile Menu -->
+    <div uus-show="showMobileMenu" class="mobile-menu">
+      <button uus-on:click="window.navigateTo('home')" class="mobile-nav-link">Home</button>
+      <button uus-on:click="window.navigateTo('shop')" class="mobile-nav-link">Shop</button>
+    </div>
+    
+    <!-- Search Bar -->
+    <div uus-show="showSearch" class="search-overlay">
+      <div class="container">
+        <div class="search-bar">
+          <input 
+            type="text" 
+            uus-model="searchQuery"
+            uus-on:input="handleSearch()"
+            placeholder="Search products..."
+            class="search-input"
+          >
+          <button uus-on:click="window.toggleSearch()" class="search-close">✕</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Cart Sidebar -->
+    <div uus-show="showCart" class="cart-overlay" uus-on:click="window.toggleCart()">
+      <div class="cart-sidebar" uus-on:click="event.stopPropagation()">
+        <div class="cart-header">
+          <h3>Shopping Cart (<span uus-text="cartCount"></span>)</h3>
+          <button uus-on:click="window.toggleCart()" class="cart-close">✕</button>
+        </div>
+        
+        <div class="cart-content">
+          <!-- Cart Items -->
+          <div uus-show="cartItems.length > 0" class="cart-items">
+            <div uus-for="item in cartItems" class="cart-item">
+              <img uus-attr:src="item.image" uus-attr:alt="item.name" class="cart-item-image">
+              
+              <div class="cart-item-details">
+                <h4 uus-text="item.name"></h4>
+                <p class="cart-item-price" uus-text="formatCurrency(item.price)"></p>
+                
+                <div class="quantity-controls">
+                  <button uus-on:click="window.updateCartQuantity(item.id, item.quantity - 1)" class="qty-btn">-</button>
+                  <span uus-text="item.quantity"></span>
+                  <button uus-on:click="window.updateCartQuantity(item.id, item.quantity + 1)" class="qty-btn">+</button>
+                </div>
+              </div>
+              
+              <button uus-on:click="window.removeFromCart(item.id)" class="remove-btn">✕</button>
+            </div>
+          </div>
+          
+          <!-- Empty Cart -->
+          <div uus-show="cartItems.length === 0" class="empty-cart">
+            <p>Your cart is empty</p>
+            <button uus-on:click="window.navigateTo('shop'); window.toggleCart()" class="btn btn-primary">Start Shopping</button>
+          </div>
+        </div>
+        
+        <!-- Cart Footer -->
+        <div uus-show="cartItems.length > 0" class="cart-footer">
+          <div class="cart-total">
+            <strong>Total: <span uus-text="formatCurrency(cartTotal)"></span></strong>
+          </div>
+          <button uus-on:click="window.navigateTo('checkout'); window.toggleCart()" class="btn btn-primary btn-block">
+            Checkout
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Main Content -->
+    <main class="main">
+      <!-- Home Page -->
+      <div uus-show="currentPage === 'home'" class="page">
+        <!-- Hero Section -->
+        <section class="hero">
+          <div class="container">
+            <div class="hero-content">
+              <h1>Welcome to UUS Store</h1>
+              <p>Discover amazing products built with the power of UUS.js</p>
+              <button uus-on:click="window.navigateTo('shop')" class="btn btn-primary btn-large">
+                Shop Now →
+              </button>
+            </div>
+          </div>
+        </section>
+        
+        <!-- Featured Products -->
+        <section class="featured-section">
+          <div class="container">
+            <h2>Featured Products</h2>
+            <div class="product-grid">
+              <div uus-for="product in featuredProducts" class="product-card">
+                <div class="product-image">
+                  <img uus-attr:src="product.image" uus-attr:alt="product.name">
+                  <div uus-show="product.originalPrice" class="sale-badge">Sale</div>
+                  <div uus-show="product.stock < 10" class="stock-badge">Low Stock</div>
+                </div>
+                
+                <div class="product-info">
+                  <h3 uus-text="product.name"></h3>
+                  <div class="product-rating">
+                    <span class="stars" uus-text="getStars(product.rating)"></span>
+                    <span class="rating-count" uus-text="'(' + product.reviews + ')'"></span>
+                  </div>
+                  <div class="product-price">
+                    <span uus-show="product.originalPrice" class="original-price" uus-text="formatCurrency(product.originalPrice)"></span>
+                    <span class="current-price" uus-text="formatCurrency(product.price)"></span>
+                  </div>
+                </div>
+                
+                <div class="product-actions">
+                  <button uus-on:click="window.navigateTo('product', product.id)" class="btn btn-secondary">
+                    View Details
+                  </button>
+                  <button uus-on:click="window.addToCart(product)" class="btn btn-primary">
+                    Add to Cart
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        
+        <!-- Categories -->
+        <section class="categories-section">
+          <div class="container">
+            <h2>Shop by Category</h2>
+            <div class="categories-grid">
+              <div uus-for="category in categories.slice(1)" class="category-card">
+                <div class="category-icon" uus-text="category.icon"></div>
+                <h3 uus-text="category.name"></h3>
+                <button uus-on:click="window.filterByCategory(category.id)" class="btn btn-outline">
+                  Browse <span uus-text="category.name"></span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+      
+      <!-- Shop Page -->
+      <div uus-show="currentPage === 'shop'" class="page">
+        <div class="container">
+          <div class="shop-layout">
+            <!-- Filters Sidebar -->
+            <aside class="filters-sidebar">
+              <div class="filter-section">
+                <h3>Categories</h3>
+                <div class="category-filters">
+                  <button 
+                    uus-for="category in categories"
+                    uus-on:click="window.filterByCategory(category.id)"
+                    class="category-filter"
+                  >
+                    <span uus-text="category.icon"></span>
+                    <span uus-text="category.name"></span>
+                  </button>
+                </div>
+              </div>
+              
+              <div class="filter-section">
+                <h3>Price Range</h3>
+                <div class="price-filter">
+                  <input 
+                    type="range" 
+                    uus-model="maxPrice"
+                    min="0"
+                    uus-attr:max="maxProductPrice"
+                    class="price-slider"
+                  >
+                  <div class="price-display">
+                    $0 - <span uus-text="formatCurrency(maxPrice)"></span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="filter-section">
+                <h3>Sort By</h3>
+                <select uus-model="sortBy" class="sort-select">
+                  <option value="name">Name</option>
+                  <option value="price-low">Price: Low to High</option>
+                  <option value="price-high">Price: High to Low</option>
+                  <option value="rating">Rating</option>
+                </select>
+              </div>
+            </aside>
+            
+            <!-- Products Grid -->
+            <div class="products-content">
+              <div class="products-header">
+                <h1>Shop</h1>
+                <p>
+                  Showing <span uus-text="filteredProducts.length"></span> products
+                  <span uus-show="selectedCategory !== 'all'">
+                    in <span uus-text="categories.find(c => c.id === selectedCategory)?.name"></span>
+                  </span>
+                </p>
+              </div>
+              
+              <div uus-show="filteredProducts.length > 0" class="product-grid">
+                <div uus-for="product in filteredProducts" class="product-card">
+                  <div class="product-image">
+                    <img uus-attr:src="product.image" uus-attr:alt="product.name">
+                    <div uus-show="product.originalPrice" class="sale-badge">Sale</div>
+                    <div uus-show="product.stock < 10" class="stock-badge">Low Stock</div>
+                  </div>
+                  
+                  <div class="product-info">
+                    <h3 uus-text="product.name"></h3>
+                    <div class="product-rating">
+                      <span class="stars" uus-text="getStars(product.rating)"></span>
+                      <span class="rating-count" uus-text="'(' + product.reviews + ')'"></span>
+                    </div>
+                    <div class="product-price">
+                      <span uus-show="product.originalPrice" class="original-price" uus-text="formatCurrency(product.originalPrice)"></span>
+                      <span class="current-price" uus-text="formatCurrency(product.price)"></span>
+                    </div>
+                  </div>
+                  
+                  <div class="product-actions">
+                    <button uus-on:click="window.navigateTo('product', product.id)" class="btn btn-secondary">
+                      View Details
+                    </button>
+                    <button 
+                      uus-on:click="window.addToCart(product)" 
+                      class="btn btn-primary"
+                      uus-attr:disabled="product.stock === 0"
+                    >
+                      <span uus-show="product.stock > 0">Add to Cart</span>
+                      <span uus-show="product.stock === 0">Out of Stock</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
+              <div uus-show="filteredProducts.length === 0" class="empty-state">
+                <h3>No products found</h3>
+                <p>Try adjusting your filters or search terms.</p>
+                <button uus-on:click="window.clearFilters()" class="btn btn-primary">
+                  Clear Filters
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Product Detail Page -->
+      <div uus-show="currentPage === 'product' && selectedProduct" class="page">
+        <div class="container">
+          <div class="product-detail">
+            <div class="product-gallery">
+              <img uus-attr:src="selectedProduct?.image || ''" uus-attr:alt="selectedProduct?.name || ''" class="product-main-image">
+            </div>
+            
+            <div class="product-details">
+              <h1 uus-text="selectedProduct?.name || ''"></h1>
+              
+              <div class="product-meta">
+                <div class="product-rating">
+                  <span class="stars" uus-text="selectedProduct?.rating ? getStars(selectedProduct.rating) : ''"></span>
+                  <span class="rating-text" uus-text="selectedProduct?.rating ? selectedProduct.rating + ' (' + selectedProduct.reviews + ' reviews)' : ''"></span>
+                </div>
+                
+                <div class="product-stock">
+                  <span uus-show="selectedProduct?.stock > 0" class="in-stock">
+                    ✅ In Stock (<span uus-text="selectedProduct?.stock || 0"></span> available)
+                  </span>
+                  <span uus-show="selectedProduct?.stock === 0" class="out-of-stock">
+                    ❌ Out of Stock
+                  </span>
+                </div>
+              </div>
+              
+              <div class="product-price-section">
+                <div class="product-price">
+                  <span uus-show="selectedProduct?.originalPrice" class="original-price" uus-text="selectedProduct?.originalPrice ? formatCurrency(selectedProduct.originalPrice) : ''"></span>
+                  <span class="current-price" uus-text="selectedProduct?.price ? formatCurrency(selectedProduct.price) : ''"></span>
+                </div>
+                
+                <div uus-show="selectedProduct?.originalPrice" class="savings">
+                  You save <span uus-text="selectedProduct?.originalPrice ? formatCurrency(selectedProduct.originalPrice - selectedProduct.price) : ''"></span>
+                </div>
+              </div>
+              
+              <div class="product-description">
+                <h3>Description</h3>
+                <p uus-text="selectedProduct?.description || ''"></p>
+              </div>
+              
+              <div class="product-features">
+                <h3>Features</h3>
+                <ul>
+                  <li uus-for="feature in selectedProduct?.features || []">
+                    ✓ <span uus-text="feature"></span>
+                  </li>
+                </ul>
+              </div>
+              
+              <div class="product-purchase">
+                <div class="quantity-section">
+                  <label>Quantity:</label>
+                  <div class="quantity-controls">
+                    <button uus-on:click="window.decreaseQuantity()" class="qty-btn">-</button>
+                    <span class="qty-display" uus-text="selectedQuantity"></span>
+                    <button uus-on:click="window.increaseQuantity()" class="qty-btn">+</button>
+                  </div>
+                </div>
+                
+                <button 
+                  uus-on:click="window.addToCart(selectedProduct, selectedQuantity)" 
+                  class="btn btn-primary btn-large"
+                  uus-attr:disabled="selectedProduct?.stock === 0"
+                >
+                  <span uus-show="selectedProduct?.stock > 0">Add to Cart - <span uus-text="selectedProduct?.price ? formatCurrency(selectedProduct.price * selectedQuantity) : ''"></span></span>
+                  <span uus-show="selectedProduct?.stock === 0">Out of Stock</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Checkout Page -->
+      <div uus-show="currentPage === 'checkout'" class="page">
+        <div class="container">
+          <div class="checkout-layout">
+            <div class="checkout-form">
+              <h1>Checkout</h1>
+              
+              <!-- Customer Information -->
+              <section class="checkout-section">
+                <h2>Customer Information</h2>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>First Name *</label>
+                    <input type="text" uus-model="customerInfo.firstName" class="form-input" required>
+                  </div>
+                  <div class="form-group">
+                    <label>Last Name</label>
+                    <input type="text" uus-model="customerInfo.lastName" class="form-input">
+                  </div>
+                </div>
+                
+                <div class="form-group">
+                  <label>Email *</label>
+                  <input type="email" uus-model="customerInfo.email" class="form-input" required>
+                </div>
+                
+                <div class="form-group">
+                  <label>Phone</label>
+                  <input type="tel" uus-model="customerInfo.phone" class="form-input">
+                </div>
+              </section>
+              
+              <!-- Shipping Address -->
+              <section class="checkout-section">
+                <h2>Shipping Address</h2>
+                <div class="form-group">
+                  <label>Address</label>
+                  <input type="text" uus-model="customerInfo.address" class="form-input">
+                </div>
+                
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>City</label>
+                    <input type="text" uus-model="customerInfo.city" class="form-input">
+                  </div>
+                  <div class="form-group">
+                    <label>ZIP Code</label>
+                    <input type="text" uus-model="customerInfo.zipCode" class="form-input">
+                  </div>
+                </div>
+                
+                <div class="form-group">
+                  <label>Country</label>
+                  <select uus-model="customerInfo.country" class="form-input">
+                    <option value="US">United States</option>
+                    <option value="CA">Canada</option>
+                    <option value="UK">United Kingdom</option>
+                  </select>
+                </div>
+              </section>
+              
+              <button 
+                uus-on:click="window.submitOrder()" 
+                class="btn btn-primary btn-large"
+                uus-attr:disabled="isLoading || cartItems.length === 0"
+              >
+                <span uus-show="!isLoading">Place Order</span>
+                <span uus-show="isLoading">Processing...</span>
+              </button>
+            </div>
+            
+            <!-- Order Summary -->
+            <div class="order-summary">
+              <h2>Order Summary</h2>
+              
+              <div class="order-items">
+                <div uus-for="item in cartItems" class="order-item">
+                  <img uus-attr:src="item.image" uus-attr:alt="item.name" class="order-item-image">
+                  <div class="order-item-info">
+                    <h4 uus-text="item.name"></h4>
+                    <p>Qty: <span uus-text="item.quantity"></span></p>
+                  </div>
+                  <span class="order-item-price" uus-text="formatCurrency(item.price * item.quantity)"></span>
+                </div>
+              </div>
+              
+              <div class="order-totals">
+                <div class="total-row">
+                  <span>Subtotal:</span>
+                  <span uus-text="formatCurrency(cartTotal)"></span>
+                </div>
+                <div class="total-row">
+                  <span>Shipping:</span>
+                  <span uus-text="formatCurrency(shipping)"></span>
+                </div>
+                <div class="total-row">
+                  <span>Tax:</span>
+                  <span uus-text="formatCurrency(tax)"></span>
+                </div>
+                <div class="total-row total-final">
+                  <span>Total:</span>
+                  <span uus-text="formatCurrency(orderTotal)"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+    
+    <!-- Notifications -->
+    <div class="notifications">
+      <div 
+        uus-for="notification in notifications"
+        class="notification"
+      >
+        <span uus-text="notification.message"></span>
+        <button uus-on:click="window.removeNotification(notification.id)" class="notification-close">✕</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
