@@ -9,7 +9,7 @@ import type {
   MountTarget,
   Result,
   DirectiveBinding,
-  ReactiveState
+  ReactiveState,
 } from './types';
 import { createReactive } from './reactive';
 import { asDirectiveName, asExpressionString } from './type-guards';
@@ -30,14 +30,14 @@ import {
   onDirective,
   componentDirective,
 } from './directives';
-import { 
-  ErrorHandler, 
-  MountingError, 
-  DirectiveError, 
+import {
+  ErrorHandler,
+  MountingError,
+  DirectiveError,
   ErrorCategory,
   globalErrorHandler,
   createSafeFunction,
-  type ErrorHandlerConfig 
+  type ErrorHandlerConfig,
 } from './errors';
 import { memoryManager, CleanupRegistry } from './memory';
 
@@ -57,13 +57,13 @@ export class Uus implements UusInstance {
   directives: UusInstance['directives'];
   rootElement: UusInstance['rootElement'];
   config: UusInstance['config'];
-  
+
   // Error handling system
   public readonly errorHandler: ErrorHandler;
-  
+
   // Track built-in directives
   private readonly builtinDirectives: Set<string>;
-  
+
   // Memory management
   private readonly instanceId: string;
   private readonly memoryTracker: ReturnType<typeof memoryManager.init>;
@@ -76,15 +76,15 @@ export class Uus implements UusInstance {
   constructor(config?: UusConfig) {
     // Generate unique instance ID
     this.instanceId = `uus-${++Uus.instanceCounter}-${Date.now()}`;
-    
+
     // Initialize memory management
     this.memoryTracker = memoryManager.init(this.instanceId);
     this.cleanupRegistry = new CleanupRegistry();
     this.abortController = new AbortController();
-    
+
     // Track abort controller cleanup
     this.cleanupRegistry.registerAbortController(this.abortController);
-    
+
     this.state = createReactive({}) as ReactiveState;
     this.effects = new Set();
     this.cleanups = new WeakMap();
@@ -96,11 +96,11 @@ export class Uus implements UusInstance {
       ...Uus.globalConfig,
       ...config,
     };
-    
+
     // Track instance creation
     this.memoryTracker.track('component', this, undefined, {
       instanceId: this.instanceId,
-      config: this.config
+      config: this.config,
     });
 
     // Initialize error handler with configuration
@@ -115,10 +115,20 @@ export class Uus implements UusInstance {
 
     // Initialize built-in directives set
     this.builtinDirectives = new Set([
-      'state', 'text', 'html', 'show', 'if', 'for', 
-      'model', 'bind', 'class', 'style', 'on', 'component'
+      'state',
+      'text',
+      'html',
+      'show',
+      'if',
+      'for',
+      'model',
+      'bind',
+      'class',
+      'style',
+      'on',
+      'component',
     ]);
-    
+
     // Register core directives
     this.registerDirective(stateDirective);
     this.registerDirective(textDirective);
@@ -137,7 +147,7 @@ export class Uus implements UusInstance {
     if (Uus.globalConfig.plugins) {
       Uus.globalConfig.plugins.forEach((plugin) => this.use(plugin));
     }
-    
+
     // Apply instance-level plugins
     if (config?.plugins) {
       config.plugins.forEach((plugin) => this.use(plugin));
@@ -149,29 +159,32 @@ export class Uus implements UusInstance {
     if (options.prefix !== undefined && typeof options.prefix !== 'string') {
       throw new TypeError('Configuration prefix must be a string');
     }
-    
+
     if (options.debug !== undefined && typeof options.debug !== 'boolean') {
       throw new TypeError('Configuration debug must be a boolean');
     }
-    
-    if (options.onError !== undefined && typeof options.onError !== 'function') {
+
+    if (
+      options.onError !== undefined &&
+      typeof options.onError !== 'function'
+    ) {
       throw new TypeError('Configuration onError must be a function');
     }
-    
+
     if (options.plugins !== undefined && !Array.isArray(options.plugins)) {
       throw new TypeError('Configuration plugins must be an array');
     }
-    
+
     Uus.globalConfig = { ...Uus.globalConfig, ...options };
   }
-  
+
   /**
    * Get global memory statistics across all instances
    */
   static getGlobalMemoryStats() {
     return memoryManager.getMemoryStats();
   }
-  
+
   /**
    * Cleanup all UUS instances (emergency cleanup)
    */
@@ -192,16 +205,21 @@ export class Uus implements UusInstance {
         );
       }
 
-      const el = mountTarget.type === 'element' ? mountTarget.element : mountTarget.resolved;
-      
+      const el =
+        mountTarget.type === 'element'
+          ? mountTarget.element
+          : mountTarget.resolved;
+
       // Check if already mounted
       if (this.rootElement) {
-        console.warn('UUS instance is already mounted. Unmounting previous element.');
+        console.warn(
+          'UUS instance is already mounted. Unmounting previous element.'
+        );
         this.unmount();
       }
 
       this.rootElement = el;
-      
+
       // Safely compile the element tree
       this.errorHandler.safe(
         () => this.compile(el),
@@ -215,14 +233,19 @@ export class Uus implements UusInstance {
         () => {
           const observer = observeDOM(el, this);
           this.domObserver = observer;
-          
+
           // Register observer for cleanup
           this.cleanupRegistry.registerObserver(observer);
-          
+
           // Track DOM observer
-          this.memoryTracker.track('observer', observer, () => {
-            observer.disconnect();
-          }, { type: 'mutation', element: el.tagName });
+          this.memoryTracker.track(
+            'observer',
+            observer,
+            () => {
+              observer.disconnect();
+            },
+            { type: 'mutation', element: el.tagName }
+          );
         },
         ErrorCategory.LIFECYCLE,
         { element: el },
@@ -250,7 +273,7 @@ export class Uus implements UusInstance {
 
   unmount(): void {
     if (!this.rootElement) return;
-    
+
     if (this.config.debug) {
       console.log(`🧹 Unmounting UUS instance: ${this.instanceId}`);
     }
@@ -260,7 +283,7 @@ export class Uus implements UusInstance {
       this.domObserver.disconnect();
       this.domObserver = undefined;
     }
-    
+
     // Stop performance observer
     if (this.performanceObserver) {
       this.performanceObserver.disconnect();
@@ -276,20 +299,20 @@ export class Uus implements UusInstance {
       }
     });
     this.effects.clear();
-    
+
     // Cleanup all registered resources
     this.cleanupRegistry.cleanup();
-    
+
     // Clear state (will trigger cleanup of reactive proxies)
     this.state = createReactive({}) as ReactiveState;
     this.rootElement = null;
-    
+
     if (this.config.debug) {
       const stats = this.memoryTracker.stats();
       console.log('📊 Memory stats before unmount:', stats);
     }
   }
-  
+
   /**
    * Completely destroy the UUS instance and cleanup all resources
    */
@@ -298,22 +321,22 @@ export class Uus implements UusInstance {
       console.warn('UUS instance already destroyed');
       return;
     }
-    
+
     if (this.config.debug) {
       console.log(`💥 Destroying UUS instance: ${this.instanceId}`);
     }
-    
+
     // Unmount if still mounted
     if (this.rootElement) {
       this.unmount();
     }
-    
+
     // Cleanup all memory tracking
     memoryManager.destroy(this.instanceId);
-    
+
     // Mark as destroyed
     this.isDestroyed = true;
-    
+
     if (this.config.debug) {
       console.log(`✅ UUS instance destroyed: ${this.instanceId}`);
     }
@@ -322,27 +345,29 @@ export class Uus implements UusInstance {
   use(plugin: UusPlugin): void {
     // Validate plugin
     if (!plugin.name || typeof plugin.install !== 'function') {
-      throw new TypeError('Invalid plugin: must have name and install function');
+      throw new TypeError(
+        'Invalid plugin: must have name and install function'
+      );
     }
-    
+
     // Check for duplicate plugins
     if (!this.installedPlugins) {
       this.installedPlugins = new Set<string>();
     }
-    
+
     if (this.installedPlugins.has(plugin.name)) {
       console.warn(`Plugin ${plugin.name} is already installed`);
       return;
     }
-    
+
     if (this.config.debug) {
       console.log(`Installing plugin: ${plugin.name}`);
     }
-    
+
     try {
       plugin.install(this);
       this.installedPlugins.add(plugin.name);
-      
+
       if (this.config.debug) {
         console.log(`Successfully installed plugin: ${plugin.name}`);
       }
@@ -368,32 +393,42 @@ export class Uus implements UusInstance {
     directive?: Omit<Directive<T>, 'name'>
   ): void {
     let finalDirective: Directive<T>;
-    
+
     if (typeof nameOrDirective === 'string') {
       // Called with separate name and directive object
       if (!directive) {
-        throw new TypeError('Directive object required when name is provided as string');
+        throw new TypeError(
+          'Directive object required when name is provided as string'
+        );
       }
       finalDirective = {
         ...directive,
-        name: asDirectiveName(nameOrDirective)
+        name: asDirectiveName(nameOrDirective),
       } as Directive<T>;
     } else {
       // Called with complete directive object
       finalDirective = nameOrDirective;
     }
-    
+
     // Validate directive structure
     if (!finalDirective.name || typeof finalDirective.name !== 'string') {
       throw new TypeError('Directive must have a valid name');
     }
-    
-    if (!finalDirective.bind && !finalDirective.init && !finalDirective.update && !finalDirective.unbind) {
+
+    if (
+      !finalDirective.bind &&
+      !finalDirective.init &&
+      !finalDirective.update &&
+      !finalDirective.unbind
+    ) {
       throw new TypeError('Directive must have at least one lifecycle hook');
     }
-    
-    this.directives.set(finalDirective.name as DirectiveName, finalDirective as Directive);
-    
+
+    this.directives.set(
+      finalDirective.name as DirectiveName,
+      finalDirective as Directive
+    );
+
     if (this.config.debug) {
       console.log(`Registered directive: ${finalDirective.name}`);
     }
@@ -431,11 +466,11 @@ export class Uus implements UusInstance {
             }
           },
           ErrorCategory.DIRECTIVE,
-          { 
-            element: el, 
+          {
+            element: el,
             directive: 'state',
             expression: parsed.value,
-            phase: 'state-initialization' 
+            phase: 'state-initialization',
           },
           undefined
         );
@@ -454,7 +489,9 @@ export class Uus implements UusInstance {
       );
 
       if (this.config.debug) {
-        console.log(`Compiled ${root.tagName} with ${this.directives.size} available directives`);
+        console.log(
+          `Compiled ${root.tagName} with ${this.directives.size} available directives`
+        );
       }
     } catch (error) {
       const compileError = new DirectiveError(
@@ -492,7 +529,11 @@ export class Uus implements UusInstance {
     if (!binding) return; // Failed to create binding
 
     // For custom directives, evaluate the value if it's an expression
-    if (!this.builtinDirectives.has(parsed.name) && binding.value && typeof binding.value === 'string') {
+    if (
+      !this.builtinDirectives.has(parsed.name) &&
+      binding.value &&
+      typeof binding.value === 'string'
+    ) {
       const evaluator = createSafeEvaluator(this.state);
       const evaluatedValue = this.errorHandler.safe(
         () => evaluator(asExpressionString(binding.value as string)),
@@ -503,7 +544,7 @@ export class Uus implements UusInstance {
       // Create a new binding with evaluated value
       const evaluatedBinding = {
         ...binding,
-        value: evaluatedValue
+        value: evaluatedValue,
       };
       // Use the evaluated binding for the directive
       if (directive.init) {
@@ -553,7 +594,9 @@ export class Uus implements UusInstance {
   /**
    * Validate mount target with enhanced type safety
    */
-  private validateMountTarget(element: HTMLElement | ElementSelector): MountTarget {
+  private validateMountTarget(
+    element: HTMLElement | ElementSelector
+  ): MountTarget {
     if (typeof element === 'string') {
       // Validate selector format
       if (!element.trim()) {
@@ -563,22 +606,28 @@ export class Uus implements UusInstance {
       try {
         const resolved = document.querySelector(element);
         if (!resolved) {
-          return { type: 'invalid', reason: `Element not found for selector: ${element}` };
+          return {
+            type: 'invalid',
+            reason: `Element not found for selector: ${element}`,
+          };
         }
 
         if (!(resolved instanceof HTMLElement)) {
-          return { type: 'invalid', reason: 'Selected element is not an HTMLElement' };
+          return {
+            type: 'invalid',
+            reason: 'Selected element is not an HTMLElement',
+          };
         }
 
-        return { 
-          type: 'selector', 
-          selector: element as ElementSelector, 
-          resolved 
+        return {
+          type: 'selector',
+          selector: element as ElementSelector,
+          resolved,
         };
       } catch (error) {
-        return { 
-          type: 'invalid', 
-          reason: `Invalid selector: ${error instanceof Error ? error.message : String(error)}` 
+        return {
+          type: 'invalid',
+          reason: `Invalid selector: ${error instanceof Error ? error.message : String(error)}`,
         };
       }
     }
@@ -588,7 +637,10 @@ export class Uus implements UusInstance {
     }
 
     if (!(element instanceof HTMLElement)) {
-      return { type: 'invalid', reason: 'Provided element is not an HTMLElement' };
+      return {
+        type: 'invalid',
+        reason: 'Provided element is not an HTMLElement',
+      };
     }
 
     return { type: 'element', element };
@@ -617,12 +669,12 @@ export class Uus implements UusInstance {
     }
 
     // Find the plugin in global config
-    const plugin = Uus.globalConfig.plugins?.find(p => p.name === name);
+    const plugin = Uus.globalConfig.plugins?.find((p) => p.name === name);
     if (plugin?.uninstall) {
       try {
         await plugin.uninstall(this);
         this.installedPlugins.delete(name);
-        
+
         if (this.config.debug) {
           console.log(`Successfully uninstalled plugin: ${name}`);
         }
@@ -644,16 +696,19 @@ export class Uus implements UusInstance {
   /**
    * Get registered directives with metadata
    */
-  public getDirectives(): Record<string, { name: DirectiveName; metadata?: any }> {
+  public getDirectives(): Record<
+    string,
+    { name: DirectiveName; metadata?: any }
+  > {
     const result: Record<string, { name: DirectiveName; metadata?: any }> = {};
-    
+
     this.directives.forEach((directive, name) => {
       result[name] = {
         name: name as DirectiveName,
-        metadata: directive.metadata
+        metadata: directive.metadata,
       };
     });
-    
+
     return result;
   }
 
@@ -686,7 +741,7 @@ export class Uus implements UusInstance {
       }
 
       this.state[key] = value;
-      
+
       if (this.config.debug) {
         console.log(`State updated: ${String(key)}`, value);
       }
@@ -716,22 +771,22 @@ export class Uus implements UusInstance {
   /**
    * Get mount information
    */
-  public getMountInfo(): { 
-    isMounted: boolean; 
-    element?: HTMLElement; 
-    tagName?: string; 
-    id?: string; 
-    className?: string; 
+  public getMountInfo(): {
+    isMounted: boolean;
+    element?: HTMLElement;
+    tagName?: string;
+    id?: string;
+    className?: string;
   } {
     return {
       isMounted: this.isMounted(),
       element: this.rootElement ?? undefined,
       tagName: this.rootElement?.tagName,
       id: this.rootElement?.id || undefined,
-      className: this.rootElement?.className || undefined
+      className: this.rootElement?.className || undefined,
     };
   }
-  
+
   /**
    * Get memory statistics for this instance
    */
@@ -739,24 +794,24 @@ export class Uus implements UusInstance {
     return {
       instance: this.instanceId,
       isDestroyed: this.isDestroyed,
-      ...this.memoryTracker.stats()
+      ...this.memoryTracker.stats(),
     };
   }
-  
+
   /**
    * Force cleanup of dead references
    */
   public cleanupDeadReferences(): number {
     return memoryManager.resourceTracker.cleanupDeadRefs();
   }
-  
+
   /**
    * Register a cleanup function for this instance
    */
   public registerCleanup(cleanup: () => void): () => void {
     return this.cleanupRegistry.register(cleanup);
   }
-  
+
   /**
    * Create an abortable operation for this instance
    */
@@ -766,7 +821,7 @@ export class Uus implements UusInstance {
     if (this.isDestroyed) {
       return Promise.reject(new Error('UUS instance is destroyed'));
     }
-    
+
     return operation(this.abortController.signal);
   }
 }

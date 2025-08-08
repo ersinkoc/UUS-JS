@@ -1,22 +1,23 @@
-import type { 
-  Effect, 
-  Ref, 
-  ComputedRef, 
-  ReactiveState, 
+import type {
+  Effect,
+  Ref,
+  ComputedRef,
+  ReactiveState,
   ReactiveMarkers,
   WatchCallback,
   WatchOptions,
-  Result
+  Result,
 } from './types';
-import { 
-  ReactiveError, 
+import {
+  ReactiveError,
   ValidationError,
   ErrorCategory,
   globalErrorHandler,
   validate,
-  createSafeFunction 
+  createSafeFunction,
 } from './errors';
 import { memoryManager } from './memory';
+import { getGlobalBatchScheduler, scheduleBatch } from './batch-scheduler';
 
 let activeEffect: Effect | null = null;
 const targetMap = new WeakMap<object, Map<string | symbol, Set<Effect>>>();
@@ -62,9 +63,14 @@ export function trigger(target: object, key: string | symbol): void {
   if (!deps) return;
 
   const effectsToRun = new Set(deps);
+
+  // Use batch scheduler for DOM updates
+  const scheduler = getGlobalBatchScheduler({ useRAF: true });
+
   effectsToRun.forEach((effect) => {
     if (effect !== activeEffect) {
-      effect();
+      // Schedule the effect to run in the next batch
+      scheduleBatch(() => effect());
     }
   });
 }
@@ -72,9 +78,9 @@ export function trigger(target: object, key: string | symbol): void {
 export function effect(fn: Effect): () => void {
   try {
     // Validate effect function
-    validate('fn', fn, { 
-      required: true, 
-      type: 'function' 
+    validate('fn', fn, {
+      required: true,
+      type: 'function',
     });
   } catch (error) {
     globalErrorHandler.handle(error as ValidationError);
@@ -86,11 +92,16 @@ export function effect(fn: Effect): () => void {
   let errorCount = 0;
   const maxErrors = 10; // Prevent infinite error loops
   const effectCleanups = new Set<() => void>();
-  
+
   // Track this effect for memory management
-  const resourceId = memoryManager.resourceTracker.track('effect', undefined, undefined, {
-    function: fn.toString().substring(0, 100)
-  });
+  const resourceId = memoryManager.resourceTracker.track(
+    'effect',
+    undefined,
+    undefined,
+    {
+      function: fn.toString().substring(0, 100),
+    }
+  );
 
   const effectFn = () => {
     if (stopped) return;
@@ -99,7 +110,9 @@ export function effect(fn: Effect): () => void {
       // Clean up previous run safely
       if (cleanup && typeof cleanup === 'function') {
         globalErrorHandler.safe(
-          () => { (cleanup as (() => void))(); },
+          () => {
+            (cleanup as () => void)();
+          },
           ErrorCategory.REACTIVE,
           { phase: 'cleanup' },
           undefined
@@ -112,11 +125,11 @@ export function effect(fn: Effect): () => void {
         effectDeps.forEach((dep) => dep.delete(effectFn));
         effectDeps.clear();
       }
-      
+
       // Clear previous cleanup functions
       const prevCleanups = effectCleanupMap.get(effectFn);
       if (prevCleanups) {
-        prevCleanups.forEach(cleanupFn => {
+        prevCleanups.forEach((cleanupFn) => {
           try {
             cleanupFn();
           } catch (error) {
@@ -127,7 +140,7 @@ export function effect(fn: Effect): () => void {
       }
 
       activeEffect = effectFn;
-      
+
       // Execute effect function with error handling
       cleanup = globalErrorHandler.safe(
         () => fn(),
@@ -135,10 +148,9 @@ export function effect(fn: Effect): () => void {
         { phase: 'execution', errorCount },
         undefined
       );
-      
+
       activeEffect = null;
       errorCount = 0; // Reset error count on successful execution
-
     } catch (error) {
       activeEffect = null;
       errorCount++;
@@ -146,10 +158,10 @@ export function effect(fn: Effect): () => void {
       const reactiveError = new ReactiveError(
         'effect execution',
         error instanceof Error ? error : new Error(String(error)),
-        { 
+        {
           effectFunction: fn.toString().substring(0, 200),
           errorCount,
-          maxErrors 
+          maxErrors,
         }
       );
 
@@ -182,23 +194,25 @@ export function effect(fn: Effect): () => void {
   return () => {
     try {
       stopped = true;
-      
+
       // Cleanup tracked resource
       memoryManager.resourceTracker.untrack(resourceId);
-      
+
       if (cleanup && typeof cleanup === 'function') {
         globalErrorHandler.safe(
-          () => { (cleanup as (() => void))(); },
+          () => {
+            (cleanup as () => void)();
+          },
           ErrorCategory.REACTIVE,
           { phase: 'final-cleanup' },
           undefined
         );
       }
-      
+
       // Run all registered cleanups
       const cleanups = effectCleanupMap.get(effectFn);
       if (cleanups) {
-        cleanups.forEach(cleanupFn => {
+        cleanups.forEach((cleanupFn) => {
           try {
             cleanupFn();
           } catch (error) {
@@ -244,26 +258,26 @@ export function registerEffectCleanup(cleanup: () => void): void {
  * Create an abortable effect with timeout
  */
 export function abortableEffect(
-  fn: Effect, 
+  fn: Effect,
   timeoutMs?: number
 ): { stop: () => void; abort: () => void } {
   const abortController = new AbortController();
   let timeoutId: number | undefined;
-  
+
   const wrappedFn = () => {
     if (abortController.signal.aborted) return;
     return fn();
   };
-  
+
   const stop = effect(wrappedFn);
-  
+
   if (timeoutMs) {
     timeoutId = window.setTimeout(() => {
       abortController.abort();
       stop();
     }, timeoutMs);
   }
-  
+
   const abort = () => {
     abortController.abort();
     if (timeoutId) {
@@ -271,10 +285,10 @@ export function abortableEffect(
     }
     stop();
   };
-  
+
   // Register cleanup
   registerEffectCleanup(abort);
-  
+
   return { stop, abort };
 }
 
@@ -283,16 +297,19 @@ export function createReactive<T extends Record<string | symbol, unknown>>(
 ): T & ReactiveMarkers {
   try {
     // Validate input
-    validate('target', target, { 
-      required: true, 
+    validate('target', target, {
+      required: true,
       type: 'object',
       custom: (value) => {
         if (value === null) return 'Target cannot be null';
-        if (typeof value === 'function') return 'Functions cannot be made reactive';
-        if (value instanceof Date) return 'Date objects should be marked as raw';
-        if (value instanceof RegExp) return 'RegExp objects should be marked as raw';
+        if (typeof value === 'function')
+          return 'Functions cannot be made reactive';
+        if (value instanceof Date)
+          return 'Date objects should be marked as raw';
+        if (value instanceof RegExp)
+          return 'RegExp objects should be marked as raw';
         return true;
-      }
+      },
     });
 
     // Check if already reactive
@@ -329,20 +346,19 @@ export function createReactive<T extends Record<string | symbol, unknown>>(
               return function (...args: unknown[]) {
                 return globalErrorHandler.safe(
                   () => {
-                    const result = (value as (...args: unknown[]) => unknown).apply(
-                      target,
-                      args
-                    );
+                    const result = (
+                      value as (...args: unknown[]) => unknown
+                    ).apply(target, args);
                     // Trigger updates for length and indices
                     trigger(target, 'length');
                     trigger(target, Symbol.for('iterate'));
                     return result;
                   },
                   ErrorCategory.REACTIVE,
-                  { 
+                  {
                     operation: 'array-method',
                     method: key as string,
-                    args: Array.from(args) 
+                    args: Array.from(args),
                   }
                 );
               };
@@ -372,13 +388,13 @@ export function createReactive<T extends Record<string | symbol, unknown>>(
           return undefined;
         }
       },
-      
+
       set(target, key, value, receiver) {
         try {
           const hadKey = Reflect.has(target, key);
           const oldValue = Reflect.get(target, key, receiver);
           const result = Reflect.set(target, key, value, receiver);
-          
+
           if (oldValue !== value) {
             trigger(target, key);
             // Trigger iterate when new property is added
@@ -400,7 +416,7 @@ export function createReactive<T extends Record<string | symbol, unknown>>(
           return false;
         }
       },
-      
+
       deleteProperty(target, key) {
         try {
           const hadKey = Reflect.has(target, key);
@@ -422,7 +438,7 @@ export function createReactive<T extends Record<string | symbol, unknown>>(
           return false;
         }
       },
-      
+
       has(target, key) {
         try {
           track(target, key);
@@ -436,7 +452,7 @@ export function createReactive<T extends Record<string | symbol, unknown>>(
           return false;
         }
       },
-      
+
       ownKeys(target) {
         try {
           track(target, Symbol.for('iterate'));
@@ -454,25 +470,29 @@ export function createReactive<T extends Record<string | symbol, unknown>>(
 
     const proxy = new Proxy(target, handler);
     reactiveMap.set(target, proxy);
-    
+
     // Track proxy relationships for cleanup
     proxyTargetMap.set(proxy, target);
     targetProxyMap.set(target, proxy);
-    
-    // Track reactive resource
-    const resourceId = memoryManager.resourceTracker.track('proxy', target, () => {
-      reactiveMap.delete(target);
-      proxyTargetMap.delete(proxy);
-      targetProxyMap.delete(target);
-    }, {
-      type: Array.isArray(target) ? 'array' : 'object',
-      keys: Object.keys(target).length
-    });
-    
-    reactiveResourceMap.set(proxy, resourceId);
-    
-    return proxy;
 
+    // Track reactive resource
+    const resourceId = memoryManager.resourceTracker.track(
+      'proxy',
+      target,
+      () => {
+        reactiveMap.delete(target);
+        proxyTargetMap.delete(proxy);
+        targetProxyMap.delete(target);
+      },
+      {
+        type: Array.isArray(target) ? 'array' : 'object',
+        keys: Object.keys(target).length,
+      }
+    );
+
+    reactiveResourceMap.set(proxy, resourceId);
+
+    return proxy;
   } catch (error) {
     if (error instanceof ValidationError) {
       globalErrorHandler.handle(error);
@@ -483,7 +503,7 @@ export function createReactive<T extends Record<string | symbol, unknown>>(
         { operation: 'createReactive' }
       );
     }
-    
+
     // Return original target as fallback
     return target;
   }
@@ -566,7 +586,9 @@ export function markRaw<T extends object>(value: T): T {
 export function ref<T>(value: T): Ref<T> {
   // Type guard for better error messages
   if (typeof value === 'function') {
-    throw new TypeError('Functions cannot be used directly in refs. Use computed() instead.');
+    throw new TypeError(
+      'Functions cannot be used directly in refs. Use computed() instead.'
+    );
   }
   // For nested refs, we need to maintain reactivity chain
   if (isRef(value)) {
@@ -691,23 +713,25 @@ export function safeReactive<T extends Record<string | symbol, unknown>>(
     if (target === null || typeof target !== 'object') {
       return {
         success: false,
-        error: new TypeError('Target must be a non-null object')
+        error: new TypeError('Target must be a non-null object'),
       };
     }
-    
+
     if (Array.isArray(target) && target.length > 10000) {
       return {
         success: false,
-        error: new TypeError('Arrays with more than 10000 items are not recommended for reactivity')
+        error: new TypeError(
+          'Arrays with more than 10000 items are not recommended for reactivity'
+        ),
       };
     }
-    
+
     const result = createReactive(target);
     return { success: true, data: result };
   } catch (error) {
     return {
       success: false,
-      error: error instanceof TypeError ? error : new TypeError(String(error))
+      error: error instanceof TypeError ? error : new TypeError(String(error)),
     };
   }
 }
@@ -722,7 +746,7 @@ export function safeRef<T>(value: T): Result<Ref<T>, TypeError> {
   } catch (error) {
     return {
       success: false,
-      error: error instanceof TypeError ? error : new TypeError(String(error))
+      error: error instanceof TypeError ? error : new TypeError(String(error)),
     };
   }
 }
@@ -738,31 +762,41 @@ export function deepReactive<T extends Record<string | symbol, unknown>>(
 ): T & ReactiveMarkers {
   // Prevent infinite recursion
   if (currentDepth > maxDepth) {
-    console.warn('Max recursion depth reached in deepReactive, returning original');
+    console.warn(
+      'Max recursion depth reached in deepReactive, returning original'
+    );
     return target as T & ReactiveMarkers;
   }
-  
+
   if (seen.has(target)) {
     // Circular reference detected, break it with WeakRef
-    console.warn('Circular reference detected in deepReactive, breaking with WeakRef');
-    return memoryManager.circularRefManager.breakCircular(target) as T & ReactiveMarkers;
+    console.warn(
+      'Circular reference detected in deepReactive, breaking with WeakRef'
+    );
+    return memoryManager.circularRefManager.breakCircular(target) as T &
+      ReactiveMarkers;
   }
-  
+
   seen.add(target);
-  
+
   // Convert nested objects recursively with depth tracking
   for (const key in target) {
     const value = target[key];
-    if (value && typeof value === 'object' && !isReactive(value) && !isRef(value)) {
+    if (
+      value &&
+      typeof value === 'object' &&
+      !isReactive(value) &&
+      !isRef(value)
+    ) {
       (target as any)[key] = deepReactive(
-        value as Record<string | symbol, unknown>, 
-        seen, 
-        maxDepth, 
+        value as Record<string | symbol, unknown>,
+        seen,
+        maxDepth,
         currentDepth + 1
       );
     }
   }
-  
+
   return createReactive(target);
 }
 
@@ -790,7 +824,7 @@ export function readonly<T extends Record<string | symbol, unknown>>(
   target: T
 ): Readonly<T & ReactiveMarkers> {
   const reactive = createReactive(target);
-  
+
   return new Proxy(reactive, {
     set() {
       console.warn('Cannot set property on readonly reactive object');
@@ -799,7 +833,7 @@ export function readonly<T extends Record<string | symbol, unknown>>(
     deleteProperty() {
       console.warn('Cannot delete property on readonly reactive object');
       return false;
-    }
+    },
   }) as Readonly<T & ReactiveMarkers>;
 }
 
@@ -813,16 +847,16 @@ export function batchUpdates<T>(fn: () => T): T {
   if (isBatching) {
     return fn();
   }
-  
+
   isBatching = true;
   try {
     const result = fn();
-    
+
     // Flush all batched updates
     const updates = Array.from(batchedUpdates);
     batchedUpdates.clear();
-    updates.forEach(update => update());
-    
+    updates.forEach((update) => update());
+
     return result;
   } finally {
     isBatching = false;
@@ -837,12 +871,12 @@ export function effectWithDeps<T extends readonly unknown[]>(
   deps: T
 ): () => void {
   let cleanup: (() => void) | undefined;
-  
+
   return effect(() => {
     if (cleanup) {
       cleanup();
     }
-    
+
     const result = fn(...deps);
     if (typeof result === 'function') {
       cleanup = result;

@@ -22,7 +22,10 @@ export enum ErrorSeverity {
 
 // Minimal error classes for production
 export class UusError extends Error {
-  constructor(message: string, public category: ErrorCategory) {
+  constructor(
+    message: string,
+    public category: ErrorCategory
+  ) {
     super(message);
     this.name = 'UusError';
   }
@@ -30,7 +33,10 @@ export class UusError extends Error {
 
 export class DirectiveError extends UusError {
   constructor(directive: string, operation: string, originalError: Error) {
-    super(`Directive error in ${directive}.${operation}: ${originalError.message}`, ErrorCategory.DIRECTIVE);
+    super(
+      `Directive error in ${directive}.${operation}: ${originalError.message}`,
+      ErrorCategory.DIRECTIVE
+    );
   }
 }
 
@@ -42,13 +48,19 @@ export class MountingError extends UusError {
 
 export class ReactiveError extends UusError {
   constructor(operation: string, originalError: Error) {
-    super(`Reactive error in ${operation}: ${originalError.message}`, ErrorCategory.REACTIVE);
+    super(
+      `Reactive error in ${operation}: ${originalError.message}`,
+      ErrorCategory.REACTIVE
+    );
   }
 }
 
 export class EvaluationError extends UusError {
   constructor(expression: string, originalError: Error) {
-    super(`Evaluation error in "${expression}": ${originalError.message}`, ErrorCategory.EVALUATION);
+    super(
+      `Evaluation error in "${expression}": ${originalError.message}`,
+      ErrorCategory.EVALUATION
+    );
   }
 }
 
@@ -60,17 +72,16 @@ export class ParsingError extends UusError {
 
 export class ValidationError extends UusError {
   constructor(field: string, originalError: Error) {
-    super(`Validation error in ${field}: ${originalError.message}`, ErrorCategory.VALIDATION);
+    super(
+      `Validation error in ${field}: ${originalError.message}`,
+      ErrorCategory.VALIDATION
+    );
   }
 }
 
 // Minimal error handler for production
 export class SlimErrorHandler {
-  safe<T>(
-    fn: () => T,
-    category: ErrorCategory,
-    fallback?: T
-  ): T | undefined {
+  safe<T>(fn: () => T, category: ErrorCategory, fallback?: T): T | undefined {
     try {
       return fn();
     } catch (error) {
@@ -96,7 +107,11 @@ export class SlimErrorHandler {
 export const slimErrorHandler = new SlimErrorHandler();
 
 // Minimal validation
-export function validate(name: string, value: unknown, options: { required?: boolean; type?: string }): void {
+export function validate(
+  name: string,
+  value: unknown,
+  options: { required?: boolean; type?: string }
+): void {
   if (process.env.NODE_ENV === 'development') {
     if (options.required && (value === null || value === undefined)) {
       throw new Error(`${name} is required`);
@@ -108,5 +123,9 @@ export function validate(name: string, value: unknown, options: { required?: boo
 }
 
 // No-op functions for production
-export const createSafeFunction = <T extends (...args: any[]) => any>(fn: T): T => fn;
-export const wrapAsync = <T extends (...args: any[]) => Promise<any>>(fn: T): T => fn;
+export const createSafeFunction = <T extends (...args: any[]) => any>(
+  fn: T
+): T => fn;
+export const wrapAsync = <T extends (...args: any[]) => Promise<any>>(
+  fn: T
+): T => fn;

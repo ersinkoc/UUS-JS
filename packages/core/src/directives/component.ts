@@ -22,7 +22,11 @@ export const componentDirective: Directive<GenericDirectiveBinding> = {
   init(el, binding, uus) {
     try {
       const evaluator = createSafeEvaluator(uus.state);
-      const componentDef = evaluator(binding.expression ? asExpressionString(binding.expression) : asExpressionString('{}'));
+      const componentDef = evaluator(
+        binding.expression
+          ? asExpressionString(binding.expression)
+          : asExpressionString('{}')
+      );
 
       if (!isComponentDefinition(componentDef)) {
         console.error('uus-component must be an object');

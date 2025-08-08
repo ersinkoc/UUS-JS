@@ -11,17 +11,20 @@ export const textDirective: Directive<ContentDirectiveBinding> = {
       // Validate inputs
       validate('el', el, {
         required: true,
-        custom: (value) => value instanceof HTMLElement ? true : 'Element must be an HTMLElement'
+        custom: (value) =>
+          value instanceof HTMLElement
+            ? true
+            : 'Element must be an HTMLElement',
       });
 
       validate('binding', binding, {
         required: true,
-        type: 'object'
+        type: 'object',
       });
 
       validate('uus', uus, {
         required: true,
-        type: 'object'
+        type: 'object',
       });
 
       const evaluator = createSafeEvaluator(uus.state);
@@ -30,11 +33,16 @@ export const textDirective: Directive<ContentDirectiveBinding> = {
         const context = {
           element: el,
           directive: 'text',
-          expression: binding.expression
+          expression: binding.expression,
         };
 
         const value = uus.errorHandler.safe(
-          () => evaluator(binding.expression ? asExpressionString(binding.expression) : asExpressionString('')),
+          () =>
+            evaluator(
+              binding.expression
+                ? asExpressionString(binding.expression)
+                : asExpressionString('')
+            ),
           ErrorCategory.EVALUATION,
           context,
           '' // Default to empty string on evaluation failure
@@ -55,7 +63,6 @@ export const textDirective: Directive<ContentDirectiveBinding> = {
       const cleanups = uus.cleanups.get(el) || new Set();
       cleanups.add(cleanup);
       uus.cleanups.set(el, cleanups);
-
     } catch (error) {
       const directiveError = new DirectiveError(
         'text',
@@ -66,7 +73,7 @@ export const textDirective: Directive<ContentDirectiveBinding> = {
       uus.errorHandler.handle(directiveError);
     }
   },
-  
+
   unbind(el, _, uus) {
     try {
       const cleanups = uus.cleanups.get(el);

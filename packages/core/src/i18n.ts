@@ -5,7 +5,12 @@
 
 import { createReactive, effect } from './reactive';
 import { UusPlugin } from './types';
-import { ValidationError, ErrorSeverity, ErrorCategory, globalErrorHandler } from './errors';
+import {
+  ValidationError,
+  ErrorSeverity,
+  ErrorCategory,
+  globalErrorHandler,
+} from './errors';
 import { asDirectiveName } from './type-guards';
 
 export interface I18nConfig {
@@ -64,11 +69,13 @@ class I18n implements I18nInstance {
 
     // Initialize reactive state
     this.state = createReactive({
-      locale: config.detectBrowserLocale ? this.detectBrowserLocale() : config.defaultLocale,
+      locale: config.detectBrowserLocale
+        ? this.detectBrowserLocale()
+        : config.defaultLocale,
       fallbackLocale: config.fallbackLocale || config.defaultLocale,
       messages: config.messages || {},
       numberFormats: config.numberFormats || {},
-      dateFormats: config.dateFormats || {}
+      dateFormats: config.dateFormats || {},
     });
 
     // Ensure current locale has messages
@@ -117,7 +124,7 @@ class I18n implements I18nInstance {
     // Handle pluralization
     if (typeof message === 'object' && message !== null) {
       let pluralKey: string;
-      
+
       if (count === 0 && 'zero' in message) {
         pluralKey = 'zero';
       } else if (count === 1 && 'one' in message) {
@@ -144,7 +151,7 @@ class I18n implements I18nInstance {
    */
   n(value: number, format?: string): string {
     const options = format ? this.state.numberFormats[format] : undefined;
-    
+
     try {
       return new Intl.NumberFormat(this.state.locale, options).format(value);
     } catch (error) {
@@ -159,7 +166,7 @@ class I18n implements I18nInstance {
   d(value: Date | number, format?: string): string {
     const date = value instanceof Date ? value : new Date(value);
     const options = format ? this.state.dateFormats[format] : undefined;
-    
+
     try {
       return new Intl.DateTimeFormat(this.state.locale, options).format(date);
     } catch (error) {
@@ -250,9 +257,16 @@ class I18n implements I18nInstance {
   /**
    * Deep merge objects
    */
-  private deepMerge(target: Record<string, any>, source: Record<string, any>): void {
+  private deepMerge(
+    target: Record<string, any>,
+    source: Record<string, any>
+  ): void {
     for (const key in source) {
-      if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+      if (
+        source[key] &&
+        typeof source[key] === 'object' &&
+        !Array.isArray(source[key])
+      ) {
         if (!target[key]) target[key] = {};
         this.deepMerge(target[key], source[key]);
       } else {
@@ -267,9 +281,10 @@ class I18n implements I18nInstance {
   private detectBrowserLocale(): string {
     if (typeof window === 'undefined') return 'en';
 
-    const browserLocale = window.navigator.language || 
-                         (window.navigator as any).userLanguage || 
-                         'en';
+    const browserLocale =
+      window.navigator.language ||
+      (window.navigator as any).userLanguage ||
+      'en';
 
     // Return just the language code (e.g., 'en' from 'en-US')
     return browserLocale.split('-')[0];
@@ -281,7 +296,7 @@ class I18n implements I18nInstance {
  */
 export const i18nPlugin: UusPlugin = {
   name: 'i18n',
-  
+
   install(app) {
     let i18nInstance: I18n | null = null;
 
@@ -289,19 +304,21 @@ export const i18nPlugin: UusPlugin = {
     Object.defineProperty(app, '$i18n', {
       get() {
         if (!i18nInstance) {
-          throw new Error('i18n not initialized. Call app.setupI18n(config) first.');
+          throw new Error(
+            'i18n not initialized. Call app.setupI18n(config) first.'
+          );
         }
         return i18nInstance;
-      }
+      },
     });
 
     // Add setupI18n method
     (app as any).setupI18n = (config: I18nConfig) => {
       i18nInstance = new I18n(config);
-      
+
       // Make i18n reactive in state
       (app.state as any).$i18n = i18nInstance;
-      
+
       return i18nInstance;
     };
 
@@ -316,7 +333,7 @@ export const i18nPlugin: UusPlugin = {
           try {
             const key = binding.expression || el.getAttribute('uus-t') || '';
             let params: Record<string, any> | undefined;
-            
+
             if (binding.arg) {
               // If there's an arg (like :name="name"), create params object
               params = { [binding.arg]: binding.value };
@@ -325,7 +342,7 @@ export const i18nPlugin: UusPlugin = {
               params = binding.value;
             }
             // If value is a string or primitive, don't use it as params
-            
+
             el.textContent = i18n.t(key, params);
           } catch (error) {
             globalErrorHandler.handleGenericError(
@@ -338,7 +355,7 @@ export const i18nPlugin: UusPlugin = {
 
         // Update on locale change
         const cleanup = effect(updateText);
-        
+
         // Store cleanup
         const cleanups = uus.cleanups.get(el) || new Set();
         cleanups.add(cleanup);
@@ -350,7 +367,7 @@ export const i18nPlugin: UusPlugin = {
           cleanups.forEach((cleanup: any) => cleanup());
           uus.cleanups.delete(el);
         }
-      }
+      },
     });
 
     // Register i18n-html directive
@@ -362,9 +379,12 @@ export const i18nPlugin: UusPlugin = {
           if (!i18n) return;
 
           try {
-            const key = binding.expression || el.getAttribute('uus-t-html') || '';
-            const params = binding.arg ? { [binding.arg]: binding.value } : binding.value;
-            
+            const key =
+              binding.expression || el.getAttribute('uus-t-html') || '';
+            const params = binding.arg
+              ? { [binding.arg]: binding.value }
+              : binding.value;
+
             el.innerHTML = i18n.t(key, params);
           } catch (error) {
             globalErrorHandler.handleGenericError(
@@ -377,7 +397,7 @@ export const i18nPlugin: UusPlugin = {
 
         // Update on locale change
         const cleanup = effect(updateHtml);
-        
+
         // Store cleanup
         const cleanups = uus.cleanups.get(el) || new Set();
         cleanups.add(cleanup);
@@ -389,9 +409,9 @@ export const i18nPlugin: UusPlugin = {
           cleanups.forEach((cleanup: any) => cleanup());
           uus.cleanups.delete(el);
         }
-      }
+      },
     });
-  }
+  },
 };
 
 // Export types for module augmentation

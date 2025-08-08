@@ -105,9 +105,9 @@ export class MemoryLeakDetector {
     leaks.push(...this.detectObserverLeaks());
 
     // Determine overall health
-    const criticalLeaks = leaks.filter(leak => leak.severity === 'critical');
-    const highLeaks = leaks.filter(leak => leak.severity === 'high');
-    
+    const criticalLeaks = leaks.filter((leak) => leak.severity === 'critical');
+    const highLeaks = leaks.filter((leak) => leak.severity === 'high');
+
     let overall: 'healthy' | 'warning' | 'critical';
     if (criticalLeaks.length > 0) {
       overall = 'critical';
@@ -127,13 +127,13 @@ export class MemoryLeakDetector {
       stats: {
         totalResources: stats.resources.totalResources,
         memoryUsage: stats.heap?.usedJSHeapSize || 0,
-        oldestResourceAge: Date.now() - stats.resources.oldestResource
+        oldestResourceAge: Date.now() - stats.resources.oldestResource,
       },
-      recommendations
+      recommendations,
     };
 
     // Notify listeners
-    this.listeners.forEach(listener => {
+    this.listeners.forEach((listener) => {
       try {
         listener(report);
       } catch (error) {
@@ -156,11 +156,11 @@ export class MemoryLeakDetector {
    */
   private detectOrphanedDOMReferences(): LeakReport[] {
     const leaks: LeakReport[] = [];
-    
+
     try {
       // Check for detached DOM nodes
       const detachedNodes = this.findDetachedDOMNodes();
-      
+
       if (detachedNodes.length > 0) {
         leaks.push({
           type: 'orphaned',
@@ -171,9 +171,9 @@ export class MemoryLeakDetector {
           suggestions: [
             'Remove event listeners before removing DOM elements',
             'Clear references to DOM elements after removal',
-            'Use WeakMap for element-to-data associations'
+            'Use WeakMap for element-to-data associations',
           ],
-          memoryImpact: detachedNodes.length * 1000 // Rough estimate
+          memoryImpact: detachedNodes.length * 1000, // Rough estimate
         });
       }
     } catch (error) {
@@ -188,11 +188,11 @@ export class MemoryLeakDetector {
    */
   private detectCircularReferences(): LeakReport[] {
     const leaks: LeakReport[] = [];
-    
+
     try {
       // Use the circular reference manager to detect cycles
       const circularPaths = this.findCircularReferences();
-      
+
       if (circularPaths.length > 0) {
         leaks.push({
           type: 'circular',
@@ -203,9 +203,9 @@ export class MemoryLeakDetector {
           suggestions: [
             'Use WeakRef to break circular references',
             'Implement proper cleanup in component unmounting',
-            'Avoid storing parent references in child objects'
+            'Avoid storing parent references in child objects',
           ],
-          memoryImpact: circularPaths.length * 5000 // Rough estimate
+          memoryImpact: circularPaths.length * 5000, // Rough estimate
         });
       }
     } catch (error) {
@@ -220,11 +220,11 @@ export class MemoryLeakDetector {
    */
   private detectTimeoutLeaks(): LeakReport[] {
     const leaks: LeakReport[] = [];
-    
+
     try {
       // Check registry stats
       const registryStats = memoryManager.cleanupRegistry.getStats();
-      
+
       if (registryStats.timers > 50) {
         leaks.push({
           type: 'timeout',
@@ -235,9 +235,9 @@ export class MemoryLeakDetector {
           suggestions: [
             'Clear timeouts and intervals when components unmount',
             'Use AbortController for cancellable operations',
-            'Register timers with cleanup registry'
+            'Register timers with cleanup registry',
           ],
-          memoryImpact: registryStats.timers * 100
+          memoryImpact: registryStats.timers * 100,
         });
       }
     } catch (error) {
@@ -252,11 +252,11 @@ export class MemoryLeakDetector {
    */
   private detectEventListenerLeaks(): LeakReport[] {
     const leaks: LeakReport[] = [];
-    
+
     try {
       // Check for excessive event listeners
       const listenerCount = this.estimateEventListenerCount();
-      
+
       if (listenerCount > 100) {
         leaks.push({
           type: 'listener',
@@ -267,9 +267,9 @@ export class MemoryLeakDetector {
           suggestions: [
             'Remove event listeners in directive unbind methods',
             'Use event delegation for dynamic content',
-            'Track listeners with cleanup functions'
+            'Track listeners with cleanup functions',
           ],
-          memoryImpact: listenerCount * 500
+          memoryImpact: listenerCount * 500,
         });
       }
     } catch (error) {
@@ -284,10 +284,10 @@ export class MemoryLeakDetector {
    */
   private detectObserverLeaks(): LeakReport[] {
     const leaks: LeakReport[] = [];
-    
+
     try {
       const registryStats = memoryManager.cleanupRegistry.getStats();
-      
+
       if (registryStats.observers > 10) {
         leaks.push({
           type: 'observer',
@@ -298,9 +298,9 @@ export class MemoryLeakDetector {
           suggestions: [
             'Disconnect observers when components unmount',
             'Register observers with cleanup registry',
-            'Avoid creating duplicate observers'
+            'Avoid creating duplicate observers',
           ],
-          memoryImpact: registryStats.observers * 1000
+          memoryImpact: registryStats.observers * 1000,
         });
       }
     } catch (error) {
@@ -315,16 +315,16 @@ export class MemoryLeakDetector {
    */
   private findDetachedDOMNodes(): Element[] {
     const detached: Element[] = [];
-    
+
     try {
       // This is a simplified approach - in practice, detecting truly detached
       // nodes is complex and may require browser-specific APIs
       const allElements = document.querySelectorAll('*');
       const connectedElements = document.querySelectorAll('html *');
-      
+
       // Rough heuristic: if there's a significant difference, there might be detached nodes
       const potentialDetached = allElements.length - connectedElements.length;
-      
+
       if (potentialDetached > 0) {
         // Return a placeholder for the count
         for (let i = 0; i < Math.min(potentialDetached, 10); i++) {
@@ -334,7 +334,7 @@ export class MemoryLeakDetector {
     } catch (error) {
       console.warn('Error finding detached DOM nodes:', error);
     }
-    
+
     return detached;
   }
 
@@ -343,12 +343,12 @@ export class MemoryLeakDetector {
    */
   private findCircularReferences(): string[] {
     const paths: string[] = [];
-    
+
     try {
       // This is a simplified implementation
       // In practice, you'd traverse object graphs looking for cycles
       const resourceStats = memoryManager.getMemoryStats();
-      
+
       // If we have a high number of proxy resources, there might be circular refs
       if (resourceStats.resources.byType.proxy > 20) {
         paths.push('proxy-circular-reference-detected');
@@ -356,7 +356,7 @@ export class MemoryLeakDetector {
     } catch (error) {
       console.warn('Error finding circular references:', error);
     }
-    
+
     return paths;
   }
 
@@ -366,9 +366,13 @@ export class MemoryLeakDetector {
   private estimateEventListenerCount(): number {
     try {
       // This is a rough estimate based on elements with common event attributes
-      const elementsWithEvents = document.querySelectorAll('[onclick], [onchange], [onsubmit]');
-      const elementsWithDataAttributes = document.querySelectorAll('[data-event], [uus-on]');
-      
+      const elementsWithEvents = document.querySelectorAll(
+        '[onclick], [onchange], [onsubmit]'
+      );
+      const elementsWithDataAttributes = document.querySelectorAll(
+        '[data-event], [uus-on]'
+      );
+
       return elementsWithEvents.length + elementsWithDataAttributes.length;
     } catch (error) {
       console.warn('Error estimating event listener count:', error);
@@ -381,28 +385,36 @@ export class MemoryLeakDetector {
    */
   private generateRecommendations(leaks: LeakReport[], stats: any): string[] {
     const recommendations: string[] = [];
-    
+
     // General recommendations
     if (leaks.length > 0) {
-      recommendations.push('Implement comprehensive cleanup in component lifecycle');
+      recommendations.push(
+        'Implement comprehensive cleanup in component lifecycle'
+      );
       recommendations.push('Use WeakMap and WeakRef for loose coupling');
     }
-    
+
     // Memory usage recommendations
-    if (stats.heap?.usedJSHeapSize > 50 * 1024 * 1024) { // 50MB
-      recommendations.push('High memory usage detected - consider pagination or virtualization');
+    if (stats.heap?.usedJSHeapSize > 50 * 1024 * 1024) {
+      // 50MB
+      recommendations.push(
+        'High memory usage detected - consider pagination or virtualization'
+      );
     }
-    
+
     // Resource count recommendations
     if (stats.resources.totalResources > 1000) {
       recommendations.push('High resource count - implement resource pooling');
     }
-    
+
     // Age-based recommendations
-    if (stats.resources.oldestResourceAge > 10 * 60 * 1000) { // 10 minutes
-      recommendations.push('Long-lived resources detected - verify cleanup is working');
+    if (stats.resources.oldestResourceAge > 10 * 60 * 1000) {
+      // 10 minutes
+      recommendations.push(
+        'Long-lived resources detected - verify cleanup is working'
+      );
     }
-    
+
     return recommendations;
   }
 
@@ -426,25 +438,27 @@ export const leakDetector = new MemoryLeakDetector();
 export function initLeakDetection(autoStart = true): MemoryLeakDetector {
   if (process.env.NODE_ENV === 'development' && autoStart) {
     leakDetector.start();
-    
+
     // Log periodic reports
     leakDetector.onReport((report) => {
       if (report.overall !== 'healthy') {
         console.group('🔍 Memory Health Report');
         console.log('Overall:', report.overall);
         console.log('Leaks found:', report.leaks.length);
-        console.table(report.leaks.map(leak => ({
-          type: leak.type,
-          severity: leak.severity,
-          count: leak.count,
-          description: leak.description
-        })));
+        console.table(
+          report.leaks.map((leak) => ({
+            type: leak.type,
+            severity: leak.severity,
+            count: leak.count,
+            description: leak.description,
+          }))
+        );
         console.log('Recommendations:', report.recommendations);
         console.groupEnd();
       }
     });
   }
-  
+
   return leakDetector;
 }
 
@@ -466,12 +480,14 @@ export function forceGC(): boolean {
 /**
  * Memory pressure test utility
  */
-export function runMemoryPressureTest(durationMs = 5000): Promise<MemoryHealthReport> {
+export function runMemoryPressureTest(
+  durationMs = 5000
+): Promise<MemoryHealthReport> {
   return new Promise((resolve) => {
     console.log('🧪 Starting memory pressure test...');
-    
+
     const initialReport = leakDetector.performHealthCheck();
-    
+
     // Create some memory pressure
     const testObjects: any[] = [];
     const testInterval = setInterval(() => {
@@ -479,20 +495,20 @@ export function runMemoryPressureTest(durationMs = 5000): Promise<MemoryHealthRe
         testObjects.push({
           data: new Array(1000).fill(Math.random()),
           timestamp: Date.now(),
-          id: `test-${i}-${Date.now()}`
+          id: `test-${i}-${Date.now()}`,
         });
       }
     }, 100);
-    
+
     setTimeout(() => {
       clearInterval(testInterval);
-      
+
       // Clear test objects
       testObjects.length = 0;
-      
+
       // Force GC if available
       forceGC();
-      
+
       // Wait a bit for cleanup
       setTimeout(() => {
         const finalReport = leakDetector.performHealthCheck();

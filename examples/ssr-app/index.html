@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UUS.js SSR Todo App</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 2rem;
+      background: #f5f5f5;
+    }
+    .app {
+      background: white;
+      border-radius: 8px;
+      padding: 2rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #2c3e50;
+      margin-bottom: 2rem;
+    }
+    .todo-form {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+    }
+    input[type="text"] {
+      flex: 1;
+      padding: 0.5rem;
+      border: 2px solid #ddd;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    button {
+      padding: 0.5rem 1rem;
+      background: #3498db;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    button:hover {
+      background: #2980b9;
+    }
+    .todo-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .todo-item {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem;
+      border-bottom: 1px solid #eee;
+      transition: all 0.3s ease;
+    }
+    .todo-item:hover {
+      background: #f9f9f9;
+    }
+    .todo-item.done {
+      opacity: 0.6;
+    }
+    .todo-item.done .todo-text {
+      text-decoration: line-through;
+      color: #999;
+    }
+    .todo-checkbox {
+      margin-right: 1rem;
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+    .todo-text {
+      flex: 1;
+      font-size: 16px;
+    }
+    .todo-remove {
+      background: #e74c3c;
+      padding: 0.25rem 0.75rem;
+      font-size: 12px;
+    }
+    .todo-remove:hover {
+      background: #c0392b;
+    }
+    .empty-state {
+      text-align: center;
+      color: #999;
+      padding: 3rem 1rem;
+      font-size: 18px;
+    }
+    .stats {
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid #eee;
+      text-align: center;
+      color: #666;
+      font-size: 14px;
+    }
+    .time-display {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      background: rgba(0,0,0,0.8);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div id="app" class="app" uus-state="{ 
+    title: 'SSR Todo App',
+    todos: [],
+    newTodo: '',
+    serverTime: new Date().toLocaleTimeString()
+  }">
+    <h1 uus-text="title"></h1>
+    
+    <div class="todo-form">
+      <input 
+        type="text" 
+        uus-model="newTodo"
+        placeholder="What needs to be done?"
+        uus-on:keyup.enter="addTodo"
+      >
+      <button uus-on:click="addTodo">Add Todo</button>
+    </div>
+    
+    <ul class="todo-list" uus-show="todos.length > 0">
+      <li 
+        uus-for="todo in todos"
+        uus-bind:key="todo.id"
+        class="todo-item"
+        uus-class="{ done: todo.done }"
+      >
+        <input 
+          type="checkbox"
+          class="todo-checkbox"
+          uus-bind:checked="todo.done"
+          uus-on:change="toggleTodo(todo)"
+        >
+        <span class="todo-text" uus-text="todo.text"></span>
+        <button 
+          class="todo-remove"
+          uus-on:click="removeTodo(todo)"
+        >
+          Remove
+        </button>
+      </li>
+    </ul>
+    
+    <div uus-show="todos.length === 0" class="empty-state">
+      <p>📝 No todos yet!</p>
+      <p>Add your first todo above to get started.</p>
+    </div>
+    
+    <div class="stats" uus-show="todos.length > 0">
+      <strong uus-text="todos.filter(t => !t.done).length"></strong> active •
+      <strong uus-text="todos.filter(t => t.done).length"></strong> completed •
+      <strong uus-text="todos.length"></strong> total
+    </div>
+    
+    <div class="time-display" uus-show="clientTime">
+      Client: <span uus-text="clientTime || 'Loading...'"></span>
+    </div>
+  </div>
+  
+  <script>
+    // Define state methods
+    window.__INITIAL_STATE__ = {
+      addTodo() {
+        if (this.newTodo.trim()) {
+          this.todos.push({
+            id: Date.now(),
+            text: this.newTodo.trim(),
+            done: false
+          });
+          this.newTodo = '';
+        }
+      },
+      
+      toggleTodo(todo) {
+        todo.done = !todo.done;
+      },
+      
+      removeTodo(todo) {
+        const index = this.todos.indexOf(todo);
+        if (index > -1) {
+          this.todos.splice(index, 1);
+        }
+      }
+    };
+  </script>
+  
+  <script type="module" src="./client.js"></script>
+</body>
+</html>

@@ -1,7 +1,11 @@
 import type { Directive, ConditionalDirectiveBinding } from '../types';
 import { effect } from '../reactive';
 import { createSafeEvaluator } from '../evaluator';
-import { DirectiveError, ErrorCategory, ValidationError, validate } from '../errors';
+import {
+  DirectiveError,
+  ErrorCategory,
+  validate,
+} from '../errors';
 import { asDirectiveName, asExpressionString } from '../type-guards';
 
 export const ifDirective: Directive<ConditionalDirectiveBinding> = {
@@ -11,12 +15,15 @@ export const ifDirective: Directive<ConditionalDirectiveBinding> = {
       // Validate inputs
       validate('el', el, {
         required: true,
-        custom: (value) => value instanceof HTMLElement ? true : 'Element must be an HTMLElement'
+        custom: (value) =>
+          value instanceof HTMLElement
+            ? true
+            : 'Element must be an HTMLElement',
       });
 
       validate('binding', binding, {
         required: true,
-        type: 'object'
+        type: 'object',
       });
 
       if (!el.parentNode) {
@@ -42,13 +49,17 @@ export const ifDirective: Directive<ConditionalDirectiveBinding> = {
           directive: 'if',
           expression: binding.expression,
           isFirstRun,
-          isShown
+          isShown,
         };
 
         // Safely evaluate condition
         const shouldShow = uus.errorHandler.safe(
           () => {
-            const result = evaluator(binding.expression ? asExpressionString(binding.expression) : asExpressionString('true'));
+            const result = evaluator(
+              binding.expression
+                ? asExpressionString(binding.expression)
+                : asExpressionString('true')
+            );
             return Boolean(result); // Ensure boolean result
           },
           ErrorCategory.EVALUATION,
@@ -99,18 +110,20 @@ export const ifDirective: Directive<ConditionalDirectiveBinding> = {
       const cleanups = uus.cleanups.get(el) || new Set();
       cleanups.add(cleanup);
       uus.cleanups.set(el, cleanups);
-
     } catch (error) {
-      const directiveError = error instanceof DirectiveError ? error : new DirectiveError(
-        'if',
-        'bind',
-        error instanceof Error ? error : new Error(String(error)),
-        { element: el, expression: binding.expression }
-      );
+      const directiveError =
+        error instanceof DirectiveError
+          ? error
+          : new DirectiveError(
+              'if',
+              'bind',
+              error instanceof Error ? error : new Error(String(error)),
+              { element: el, expression: binding.expression }
+            );
       uus.errorHandler.handle(directiveError);
     }
   },
-  
+
   unbind(el, _, uus) {
     try {
       const cleanups = uus.cleanups.get(el);
@@ -130,8 +143,11 @@ export const ifDirective: Directive<ConditionalDirectiveBinding> = {
       uus.errorHandler.safe(
         () => {
           const comment = el.parentNode?.previousSibling;
-          if (comment && comment.nodeType === Node.COMMENT_NODE && 
-              comment.textContent === 'uus-if') {
+          if (
+            comment &&
+            comment.nodeType === Node.COMMENT_NODE &&
+            comment.textContent === 'uus-if'
+          ) {
             comment.parentNode?.replaceChild(el, comment);
           }
         },
@@ -139,7 +155,6 @@ export const ifDirective: Directive<ConditionalDirectiveBinding> = {
         { element: el, directive: 'if', phase: 'cleanup-dom' },
         undefined
       );
-
     } catch (error) {
       uus.errorHandler.handleGenericError(
         error instanceof Error ? error : new Error(String(error)),

@@ -13,12 +13,12 @@ export interface TrackedResource {
   metadata?: Record<string, unknown>;
 }
 
-export type ResourceType = 
-  | 'effect' 
-  | 'eventListener' 
-  | 'observer' 
-  | 'timer' 
-  | 'component' 
+export type ResourceType =
+  | 'effect'
+  | 'eventListener'
+  | 'observer'
+  | 'timer'
+  | 'component'
   | 'directive'
   | 'asyncOperation'
   | 'proxy';
@@ -43,8 +43,9 @@ export interface LeakDetectionConfig {
  */
 export class ResourceTracker {
   private resources = new Map<string, TrackedResource>();
-  private weakRefs = new Set<WeakRef<object>>();
-  private cleanupCallbacks = new Set<() => void>();
+  private weakRefs = new WeakMap<object, Set<WeakRef<object>>>();
+  private cleanupCallbacks = new WeakMap<object, Set<() => void>>();
+  private globalCleanups = new Set<() => void>();
   private leakDetectionConfig: LeakDetectionConfig;
   private leakCheckTimer?: number;
   private resourceCounter = 0;
@@ -55,7 +56,7 @@ export class ResourceTracker {
       checkInterval: 30000, // 30 seconds
       maxResourceAge: 300000, // 5 minutes
       maxResourceCount: 1000,
-      ...config
+      ...config,
     };
 
     if (this.leakDetectionConfig.enabled) {
@@ -73,25 +74,39 @@ export class ResourceTracker {
     metadata?: Record<string, unknown>
   ): string {
     const id = `${type}-${++this.resourceCounter}-${Date.now()}`;
-    
+
     const tracked: TrackedResource = {
       id,
       type,
       created: Date.now(),
       cleanup,
-      metadata
+      metadata,
     };
 
     // Use WeakRef for DOM elements to prevent memory leaks
     if (resource instanceof HTMLElement) {
       tracked.element = new WeakRef(resource);
-      this.weakRefs.add(tracked.element);
+
+      // Store WeakRef in WeakMap for better memory management
+      if (!this.weakRefs.has(resource)) {
+        this.weakRefs.set(resource, new Set());
+      }
+      this.weakRefs.get(resource)!.add(tracked.element);
     }
 
     this.resources.set(id, tracked);
 
     if (cleanup) {
-      this.cleanupCallbacks.add(cleanup);
+      if (resource) {
+        // Store cleanup in WeakMap associated with resource
+        if (!this.cleanupCallbacks.has(resource)) {
+          this.cleanupCallbacks.set(resource, new Set());
+        }
+        this.cleanupCallbacks.get(resource)!.add(cleanup);
+      } else {
+        // Global cleanup for non-resource-specific cleanups
+        this.globalCleanups.add(cleanup);
+      }
     }
 
     return id;
@@ -108,16 +123,13 @@ export class ResourceTracker {
     if (resource.cleanup) {
       try {
         resource.cleanup();
-        this.cleanupCallbacks.delete(resource.cleanup);
+        this.globalCleanups.delete(resource.cleanup);
       } catch (error) {
         console.warn('Error during resource cleanup:', error);
       }
     }
 
-    // Clean up WeakRef
-    if (resource.element) {
-      this.weakRefs.delete(resource.element);
-    }
+    // Clean up WeakRef - no need as WeakMap auto-cleans
 
     this.resources.delete(id);
     return true;
@@ -147,15 +159,15 @@ export class ResourceTracker {
    */
   cleanupAll(): void {
     const resourceIds = Array.from(this.resources.keys());
-    
+
     for (const id of resourceIds) {
       this.untrack(id);
     }
 
     // Clear any remaining collections
     this.resources.clear();
-    this.weakRefs.clear();
-    this.cleanupCallbacks.clear();
+    this.globalCleanups.clear();
+    // WeakMaps auto-clean, no need to clear
 
     if (this.leakCheckTimer) {
       clearInterval(this.leakCheckTimer);
@@ -175,7 +187,7 @@ export class ResourceTracker {
       component: 0,
       directive: 0,
       asyncOperation: 0,
-      proxy: 0
+      proxy: 0,
     };
 
     let oldestResource = Date.now();
@@ -190,7 +202,7 @@ export class ResourceTracker {
     const stats: MemoryStats = {
       totalResources: this.resources.size,
       byType,
-      oldestResource
+      oldestResource,
     };
 
     // Add memory usage if available
@@ -210,7 +222,7 @@ export class ResourceTracker {
 
     for (const resource of this.resources.values()) {
       const age = now - resource.created;
-      
+
       // Check for old resources
       if (age > this.leakDetectionConfig.maxResourceAge) {
         leaks.push(resource);
@@ -225,7 +237,9 @@ export class ResourceTracker {
 
     // Check total resource count
     if (this.resources.size > this.leakDetectionConfig.maxResourceCount) {
-      console.warn(`High resource count detected: ${this.resources.size} resources`);
+      console.warn(
+        `High resource count detected: ${this.resources.size} resources`
+      );
     }
 
     return leaks;
@@ -239,15 +253,17 @@ export class ResourceTracker {
 
     this.leakCheckTimer = window.setInterval(() => {
       const leaks = this.detectLeaks();
-      
+
       if (leaks.length > 0) {
         console.warn(`Memory leaks detected: ${leaks.length} resources`);
-        console.table(leaks.map(leak => ({
-          id: leak.id,
-          type: leak.type,
-          age: Date.now() - leak.created,
-          metadata: leak.metadata
-        })));
+        console.table(
+          leaks.map((leak) => ({
+            id: leak.id,
+            type: leak.type,
+            age: Date.now() - leak.created,
+            metadata: leak.metadata,
+          }))
+        );
 
         if (this.leakDetectionConfig.onLeakDetected) {
           this.leakDetectionConfig.onLeakDetected(leaks);
@@ -265,19 +281,11 @@ export class ResourceTracker {
    * Force garbage collection of dead WeakRefs (if available)
    */
   cleanupDeadRefs(): number {
-    let cleaned = 0;
+    const cleaned = 0;
     const deadRefs = new Set<WeakRef<object>>();
 
-    for (const ref of this.weakRefs) {
-      if (!ref.deref()) {
-        deadRefs.add(ref);
-        cleaned++;
-      }
-    }
-
-    for (const deadRef of deadRefs) {
-      this.weakRefs.delete(deadRef);
-    }
+    // WeakMap cannot be iterated - this would need a different cleanup strategy
+    // For example, tracking refs separately or using a periodic cleanup mechanism
 
     return cleaned;
   }
@@ -290,14 +298,16 @@ export class CleanupRegistry {
   private cleanupFunctions = new Set<() => void>();
   private timers = new Set<number>();
   private abortControllers = new Set<AbortController>();
-  private observers = new Set<MutationObserver | ResizeObserver | PerformanceObserver>();
+  private observers = new Set<
+    MutationObserver | ResizeObserver | PerformanceObserver
+  >();
 
   /**
    * Register a cleanup function
    */
   register(cleanup: () => void): () => void {
     this.cleanupFunctions.add(cleanup);
-    
+
     // Return unregister function
     return () => {
       this.cleanupFunctions.delete(cleanup);
@@ -309,7 +319,7 @@ export class CleanupRegistry {
    */
   registerTimer(timerId: number): () => void {
     this.timers.add(timerId);
-    
+
     return () => {
       clearTimeout(timerId);
       clearInterval(timerId);
@@ -322,7 +332,7 @@ export class CleanupRegistry {
    */
   registerAbortController(controller: AbortController): () => void {
     this.abortControllers.add(controller);
-    
+
     return () => {
       if (!controller.signal.aborted) {
         controller.abort();
@@ -338,7 +348,7 @@ export class CleanupRegistry {
     observer: MutationObserver | ResizeObserver | PerformanceObserver
   ): () => void {
     this.observers.add(observer);
-    
+
     return () => {
       observer.disconnect();
       this.observers.delete(observer);
@@ -391,7 +401,7 @@ export class CleanupRegistry {
       cleanupFunctions: this.cleanupFunctions.size,
       timers: this.timers.size,
       abortControllers: this.abortControllers.size,
-      observers: this.observers.size
+      observers: this.observers.size,
     };
   }
 }
@@ -443,14 +453,14 @@ export class CircularReferenceManager {
    */
   breakCircular(obj: object, maxDepth = 10): object {
     const seen = new WeakMap<object, WeakRef<object>>();
-    
+
     const process = (current: unknown, depth: number): unknown => {
       if (depth > maxDepth || current === null || typeof current !== 'object') {
         return current;
       }
 
       const currentObj = current as object;
-      
+
       if (seen.has(currentObj)) {
         // Return WeakRef to break circular reference
         return seen.get(currentObj)!;
@@ -460,7 +470,7 @@ export class CircularReferenceManager {
       seen.set(currentObj, weakRef);
 
       if (Array.isArray(currentObj)) {
-        return currentObj.map(item => process(item, depth + 1));
+        return currentObj.map((item) => process(item, depth + 1));
       }
 
       const result: Record<string, unknown> = {};
@@ -503,8 +513,8 @@ export const memoryManager = {
       cleanup: this.cleanupRegistry.register.bind(this.cleanupRegistry),
       stats: () => ({
         resources: this.resourceTracker.getStats(),
-        registry: this.cleanupRegistry.getStats()
-      })
+        registry: this.cleanupRegistry.getStats(),
+      }),
     };
   },
 
@@ -525,9 +535,9 @@ export const memoryManager = {
     return {
       resources: this.resourceTracker.getStats(),
       registry: this.cleanupRegistry.getStats(),
-      ...(typeof window !== 'undefined' && (window.performance as any).memory 
+      ...(typeof window !== 'undefined' && (window.performance as any).memory
         ? { heap: (window.performance as any).memory }
-        : {})
+        : {}),
     };
-  }
+  },
 };

@@ -11,7 +11,11 @@ export const styleDirective: Directive<StyleDirectiveBinding> = {
 
     const cleanup = effect(() => {
       try {
-        const value = evaluator(binding.expression ? asExpressionString(binding.expression) : asExpressionString('{}'));
+        const value = evaluator(
+          binding.expression
+            ? asExpressionString(binding.expression)
+            : asExpressionString('{}')
+        );
 
         // Reset to original style
         el.setAttribute('style', originalStyle);

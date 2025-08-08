@@ -41,10 +41,7 @@ export {
 export { SlimErrorHandler as ErrorHandler } from './errors/slim';
 export { slimErrorHandler as globalErrorHandler } from './errors/slim';
 
-export type {
-  UusErrorContext,
-  ErrorHandlerConfig,
-} from './errors';
+export type { UusErrorContext, ErrorHandlerConfig } from './errors';
 
 // Minimal validation for production
 export function validateElement(element: unknown): element is HTMLElement {

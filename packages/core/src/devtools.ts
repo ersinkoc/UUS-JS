@@ -50,7 +50,11 @@ export class DevTools {
   private performanceMarks: Map<string, number> = new Map();
   private cleanupFunctions: Set<() => void> = new Set();
   private observers: Set<PerformanceObserver> = new Set();
-  private eventListeners: Array<{ target: EventTarget; type: string; listener: EventListener }> = [];
+  private eventListeners: Array<{
+    target: EventTarget;
+    type: string;
+    listener: EventListener;
+  }> = [];
 
   constructor(app: Uus, config: DevToolsConfig = {}) {
     this.app = app;
@@ -133,9 +137,13 @@ export class DevTools {
       // Break on error is enabled but debugger statement removed for production
       // Use browser dev tools or conditional breakpoints instead
     };
-    
+
     window.addEventListener('error', errorHandler as EventListener);
-    this.eventListeners.push({ target: window, type: 'error', listener: errorHandler as EventListener });
+    this.eventListeners.push({
+      target: window,
+      type: 'error',
+      listener: errorHandler as EventListener,
+    });
   }
 
   private setupPerformanceTracking() {
@@ -201,12 +209,12 @@ export class DevTools {
     if (this.stateHistory.length > 50) {
       this.stateHistory.shift();
     }
-    
+
     // Periodically clean up old snapshots
     const now = Date.now();
     const maxAge = 5 * 60 * 1000; // 5 minutes
-    this.stateHistory = this.stateHistory.filter(snap => 
-      now - snap.timestamp < maxAge
+    this.stateHistory = this.stateHistory.filter(
+      (snap) => now - snap.timestamp < maxAge
     );
   }
 
@@ -430,7 +438,7 @@ export class DevTools {
       console.error('Failed to import state:', error);
     }
   }
-  
+
   /**
    * Get memory statistics
    */
@@ -440,25 +448,25 @@ export class DevTools {
         stateHistory: this.stateHistory.length,
         performanceMarks: this.performanceMarks.size,
         observers: this.observers.size,
-        eventListeners: this.eventListeners.length
+        eventListeners: this.eventListeners.length,
       },
       app: (this.app as any).getMemoryStats?.() || 'Not available',
-      global: memoryManager.getMemoryStats()
+      global: memoryManager.getMemoryStats(),
     };
   }
-  
+
   /**
    * Cleanup DevTools resources
    */
   destroy() {
     // Clear state history
     this.stateHistory = [];
-    
+
     // Clear performance marks
     this.performanceMarks.clear();
-    
+
     // Disconnect observers
-    this.observers.forEach(observer => {
+    this.observers.forEach((observer) => {
       try {
         observer.disconnect();
       } catch (error) {
@@ -466,7 +474,7 @@ export class DevTools {
       }
     });
     this.observers.clear();
-    
+
     // Remove event listeners
     this.eventListeners.forEach(({ target, type, listener }) => {
       try {
@@ -476,9 +484,9 @@ export class DevTools {
       }
     });
     this.eventListeners = [];
-    
+
     // Run cleanup functions
-    this.cleanupFunctions.forEach(cleanup => {
+    this.cleanupFunctions.forEach((cleanup) => {
       try {
         cleanup();
       } catch (error) {
@@ -486,12 +494,12 @@ export class DevTools {
       }
     });
     this.cleanupFunctions.clear();
-    
+
     // Remove from window
     if (typeof window !== 'undefined') {
       delete (window as any).__UUS_DEVTOOLS__;
     }
-    
+
     console.log('%c🗑️ DevTools cleaned up', 'color: #95a5a6;');
   }
 }
@@ -516,7 +524,7 @@ export class DevToolsExtensionBridge {
       if (event.data.source !== 'uus-devtools-extension') return;
       this.handleMessage(event.data);
     };
-    
+
     window.addEventListener('message', this.messageListener);
 
     // Notify extension that app is ready
@@ -528,7 +536,7 @@ export class DevToolsExtensionBridge {
       },
     });
   }
-  
+
   /**
    * Cleanup extension bridge resources
    */
@@ -537,8 +545,8 @@ export class DevToolsExtensionBridge {
       window.removeEventListener('message', this.messageListener);
       this.messageListener = undefined;
     }
-    
-    this.cleanupFunctions.forEach(cleanup => {
+
+    this.cleanupFunctions.forEach((cleanup) => {
       try {
         cleanup();
       } catch (error) {
@@ -546,7 +554,7 @@ export class DevToolsExtensionBridge {
       }
     });
     this.cleanupFunctions.clear();
-    
+
     console.log('%c🌉 Extension bridge cleaned up', 'color: #95a5a6;');
   }
 

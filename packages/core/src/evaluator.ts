@@ -1,17 +1,18 @@
-import type { 
-  ReactiveState, 
-  ExpressionString, 
-  Result, 
-  EventHandler 
+import type {
+  ReactiveState,
+  ExpressionString,
+  Result,
+  EventHandler,
 } from './types';
-import { 
-  EvaluationError, 
-  ValidationError, 
+import {
+  EvaluationError,
+  ValidationError,
   ErrorCategory,
   globalErrorHandler,
   validate,
-  createSafeFunction 
+  createSafeFunction,
 } from './errors';
+import { safeEvaluateExpression } from './safe-evaluator';
 
 const FORBIDDEN_GLOBALS = new Set([
   'eval',
@@ -29,13 +30,13 @@ export function createSafeEvaluator(
 ): (expression: ExpressionString) => unknown {
   // Validate state parameter
   try {
-    validate('state', state, { 
-      required: true, 
+    validate('state', state, {
+      required: true,
       type: 'object',
       custom: (value) => {
         if (value === null) return 'State cannot be null';
         return true;
-      }
+      },
     });
   } catch (error) {
     globalErrorHandler.handle(error as ValidationError);
@@ -70,10 +71,15 @@ export function createSafeEvaluator(
 
     try {
       // Validate expression input
-      validate('expression', expression, { 
-        type: 'string',
-        maxLength: 10000, // Prevent overly complex expressions
-      }, context);
+      validate(
+        'expression',
+        expression,
+        {
+          type: 'string',
+          maxLength: 10000, // Prevent overly complex expressions
+        },
+        context
+      );
 
       // Security check for forbidden keywords
       for (const forbidden of FORBIDDEN_GLOBALS) {
@@ -83,11 +89,11 @@ export function createSafeEvaluator(
             new Error(`Security violation: forbidden keyword "${forbidden}"`),
             context
           );
-          
+
           if (options?.throwOnError) {
             throw error;
           }
-          
+
           globalErrorHandler.handle(error);
           return undefined;
         }
@@ -98,38 +104,13 @@ export function createSafeEvaluator(
         return undefined;
       }
 
-      // Check cache first
-      const cacheKey = expression + Object.keys(state).join(',');
-      let func = expressionCache.get(cacheKey);
-
-      if (!func) {
-        func = globalErrorHandler.safe(
-          () => compileExpression(expression, state, allowedGlobals),
-          ErrorCategory.EVALUATION,
-          { ...context, phase: 'compilation' }
-        ) || undefined;
-
-        if (!func) {
-          // Compilation failed, return undefined as fallback
-          return undefined;
-        }
-
-        // Cache for performance with size management
-        if (expressionCache.size > 1000) {
-          expressionCache.clear();
-        }
-        expressionCache.set(cacheKey, func);
-      }
-
-      // Execute the compiled function with error handling
-      const allContext = { ...state, ...allowedGlobals, _state: state };
+      // Use safe AST-based evaluator instead of Function constructor
       return globalErrorHandler.safe(
-        () => func!(allContext),
+        () => safeEvaluateExpression(expression, state),
         ErrorCategory.EVALUATION,
         { ...context, phase: 'execution' },
         undefined // Return undefined on execution failure
       );
-
     } catch (error) {
       if (error instanceof EvaluationError) {
         if (options?.throwOnError) {
@@ -144,11 +125,11 @@ export function createSafeEvaluator(
         error instanceof Error ? error : new Error(String(error)),
         context
       );
-      
+
       if (options?.throwOnError) {
         throw evaluationError;
       }
-      
+
       globalErrorHandler.handle(evaluationError);
       return undefined; // Graceful fallback
     }
@@ -194,8 +175,7 @@ function compileExpression(
       !processedExpression.includes('<=') &&
       !processedExpression.includes('>=');
     const hasIncrement =
-      processedExpression.includes('++') ||
-      processedExpression.includes('--');
+      processedExpression.includes('++') || processedExpression.includes('--');
 
     if (hasAssignment || hasIncrement) {
       processedExpression = transformStateAccessors(processedExpression, state);
@@ -240,8 +220,8 @@ function compileExpression(
       throw new Error('Expression too complex');
     }
 
+    // eslint-disable-next-line @typescript-eslint/ban-types
     return new Function(functionBody) as (...args: unknown[]) => unknown;
-
   } catch (error) {
     throw new EvaluationError(
       expression,
@@ -254,7 +234,10 @@ function compileExpression(
 /**
  * Transforms state accessor patterns in expressions
  */
-function transformStateAccessors(expression: string, state: ReactiveState): string {
+function transformStateAccessors(
+  expression: string,
+  state: ReactiveState
+): string {
   let processedExpression = expression;
   const stateKeys = Object.keys(state);
 
@@ -265,20 +248,14 @@ function transformStateAccessors(expression: string, state: ReactiveState): stri
       key.match(/^[a-zA-Z_$][a-zA-Z0-9_$]*$/)
     ) {
       // Transform assignments like "clicked = true" to "arguments[0]._state.clicked = true"
-      const assignmentRegex = new RegExp(
-        `\\b${key}\\s*([+\\-*\\/]?=)`,
-        'g'
-      );
+      const assignmentRegex = new RegExp(`\\b${key}\\s*([+\\-*\\/]?=)`, 'g');
       processedExpression = processedExpression.replace(
         assignmentRegex,
         `arguments[0]._state.${key} $1`
       );
 
       // Transform increment/decrement like "count++" to "(arguments[0]._state.count++)"
-      const incrementRegex = new RegExp(
-        `\\b${key}\\s*(\\+\\+|\\-\\-)`,
-        'g'
-      );
+      const incrementRegex = new RegExp(`\\b${key}\\s*(\\+\\+|\\-\\-)`, 'g');
       processedExpression = processedExpression.replace(
         incrementRegex,
         `(arguments[0]._state.${key}$1)`
@@ -305,19 +282,19 @@ export function parseEventExpression(expression: ExpressionString): {
 } {
   try {
     // Validate input
-    validate('expression', expression, { 
+    validate('expression', expression, {
       required: true,
       type: 'string',
-      maxLength: 1000 
+      maxLength: 1000,
     });
 
     const trimmedExpression = expression.trim();
-    
+
     // Parse function call syntax: functionName(arg1, arg2, ...)
     const match = trimmedExpression.match(/^(\w+)\((.*)\)$/);
     if (match) {
       const [, handler, argsStr] = match;
-      
+
       // Validate handler name
       if (!handler || !handler.match(/^[a-zA-Z_$][a-zA-Z0-9_$]*$/)) {
         throw new EvaluationError(
@@ -333,19 +310,18 @@ export function parseEventExpression(expression: ExpressionString): {
             .map((arg) => arg.trim())
             .filter(Boolean)
         : [];
-      
+
       return { handler, args };
     }
-    
+
     // Simple handler name without parentheses
     if (trimmedExpression.match(/^[a-zA-Z_$][a-zA-Z0-9_$]*$/)) {
       return { handler: trimmedExpression, args: [] };
     }
-    
-    // For complex expressions (assignments, operations, etc.), 
+
+    // For complex expressions (assignments, operations, etc.),
     // return the expression as-is for direct evaluation
     return { handler: expression, args: [] };
-    
   } catch (error) {
     if (error instanceof EvaluationError || error instanceof ValidationError) {
       globalErrorHandler.handle(error);
@@ -356,7 +332,7 @@ export function parseEventExpression(expression: ExpressionString): {
         { expression }
       );
     }
-    
+
     // Return safe fallback
     return { handler: '', args: [] };
   }
@@ -377,7 +353,7 @@ export function safeEvaluate<T = unknown>(
   try {
     const evaluator = createSafeEvaluator(state);
     const result = evaluator(expression);
-    
+
     // Type validation if expected type is provided
     if (expectedType && typeof result !== expectedType) {
       return {
@@ -386,21 +362,22 @@ export function safeEvaluate<T = unknown>(
           expression,
           new TypeError(`Expected ${expectedType}, got ${typeof result}`),
           { expectedType, actualType: typeof result }
-        )
+        ),
       };
     }
-    
+
     return { success: true, data: result as T };
   } catch (error) {
     return {
       success: false,
-      error: error instanceof EvaluationError 
-        ? error 
-        : new EvaluationError(
-            expression,
-            error instanceof Error ? error : new Error(String(error)),
-            { phase: 'safe-evaluation' }
-          )
+      error:
+        error instanceof EvaluationError
+          ? error
+          : new EvaluationError(
+              expression,
+              error instanceof Error ? error : new Error(String(error)),
+              { phase: 'safe-evaluation' }
+            ),
     };
   }
 }
@@ -416,7 +393,7 @@ export function evaluateAsBoolean(
   if (!result.success) {
     return false; // Safe fallback
   }
-  
+
   return Boolean(result.data);
 }
 
@@ -431,12 +408,12 @@ export function evaluateAsString(
   if (!result.success) {
     return ''; // Safe fallback
   }
-  
+
   const value = result.data;
   if (value === null || value === undefined) {
     return '';
   }
-  
+
   return String(value);
 }
 
@@ -451,7 +428,7 @@ export function evaluateAsNumber(
   if (!result.success) {
     return 0; // Safe fallback
   }
-  
+
   const num = Number(result.data);
   return isNaN(num) ? 0 : num;
 }
@@ -471,23 +448,24 @@ export function evaluateAsEventHandler(
       return handler as EventHandler;
     }
   }
-  
+
   // Fall back to direct evaluation for simple function references
   // Only try function evaluation for expressions that could be function references
   const trimmed = expression.trim();
-  const couldBeFunction = /^[a-zA-Z_$][a-zA-Z0-9_$.]*$/.test(trimmed) && 
-                         !trimmed.includes('=') && 
-                         !trimmed.includes('++') && 
-                         !trimmed.includes('--') &&
-                         !trimmed.includes('$event');
-  
+  const couldBeFunction =
+    /^[a-zA-Z_$][a-zA-Z0-9_$.]*$/.test(trimmed) &&
+    !trimmed.includes('=') &&
+    !trimmed.includes('++') &&
+    !trimmed.includes('--') &&
+    !trimmed.includes('$event');
+
   if (couldBeFunction) {
     const result = safeEvaluate(expression, state, 'function');
     if (result.success && typeof result.data === 'function') {
       return result.data as EventHandler;
     }
   }
-  
+
   // Return expression string as fallback
   return expression;
 }
@@ -503,17 +481,19 @@ export function validateExpressionSyntax(
     if (!expression || expression.trim() === '') {
       return { success: true, data: true };
     }
-    
+
     // Check for basic syntax errors by attempting to parse as function body
+    // eslint-disable-next-line @typescript-eslint/ban-types
     new Function(`return (${expression})`);
-    
+
     return { success: true, data: true };
   } catch (error) {
     return {
       success: false,
-      error: error instanceof SyntaxError 
-        ? error 
-        : new SyntaxError(`Invalid expression syntax: ${String(error)}`)
+      error:
+        error instanceof SyntaxError
+          ? error
+          : new SyntaxError(`Invalid expression syntax: ${String(error)}`),
     };
   }
 }

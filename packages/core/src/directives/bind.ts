@@ -1,7 +1,11 @@
 import type { Directive, BindDirectiveBinding } from '../types';
 import { effect } from '../reactive';
 import { createSafeEvaluator } from '../evaluator';
-import { asDirectiveName, asExpressionString, isBindDirectiveBinding } from '../type-guards';
+import {
+  asDirectiveName,
+  asExpressionString,
+  isBindDirectiveBinding,
+} from '../type-guards';
 
 export const bindDirective: Directive<BindDirectiveBinding> = {
   name: asDirectiveName('bind'),
@@ -21,7 +25,11 @@ export const bindDirective: Directive<BindDirectiveBinding> = {
 
     const cleanup = effect(() => {
       try {
-        const value = evaluator(binding.expression ? asExpressionString(binding.expression) : asExpressionString(''));
+        const value = evaluator(
+          binding.expression
+            ? asExpressionString(binding.expression)
+            : asExpressionString('')
+        );
 
         // Special handling for certain attributes
         if (attrName === 'class') {

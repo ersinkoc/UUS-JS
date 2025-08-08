@@ -5,6 +5,43 @@ import type {
   RealtimeMessage,
 } from './types';
 
+// Safe JSON parsing to prevent prototype pollution
+function safeJsonParse(text: string): any {
+  try {
+    const parsed = JSON.parse(text);
+    
+    // Check for prototype pollution attempts
+    if (parsed && typeof parsed === 'object') {
+      const dangerous = ['__proto__', 'constructor', 'prototype'];
+      
+      // Recursive check for dangerous keys
+      const checkObject = (obj: any): boolean => {
+        if (!obj || typeof obj !== 'object') return true;
+        
+        for (const key of Object.keys(obj)) {
+          if (dangerous.includes(key)) {
+            console.error('[WebSocket] Potential prototype pollution detected');
+            return false;
+          }
+          if (typeof obj[key] === 'object' && !checkObject(obj[key])) {
+            return false;
+          }
+        }
+        return true;
+      };
+      
+      if (!checkObject(parsed)) {
+        throw new Error('Unsafe JSON detected');
+      }
+    }
+    
+    return parsed;
+  } catch (error) {
+    console.error('[WebSocket] JSON parse error:', error);
+    throw error;
+  }
+}
+
 /**
  * Create a WebSocket connection
  */
@@ -82,6 +119,21 @@ export function createWebSocket(
     }
   }
 
+  // Sanitize auth parameters to prevent injection attacks
+  function sanitizeAuthParams(params: Record<string, any>): Record<string, string> {
+    const safe: Record<string, string> = {};
+    for (const [key, value] of Object.entries(params)) {
+      // Only allow alphanumeric keys with underscores and hyphens
+      if (/^[a-zA-Z0-9_-]+$/.test(key)) {
+        // Encode value to prevent injection
+        safe[key] = encodeURIComponent(String(value));
+      } else {
+        console.warn(`[WebSocket] Skipping invalid auth parameter key: ${key}`);
+      }
+    }
+    return safe;
+  }
+
   async function connect(): Promise<void> {
     if (state.connected || state.connecting) return;
 
@@ -97,10 +149,12 @@ export function createWebSocket(
             : options.auth;
       }
 
-      // Build URL with auth params
+      // Build URL with sanitized auth params
       const url = new URL(opts.url);
-      Object.entries(authData).forEach(([key, value]) => {
-        url.searchParams.set(key, String(value));
+      const sanitizedAuth = sanitizeAuthParams(authData);
+      Object.entries(sanitizedAuth).forEach(([key, value]) => {
+        // Values are already encoded by sanitizeAuthParams
+        url.searchParams.set(key, value);
       });
 
       // Create WebSocket
@@ -153,7 +207,8 @@ export function createWebSocket(
 
       ws.onmessage = (event) => {
         try {
-          const message: RealtimeMessage = JSON.parse(event.data);
+          // Safe JSON parsing with validation
+          const message: RealtimeMessage = safeJsonParse(event.data);
           log('Message received', message);
 
           // Handle heartbeat

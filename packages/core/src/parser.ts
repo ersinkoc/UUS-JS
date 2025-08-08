@@ -1,26 +1,26 @@
-import type { 
-  DirectiveBinding, 
-  DirectiveName, 
+import type {
+  DirectiveBinding,
+  DirectiveName,
   ExpressionString,
   EventName,
-  AttributeName 
+  AttributeName,
 } from './types';
-import { 
-  isDirectiveName, 
-  isEventName, 
+import {
+  isDirectiveName,
+  isEventName,
   isAttributeName,
   validateDirectiveNameFormat,
   asDirectiveName,
   asExpressionString,
   asEventName,
-  asAttributeName
+  asAttributeName,
 } from './type-guards';
-import { 
-  ParsingError, 
+import {
+  ParsingError,
   ValidationError,
   ErrorCategory,
   globalErrorHandler,
-  validate 
+  validate,
 } from './errors';
 
 const DIRECTIVE_PREFIX = 'uus-';
@@ -34,17 +34,26 @@ export interface ParsedDirective {
   modifiers: Record<string, boolean>;
 }
 
-export function parseDirective(attr: Attr, options?: { throwOnError?: boolean }): ParsedDirective | null {
+export function parseDirective(
+  attr: Attr,
+  options?: { throwOnError?: boolean }
+): ParsedDirective | null {
   try {
     // Validate input
-    validate('attr', attr, { 
+    validate('attr', attr, {
       required: true,
       custom: (value) => {
-        if (!value || typeof value !== 'object') return 'Attribute must be an object';
-        if (!(value as any).name || typeof (value as any).name !== 'string') return 'Attribute must have a name property';
-        if ((value as any).value !== undefined && typeof (value as any).value !== 'string') return 'Attribute value must be a string';
+        if (!value || typeof value !== 'object')
+          return 'Attribute must be an object';
+        if (!(value as any).name || typeof (value as any).name !== 'string')
+          return 'Attribute must have a name property';
+        if (
+          (value as any).value !== undefined &&
+          typeof (value as any).value !== 'string'
+        )
+          return 'Attribute value must be a string';
         return true;
-      }
+      },
     });
 
     const name = attr.name;
@@ -54,7 +63,7 @@ export function parseDirective(attr: Attr, options?: { throwOnError?: boolean })
     }
 
     const directivePart = name.slice(DIRECTIVE_PREFIX.length);
-    
+
     // Validate directive part
     if (!directivePart) {
       const error = new ParsingError(
@@ -63,11 +72,11 @@ export function parseDirective(attr: Attr, options?: { throwOnError?: boolean })
         new Error('Directive name cannot be empty'),
         { directivePart, attributeName: name }
       );
-      
+
       if (options?.throwOnError) {
         throw error;
       }
-      
+
       globalErrorHandler.handle(error);
       return null;
     }
@@ -81,22 +90,23 @@ export function parseDirective(attr: Attr, options?: { throwOnError?: boolean })
       if (directivePart.startsWith(EVENT_PREFIX)) {
         directiveName = asDirectiveName('on');
         const eventPart = directivePart.slice(EVENT_PREFIX.length);
-        
+
         if (!eventPart) {
           throw new Error('Event name cannot be empty');
         }
-        
+
         const [eventName, ...modifierParts] = eventPart.split('.');
-        
+
         // Validate event name
         if (!eventName || !eventName.match(/^[a-zA-Z][a-zA-Z0-9]*$/)) {
           throw new Error('Invalid event name format');
         }
-        
+
         arg = asEventName(eventName);
         modifiers = modifierParts.reduce(
           (acc, mod) => {
-            if (mod !== undefined) { // Include empty modifiers
+            if (mod !== undefined) {
+              // Include empty modifiers
               if (mod === '' || mod.match(/^[a-zA-Z][a-zA-Z0-9]*$/)) {
                 acc[mod] = true;
               }
@@ -108,30 +118,31 @@ export function parseDirective(attr: Attr, options?: { throwOnError?: boolean })
       } else if (directivePart.startsWith(BIND_PREFIX)) {
         directiveName = asDirectiveName('bind');
         const bindPart = directivePart.slice(BIND_PREFIX.length);
-        
+
         if (!bindPart) {
           throw new Error('Bind attribute name cannot be empty');
         }
-        
+
         // Validate bind attribute name
         if (!bindPart.match(/^[a-zA-Z][a-zA-Z0-9-]*$/)) {
           throw new Error('Invalid bind attribute name format');
         }
-        
+
         arg = asAttributeName(bindPart);
       } else {
         // Regular directive, might have modifiers
         const [name, ...modifierParts] = directivePart.split('.');
         directiveName = asDirectiveName(name || directivePart);
-        
+
         // Validate directive name
         if (!directiveName.match(/^[a-zA-Z][a-zA-Z0-9]*$/)) {
           throw new Error('Invalid directive name format');
         }
-        
+
         modifiers = modifierParts.reduce(
           (acc, mod) => {
-            if (mod !== undefined) { // Include empty modifiers
+            if (mod !== undefined) {
+              // Include empty modifiers
               if (mod === '' || mod.match(/^[a-zA-Z][a-zA-Z0-9]*$/)) {
                 acc[mod] = true;
               }
@@ -153,26 +164,24 @@ export function parseDirective(attr: Attr, options?: { throwOnError?: boolean })
         arg,
         modifiers,
       };
-
     } catch (error) {
       throw new ParsingError(
         null as any, // Element not available in this context
         name,
         error instanceof Error ? error : new Error(String(error)),
-        { 
-          directivePart, 
+        {
+          directivePart,
           attributeName: name,
-          attributeValue: attr.value 
+          attributeValue: attr.value,
         }
       );
     }
-
   } catch (error) {
     // If we're in test mode and should throw errors, re-throw them
     if (options?.throwOnError && error instanceof ParsingError) {
       throw error;
     }
-    
+
     if (error instanceof ParsingError || error instanceof ValidationError) {
       globalErrorHandler.handle(error);
     } else {
@@ -182,7 +191,7 @@ export function parseDirective(attr: Attr, options?: { throwOnError?: boolean })
         { attributeName: attr?.name, attributeValue: attr?.value }
       );
     }
-    
+
     // Return null for invalid directives to skip them gracefully
     return null;
   }
@@ -194,12 +203,22 @@ export function createBinding(parsed: ParsedDirective): DirectiveBinding {
     validate('parsed', parsed, {
       required: true,
       custom: (value) => {
-        if (!value || typeof value !== 'object') return 'Parsed directive must be an object';
-        if (typeof (value as any).name !== 'string') return 'Directive name must be a string';
-        if ((value as any).value !== undefined && typeof (value as any).value !== 'string') return 'Directive value must be a string';
-        if ((value as any).modifiers && typeof (value as any).modifiers !== 'object') return 'Modifiers must be an object';
+        if (!value || typeof value !== 'object')
+          return 'Parsed directive must be an object';
+        if (typeof (value as any).name !== 'string')
+          return 'Directive name must be a string';
+        if (
+          (value as any).value !== undefined &&
+          typeof (value as any).value !== 'string'
+        )
+          return 'Directive value must be a string';
+        if (
+          (value as any).modifiers &&
+          typeof (value as any).modifiers !== 'object'
+        )
+          return 'Modifiers must be an object';
         return true;
-      }
+      },
     });
 
     // Create binding matching expected test structure
@@ -215,7 +234,6 @@ export function createBinding(parsed: ParsedDirective): DirectiveBinding {
     }
 
     return binding;
-
   } catch (error) {
     if (error instanceof ValidationError) {
       globalErrorHandler.handle(error);
@@ -247,14 +265,15 @@ export function walkElement(
     validate('el', el, {
       required: true,
       custom: (value) => {
-        if (!(value instanceof HTMLElement)) return 'Element must be an HTMLElement';
+        if (!(value instanceof HTMLElement))
+          return 'Element must be an HTMLElement';
         return true;
-      }
+      },
     });
 
     validate('callback', callback, {
       required: true,
-      type: 'function'
+      type: 'function',
     });
 
     // Process attributes with error handling
@@ -273,11 +292,11 @@ export function walkElement(
         globalErrorHandler.handleGenericError(
           error instanceof Error ? error : new Error(String(error)),
           ErrorCategory.PARSING,
-          { 
+          {
             element: el,
             attributeName: attr.name,
             attributeValue: attr.value,
-            phase: 'directive-parsing' 
+            phase: 'directive-parsing',
           }
         );
         // Continue processing other attributes
@@ -285,12 +304,17 @@ export function walkElement(
     }
 
     // Sort directives by priority - structural directives first
-    const structuralDirectives = parsedDirectives.filter(d => d.name === 'for' || d.name === 'if');
-    const otherDirectives = parsedDirectives.filter(d => d.name !== 'for' && d.name !== 'if');
-    
+    const structuralDirectives = parsedDirectives.filter(
+      (d) => d.name === 'for' || d.name === 'if'
+    );
+    const otherDirectives = parsedDirectives.filter(
+      (d) => d.name !== 'for' && d.name !== 'if'
+    );
+
     // If there are structural directives, only process them and skip other directives
     // The structural directives will handle other directives on the same element
-    const directivesToProcess = structuralDirectives.length > 0 ? structuralDirectives : parsedDirectives;
+    const directivesToProcess =
+      structuralDirectives.length > 0 ? structuralDirectives : parsedDirectives;
 
     // Process directives in priority order
     for (const parsed of directivesToProcess) {
@@ -299,11 +323,11 @@ export function walkElement(
         globalErrorHandler.safe(
           () => callback(el, parsed),
           ErrorCategory.PARSING,
-          { 
+          {
             element: el,
             directive: parsed.name,
             attributeName: `uus-${parsed.name}`,
-            attributeValue: parsed.value 
+            attributeValue: parsed.value,
           },
           undefined
         );
@@ -316,11 +340,11 @@ export function walkElement(
         globalErrorHandler.handleGenericError(
           error instanceof Error ? error : new Error(String(error)),
           ErrorCategory.PARSING,
-          { 
+          {
             element: el,
             directive: parsed.name,
             attributeValue: parsed.value,
-            phase: 'directive-processing' 
+            phase: 'directive-processing',
           }
         );
         // Continue processing other directives
@@ -337,10 +361,10 @@ export function walkElement(
             globalErrorHandler.safe(
               () => walkElement(child, callback, options),
               ErrorCategory.PARSING,
-              { 
+              {
                 element: el,
                 childElement: child,
-                phase: 'child-processing' 
+                phase: 'child-processing',
               },
               undefined
             );
@@ -354,7 +378,6 @@ export function walkElement(
         );
       }
     }
-
   } catch (error) {
     if (error instanceof ValidationError) {
       globalErrorHandler.handle(error);

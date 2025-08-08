@@ -1,6 +1,6 @@
 /**
  * UUS.js Error Handling System
- * 
+ *
  * Provides comprehensive error handling with:
  * - Custom error classes for different types of failures
  * - Centralized error logging and reporting
@@ -24,10 +24,10 @@ export enum ErrorCategory {
 }
 
 export enum ErrorSeverity {
-  LOW = 'low',         // Warning-level, non-breaking issues
-  MEDIUM = 'medium',   // Errors that affect functionality but don't crash
-  HIGH = 'high',       // Critical errors that may break features
-  CRITICAL = 'critical' // System-level failures that require immediate attention
+  LOW = 'low', // Warning-level, non-breaking issues
+  MEDIUM = 'medium', // Errors that affect functionality but don't crash
+  HIGH = 'high', // Critical errors that may break features
+  CRITICAL = 'critical', // System-level failures that require immediate attention
 }
 
 // ============================================================================
@@ -108,8 +108,9 @@ export class UusError extends Error {
     this.context = {
       timestamp: Date.now(),
       stackTrace: this.stack,
-      userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown',
-      ...context
+      userAgent:
+        typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown',
+      ...context,
     };
     this.code = code || `UUS_${category.toUpperCase()}_ERROR`;
     this.recoverable = recoverable;
@@ -165,7 +166,9 @@ export class UusError extends Error {
     if (this.context.element) {
       const tagName = this.context.element.tagName.toLowerCase();
       const id = this.context.element.id ? `#${this.context.element.id}` : '';
-      const className = this.context.element.className ? `.${this.context.element.className.split(' ').join('.')}` : '';
+      const className = this.context.element.className
+        ? `.${this.context.element.className.split(' ').join('.')}`
+        : '';
       parts.push(`Element: ${tagName}${id}${className}`);
     }
 
@@ -186,11 +189,13 @@ export class UusError extends Error {
       timestamp: this.timestamp,
       context: {
         ...this.context,
-        element: this.context.element ? {
-          tagName: this.context.element.tagName,
-          id: this.context.element.id,
-          className: this.context.element.className,
-        } : undefined,
+        element: this.context.element
+          ? {
+              tagName: this.context.element.tagName,
+              id: this.context.element.id,
+              className: this.context.element.className,
+            }
+          : undefined,
         state: this.context.state ? Object.keys(this.context.state) : undefined, // Don't serialize actual state values
       },
       stack: this.stack,
@@ -376,10 +381,11 @@ export const defaultErrorConfig: ErrorHandlerConfig = {
   maxErrors: 100,
   isDevelopment: () => {
     return (
-      typeof process !== 'undefined' && 
-      process.env?.NODE_ENV === 'development'
-    ) || 
-    (typeof window !== 'undefined' && window.location?.hostname === 'localhost');
+      (typeof process !== 'undefined' &&
+        process.env?.NODE_ENV === 'development') ||
+      (typeof window !== 'undefined' &&
+        window.location?.hostname === 'localhost')
+    );
   },
 };
 
@@ -452,7 +458,7 @@ export class ErrorHandler {
       undefined,
       category !== ErrorCategory.REACTIVE // Most errors are recoverable except reactive
     );
-    
+
     this.handle(uusError);
   }
 
@@ -483,9 +489,12 @@ export class ErrorHandler {
   private trackError(error: UusError): void {
     // Add to history
     this.errorHistory.push(error);
-    
+
     // Maintain size limit
-    if (this.config.maxErrors && this.errorHistory.length > this.config.maxErrors) {
+    if (
+      this.config.maxErrors &&
+      this.errorHistory.length > this.config.maxErrors
+    ) {
       this.errorHistory.shift();
     }
 
@@ -499,7 +508,7 @@ export class ErrorHandler {
    */
   private logError(error: UusError): void {
     const isDev = this.config.isDevelopment?.() ?? false;
-    
+
     if (isDev && this.config.includeDebugInfo) {
       // Development: show full debug information
       console.group(`🔴 UUS Error [${error.severity.toUpperCase()}]`);
@@ -514,9 +523,14 @@ export class ErrorHandler {
       console.groupEnd();
     } else {
       // Production: show basic error information
-      const severity = error.severity === ErrorSeverity.CRITICAL ? '🚨' : 
-                      error.severity === ErrorSeverity.HIGH ? '🔴' : 
-                      error.severity === ErrorSeverity.MEDIUM ? '🟡' : '🔵';
+      const severity =
+        error.severity === ErrorSeverity.CRITICAL
+          ? '🚨'
+          : error.severity === ErrorSeverity.HIGH
+            ? '🔴'
+            : error.severity === ErrorSeverity.MEDIUM
+              ? '🟡'
+              : '🔵';
       console.error(`${severity} [${error.code}] ${error.message}`);
     }
   }
@@ -540,14 +554,14 @@ export class ErrorHandler {
         // For evaluation errors, we typically fall back to undefined/empty values
         // This is handled in the evaluator itself
         break;
-      
+
       case ErrorCategory.DIRECTIVE:
         // For directive errors, we might try to remove the directive or reset the element
         if (error.context.element && error.context.directive) {
           try {
             // Remove the problematic directive attribute
             const prefix = 'uus-';
-            Array.from(error.context.element.attributes).forEach(attr => {
+            Array.from(error.context.element.attributes).forEach((attr) => {
               if (attr.name.startsWith(prefix + error.context.directive!)) {
                 error.context.element!.removeAttribute(attr.name);
               }
@@ -557,7 +571,7 @@ export class ErrorHandler {
           }
         }
         break;
-      
+
       case ErrorCategory.PARSING:
         // For parsing errors, remove the problematic attribute
         if (error.context.element && error.context.attribute) {
@@ -585,15 +599,15 @@ export class ErrorHandler {
     const errorsBySeverity = {} as Record<ErrorSeverity, number>;
 
     // Initialize counters
-    Object.values(ErrorCategory).forEach(category => {
+    Object.values(ErrorCategory).forEach((category) => {
       errorsByCategory[category] = 0;
     });
-    Object.values(ErrorSeverity).forEach(severity => {
+    Object.values(ErrorSeverity).forEach((severity) => {
       errorsBySeverity[severity] = 0;
     });
 
     // Count errors
-    this.errorHistory.forEach(error => {
+    this.errorHistory.forEach((error) => {
       errorsByCategory[error.category]++;
       errorsBySeverity[error.severity]++;
     });
@@ -667,31 +681,67 @@ export function validate(
   },
   context: UusErrorContext = {}
 ): void {
-  if (requirements.required && (value === null || value === undefined || value === '')) {
+  if (
+    requirements.required &&
+    (value === null || value === undefined || value === '')
+  ) {
     throw new ValidationError(field, value, 'Field is required', context);
   }
 
   if (value !== null && value !== undefined) {
     if (requirements.type && typeof value !== requirements.type) {
-      throw new ValidationError(field, value, `Expected type ${requirements.type}`, context);
+      throw new ValidationError(
+        field,
+        value,
+        `Expected type ${requirements.type}`,
+        context
+      );
     }
 
-    if (requirements.minLength && typeof value === 'string' && value.length < requirements.minLength) {
-      throw new ValidationError(field, value, `Minimum length is ${requirements.minLength}`, context);
+    if (
+      requirements.minLength &&
+      typeof value === 'string' &&
+      value.length < requirements.minLength
+    ) {
+      throw new ValidationError(
+        field,
+        value,
+        `Minimum length is ${requirements.minLength}`,
+        context
+      );
     }
 
-    if (requirements.maxLength && typeof value === 'string' && value.length > requirements.maxLength) {
-      throw new ValidationError(field, value, `Maximum length is ${requirements.maxLength}`, context);
+    if (
+      requirements.maxLength &&
+      typeof value === 'string' &&
+      value.length > requirements.maxLength
+    ) {
+      throw new ValidationError(
+        field,
+        value,
+        `Maximum length is ${requirements.maxLength}`,
+        context
+      );
     }
 
-    if (requirements.pattern && typeof value === 'string' && !requirements.pattern.test(value)) {
-      throw new ValidationError(field, value, `Value does not match required pattern`, context);
+    if (
+      requirements.pattern &&
+      typeof value === 'string' &&
+      !requirements.pattern.test(value)
+    ) {
+      throw new ValidationError(
+        field,
+        value,
+        `Value does not match required pattern`,
+        context
+      );
     }
 
     if (requirements.custom) {
       const result = requirements.custom(value);
       if (result !== true) {
-        const message = typeof result === 'string' ? result : 'Custom validation failed';
+        const message =
+          typeof result === 'string' ? result : 'Custom validation failed';
         throw new ValidationError(field, value, message, context);
       }
     }

@@ -28,7 +28,7 @@ export function getValidator(name: string) {
     }
   } else {
     // Load full validation in development
-    return import('../validation').then(validators => {
+    return import('../validation').then((validators) => {
       switch (name) {
         case 'element':
           return validators.validateElement;
@@ -49,7 +49,7 @@ export function withValidation<T extends (...args: any[]) => any>(
   if (process.env.NODE_ENV === 'production' || !validator) {
     return fn;
   }
-  
+
   return ((...args: Parameters<T>) => {
     validator(args);
     return fn(...args);

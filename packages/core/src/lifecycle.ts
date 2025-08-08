@@ -94,23 +94,28 @@ export function registerComponentWithTracking(
   uus?: UusInstance
 ): () => void {
   registerComponent(element, hooks);
-  
+
   // Track component with memory manager if UUS instance is available
   if (uus && (uus as any).memoryTracker) {
-    const resourceId = (uus as any).memoryTracker.track('component', element, () => {
-      destroyComponent(element);
-    }, {
-      tagName: element.tagName,
-      id: element.id || undefined,
-      className: element.className || undefined
-    });
-    
+    const resourceId = (uus as any).memoryTracker.track(
+      'component',
+      element,
+      () => {
+        destroyComponent(element);
+      },
+      {
+        tagName: element.tagName,
+        id: element.id || undefined,
+        className: element.className || undefined,
+      }
+    );
+
     // Return cleanup function
     return () => {
       (uus as any).memoryTracker.untrack(resourceId);
     };
   }
-  
+
   // Return basic cleanup
   return () => destroyComponent(element);
 }
@@ -122,12 +127,15 @@ export function cleanupAllComponents(): void {
   // Get all components (we can't iterate WeakMap directly, but we can track them)
   // This is mainly for emergency cleanup scenarios
   console.log('Cleaning up all registered components');
-  
+
   // Note: WeakMaps will be garbage collected automatically when elements are removed
   // This is just for logging/debugging purposes
 }
 
-export function observeDOM(root: HTMLElement, uus: UusInstance): MutationObserver {
+export function observeDOM(
+  root: HTMLElement,
+  uus: UusInstance
+): MutationObserver {
   const observer = new MutationObserver((mutations) => {
     mutations.forEach((mutation) => {
       // Handle removed nodes
@@ -159,7 +167,7 @@ export function observeDOM(root: HTMLElement, uus: UusInstance): MutationObserve
     childList: true,
     subtree: true,
     attributeFilter: ['uus-*'], // Only observe UUS attribute changes
-    attributeOldValue: true
+    attributeOldValue: true,
   });
 
   // Store the observer on the UUS instance for testing and cleanup
@@ -170,7 +178,7 @@ export function observeDOM(root: HTMLElement, uus: UusInstance): MutationObserve
 
 function hasUusAttributes(element: HTMLElement): boolean {
   const prefix = 'uus-';
-  
+
   // Check current element
   for (const attr of element.attributes) {
     if (attr.name.startsWith(prefix)) {
@@ -181,7 +189,7 @@ function hasUusAttributes(element: HTMLElement): boolean {
   // Check children (but limit depth to prevent performance issues)
   const checkChildren = (el: Element, depth: number = 0): boolean => {
     if (depth > 5) return false; // Limit recursion depth
-    
+
     for (const child of el.children) {
       if (child instanceof HTMLElement) {
         for (const attr of child.attributes) {
@@ -224,7 +232,7 @@ function destroyElement(element: HTMLElement, uus: UusInstance): void {
         destroyElement(child, uus);
       }
     });
-    
+
     // Clean up any tracked resources for this element
     if ((uus as any).memoryTracker) {
       // Clean up resources associated with this element

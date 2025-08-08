@@ -1,6 +1,6 @@
 /**
  * Validation helpers for critical paths in UUS.js
- * 
+ *
  * Provides runtime validation for common scenarios to prevent errors
  * and improve developer experience with clear error messages.
  */
@@ -10,7 +10,10 @@ import { ValidationError, validate } from './errors';
 /**
  * Validates that an element is a valid HTMLElement for UUS directives
  */
-export function validateElement(element: unknown, context?: string): HTMLElement {
+export function validateElement(
+  element: unknown,
+  context?: string
+): HTMLElement {
   validate('element', element, {
     required: true,
     custom: (value) => {
@@ -18,7 +21,7 @@ export function validateElement(element: unknown, context?: string): HTMLElement
         return `Expected HTMLElement${context ? ` for ${context}` : ''}, got ${typeof value}`;
       }
       return true;
-    }
+    },
   });
   return element as HTMLElement;
 }
@@ -26,7 +29,10 @@ export function validateElement(element: unknown, context?: string): HTMLElement
 /**
  * Validates that a directive expression is safe and reasonable
  */
-export function validateDirectiveExpression(expression: unknown, directiveName?: string): string {
+export function validateDirectiveExpression(
+  expression: unknown,
+  directiveName?: string
+): string {
   validate('expression', expression, {
     type: 'string',
     maxLength: 5000,
@@ -52,8 +58,8 @@ export function validateDirectiveExpression(expression: unknown, directiveName?:
         // Check for reasonable complexity
         const complexityIndicators = [
           (value.match(/\(/g) || []).length > 10, // Too many function calls
-          (value.match(/\[/g) || []).length > 5,  // Too many array accesses
-          value.length > 1000,                     // Too long
+          (value.match(/\[/g) || []).length > 5, // Too many array accesses
+          value.length > 1000, // Too long
         ];
 
         if (complexityIndicators.some(Boolean)) {
@@ -61,7 +67,7 @@ export function validateDirectiveExpression(expression: unknown, directiveName?:
         }
       }
       return true;
-    }
+    },
   });
   return expression as string;
 }
@@ -69,7 +75,10 @@ export function validateDirectiveExpression(expression: unknown, directiveName?:
 /**
  * Validates directive binding objects
  */
-export function validateDirectiveBinding(binding: unknown, directiveName?: string): {
+export function validateDirectiveBinding(
+  binding: unknown,
+  directiveName?: string
+): {
   value: string;
   expression: string;
   arg?: string;
@@ -96,12 +105,15 @@ export function validateDirectiveBinding(binding: unknown, directiveName?: strin
         return 'Binding arg must be a string';
       }
 
-      if (b.modifiers !== undefined && (typeof b.modifiers !== 'object' || Array.isArray(b.modifiers))) {
+      if (
+        b.modifiers !== undefined &&
+        (typeof b.modifiers !== 'object' || Array.isArray(b.modifiers))
+      ) {
         return 'Binding modifiers must be an object';
       }
 
       return true;
-    }
+    },
   });
 
   const b = binding as any;
@@ -126,7 +138,7 @@ export function validateUusInstance(uus: unknown, context?: string): any {
       }
 
       const u = value as any;
-      
+
       // Check required properties
       const requiredProps = ['state', 'directives', 'cleanups', 'errorHandler'];
       for (const prop of requiredProps) {
@@ -153,7 +165,7 @@ export function validateUusInstance(uus: unknown, context?: string): any {
       }
 
       return true;
-    }
+    },
   });
 
   return uus;
@@ -162,7 +174,10 @@ export function validateUusInstance(uus: unknown, context?: string): any {
 /**
  * Validates event handler expressions
  */
-export function validateEventHandler(handler: unknown, eventName?: string): string {
+export function validateEventHandler(
+  handler: unknown,
+  eventName?: string
+): string {
   validate('handler', handler, {
     required: true,
     type: 'string',
@@ -175,7 +190,7 @@ export function validateEventHandler(handler: unknown, eventName?: string): stri
           /^[a-zA-Z_$][a-zA-Z0-9_$]*\s*\(.*\)$/, // Function call
         ];
 
-        if (!validPatterns.some(pattern => pattern.test(value.trim()))) {
+        if (!validPatterns.some((pattern) => pattern.test(value.trim()))) {
           return `Invalid event handler format${eventName ? ` for ${eventName} event` : ''}`;
         }
 
@@ -185,7 +200,7 @@ export function validateEventHandler(handler: unknown, eventName?: string): stri
         }
       }
       return true;
-    }
+    },
   });
 
   return handler as string;
@@ -194,7 +209,9 @@ export function validateEventHandler(handler: unknown, eventName?: string): stri
 /**
  * Validates CSS class binding values
  */
-export function validateClassBinding(classes: unknown): string | Record<string, boolean> | Array<string> {
+export function validateClassBinding(
+  classes: unknown
+): string | Record<string, boolean> | Array<string> {
   // Allow string, object, or array
   if (typeof classes === 'string') {
     validate('classes', classes, {
@@ -208,7 +225,7 @@ export function validateClassBinding(classes: unknown): string | Record<string, 
           }
         }
         return true;
-      }
+      },
     });
     return classes;
   }
@@ -229,7 +246,7 @@ export function validateClassBinding(classes: unknown): string | Record<string, 
           }
         }
         return true;
-      }
+      },
     });
     return classes;
   }
@@ -248,7 +265,7 @@ export function validateClassBinding(classes: unknown): string | Record<string, 
           }
         }
         return true;
-      }
+      },
     });
     return classes as Record<string, boolean>;
   }
@@ -264,7 +281,9 @@ export function validateClassBinding(classes: unknown): string | Record<string, 
 /**
  * Validates style binding values
  */
-export function validateStyleBinding(styles: unknown): string | Record<string, string> {
+export function validateStyleBinding(
+  styles: unknown
+): string | Record<string, string> {
   if (typeof styles === 'string') {
     validate('styles', styles, {
       maxLength: 2000,
@@ -283,7 +302,7 @@ export function validateStyleBinding(styles: unknown): string | Record<string, s
           }
         }
         return true;
-      }
+      },
     });
     return styles;
   }
@@ -296,13 +315,13 @@ export function validateStyleBinding(styles: unknown): string | Record<string, s
         if (keys.length > 50) {
           return 'Too many style properties (max 50)';
         }
-        
+
         for (const [key, val] of Object.entries(obj)) {
           // Validate CSS property names (basic check)
           if (!/^[a-zA-Z-]+$/.test(key)) {
             return `Invalid CSS property name: ${key}`;
           }
-          
+
           // Validate CSS values
           if (typeof val === 'string') {
             const dangerousPatterns = [
@@ -319,7 +338,7 @@ export function validateStyleBinding(styles: unknown): string | Record<string, s
           }
         }
         return true;
-      }
+      },
     });
     return styles as Record<string, string>;
   }
@@ -335,7 +354,10 @@ export function validateStyleBinding(styles: unknown): string | Record<string, s
 /**
  * Validates loop iteration data for v-for directive
  */
-export function validateLoopData(items: unknown, expression?: string): unknown[] {
+export function validateLoopData(
+  items: unknown,
+  expression?: string
+): unknown[] {
   validate('items', items, {
     custom: (value) => {
       if (!Array.isArray(value)) {
@@ -347,7 +369,7 @@ export function validateLoopData(items: unknown, expression?: string): unknown[]
       }
 
       return true;
-    }
+    },
   });
 
   return items as unknown[];

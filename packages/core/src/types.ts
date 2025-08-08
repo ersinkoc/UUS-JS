@@ -3,28 +3,38 @@
 // ============================================================================
 
 /** Brand for directive names to prevent string confusion */
-export type DirectiveName<T extends string = string> = T & { readonly __brand: 'DirectiveName' };
+export type DirectiveName<T extends string = string> = T;
 
 /** Brand for element selectors */
-export type ElementSelector = string & { readonly __brand: 'ElementSelector' };
+export type ElementSelector = string;
 
 /** Brand for HTML attribute names */
-export type AttributeName = string & { readonly __brand: 'AttributeName' };
+export type AttributeName = string;
 
 /** Brand for event names */
-export type EventName = string & { readonly __brand: 'EventName' };
+export type EventName = string;
 
 /** Brand for expression strings */
-export type ExpressionString = string & { readonly __brand: 'ExpressionString' };
+export type ExpressionString = string;
 
 // ============================================================================
 // TEMPLATE LITERAL TYPES - For directive name validation
 // ============================================================================
 
 /** Core directive names as template literals */
-export type CoreDirectiveNames = 
-  | 'state' | 'text' | 'html' | 'show' | 'if' | 'for' 
-  | 'model' | 'bind' | 'class' | 'style' | 'on' | 'component';
+export type CoreDirectiveNames =
+  | 'state'
+  | 'text'
+  | 'html'
+  | 'show'
+  | 'if'
+  | 'for'
+  | 'model'
+  | 'bind'
+  | 'class'
+  | 'style'
+  | 'on'
+  | 'component';
 
 /** Event directive pattern */
 export type EventDirective<T extends string = string> = `on:${T}`;
@@ -33,7 +43,7 @@ export type EventDirective<T extends string = string> = `on:${T}`;
 export type BindDirective<T extends string = string> = `bind:${T}`;
 
 /** All possible directive patterns */
-export type DirectivePattern<T extends string = string> = 
+export type DirectivePattern<T extends string = string> =
   | CoreDirectiveNames
   | EventDirective<T>
   | BindDirective<T>
@@ -44,7 +54,7 @@ export type DirectivePattern<T extends string = string> =
 // ============================================================================
 
 /** Discriminated union for different directive types */
-export type DirectiveType = 
+export type DirectiveType =
   | { kind: 'state'; binding: StateDirectiveBinding }
   | { kind: 'event'; binding: EventDirectiveBinding }
   | { kind: 'bind'; binding: BindDirectiveBinding }
@@ -55,12 +65,12 @@ export type DirectiveType =
   | { kind: 'generic'; binding: GenericDirectiveBinding };
 
 /** Result type for operations that can succeed or fail */
-export type Result<T, E = Error> = 
+export type Result<T, E = Error> =
   | { success: true; data: T }
   | { success: false; error: E };
 
 /** Mount target validation result */
-export type MountTarget = 
+export type MountTarget =
   | { type: 'element'; element: HTMLElement }
   | { type: 'selector'; selector: ElementSelector; resolved: HTMLElement }
   | { type: 'invalid'; reason: string };
@@ -79,23 +89,23 @@ export interface ErrorHandler {
 export interface UusConfig {
   /** Enable debug mode with enhanced logging */
   readonly debug?: boolean;
-  
+
   /** Directive prefix (default: 'uus-') */
   readonly prefix?: string;
-  
+
   /** Enhanced error handler with context support */
   readonly onError?: ErrorHandler;
-  
+
   /** Instance-level plugins to install */
   readonly plugins?: readonly UusPlugin[];
-  
+
   /** Performance monitoring options */
   readonly performance?: {
     readonly trackDirectives?: boolean;
     readonly trackReactivity?: boolean;
     readonly maxCallStack?: number;
   };
-  
+
   /** Security options */
   readonly security?: {
     readonly allowedGlobals?: readonly string[];
@@ -164,7 +174,7 @@ export interface WatchOptions {
 
 /** Enhanced reactive state with better constraints */
 export interface ReactiveState {
-  readonly [key: string]: unknown;
+  [key: string]: unknown;
   readonly [key: symbol]: unknown;
 }
 
@@ -206,7 +216,7 @@ export interface StateDirectiveBinding extends BaseDirectiveBinding {
 export interface EventDirectiveBinding extends BaseDirectiveBinding {
   readonly arg: EventName;
   readonly modifiers: EventModifiers;
-  readonly value: ExpressionString | Function;
+  readonly value: ExpressionString | ((...args: any[]) => any);
 }
 
 /** Bind directive specific binding */
@@ -242,7 +252,7 @@ export interface GenericDirectiveBinding extends BaseDirectiveBinding {
 }
 
 /** Union of all directive binding types */
-export type DirectiveBinding = 
+export type DirectiveBinding =
   | StateDirectiveBinding
   | EventDirectiveBinding
   | BindDirectiveBinding
@@ -267,7 +277,7 @@ export interface EventModifiers {
 }
 
 /** Event handler types */
-export type EventHandler<E extends Event = Event> = 
+export type EventHandler<E extends Event = Event> =
   | ((event: E) => void)
   | ((event: E) => Promise<void>)
   | ExpressionString;
@@ -285,12 +295,21 @@ export interface DirectiveHooks<T extends DirectiveBinding = DirectiveBinding> {
 }
 
 /** Enhanced directive interface */
-export interface Directive<T extends DirectiveBinding = DirectiveBinding> extends DirectiveHooks<T> {
+export interface Directive<T extends DirectiveBinding = DirectiveBinding>
+  extends DirectiveHooks<T> {
   readonly name: DirectiveName;
   readonly metadata?: {
     readonly description?: string;
     readonly example?: string;
-    readonly category?: 'content' | 'conditional' | 'loop' | 'event' | 'binding' | 'style' | 'state' | 'custom';
+    readonly category?:
+      | 'content'
+      | 'conditional'
+      | 'loop'
+      | 'event'
+      | 'binding'
+      | 'style'
+      | 'state'
+      | 'custom';
   };
 }
 
@@ -307,18 +326,18 @@ export interface UusInstance {
   rootElement: HTMLElement | null;
   readonly config: UusConfig;
   readonly errorHandler: import('./errors').ErrorHandler;
-  
+
   /** Register a new directive */
   registerDirective<T extends DirectiveBinding = DirectiveBinding>(
     directive: Directive<T>
   ): void;
-  
+
   /** Mount to an element or selector */
   mount(target: HTMLElement | ElementSelector): void;
-  
+
   /** Unmount and cleanup */
   unmount(): void;
-  
+
   /** Install a plugin */
   use(plugin: UusPlugin): void;
 }
@@ -337,7 +356,9 @@ export function isRef<T = unknown>(value: unknown): value is Ref<T> {
 }
 
 /** Type predicate for checking if value is reactive */
-export function isReactive(value: unknown): value is ReactiveState & ReactiveMarkers {
+export function isReactive(
+  value: unknown
+): value is ReactiveState & ReactiveMarkers {
   return (
     value !== null &&
     typeof value === 'object' &&
@@ -360,28 +381,35 @@ export function isElementSelector(value: string): value is ElementSelector {
 // ============================================================================
 
 /** Extract directive binding type based on directive name */
-export type DirectiveBindingFor<T extends string> = 
-  T extends 'state' ? StateDirectiveBinding :
-  T extends 'on' ? EventDirectiveBinding :
-  T extends 'bind' ? BindDirectiveBinding :
-  T extends 'if' | 'show' ? ConditionalDirectiveBinding :
-  T extends 'for' ? LoopDirectiveBinding :
-  T extends 'text' | 'html' ? ContentDirectiveBinding :
-  T extends 'style' | 'class' ? StyleDirectiveBinding :
-  GenericDirectiveBinding;
+export type DirectiveBindingFor<T extends string> = T extends 'state'
+  ? StateDirectiveBinding
+  : T extends 'on'
+    ? EventDirectiveBinding
+    : T extends 'bind'
+      ? BindDirectiveBinding
+      : T extends 'if' | 'show'
+        ? ConditionalDirectiveBinding
+        : T extends 'for'
+          ? LoopDirectiveBinding
+          : T extends 'text' | 'html'
+            ? ContentDirectiveBinding
+            : T extends 'style' | 'class'
+              ? StyleDirectiveBinding
+              : GenericDirectiveBinding;
 
 /** Extract element type from mount target */
-export type ElementFromTarget<T> = 
-  T extends HTMLElement ? T :
-  T extends ElementSelector ? HTMLElement :
-  HTMLElement;
+export type ElementFromTarget<T> = T extends HTMLElement
+  ? T
+  : T extends ElementSelector
+    ? HTMLElement
+    : HTMLElement;
 
 /** Extract return type from effect function */
-export type EffectCleanup<T extends Effect> = 
-  T extends () => infer R ? 
-    R extends () => void ? R : 
-    () => void : 
-  () => void;
+export type EffectCleanup<T extends Effect> = T extends () => infer R
+  ? R extends () => void
+    ? R
+    : () => void
+  : () => void;
 
 // ============================================================================
 // HELPER TYPE UTILITIES
@@ -397,12 +425,12 @@ export type RequiredKeys<T, K extends keyof T> = T & Required<Pick<T, K>>;
 
 /** Extract non-function properties */
 export type NonFunctionProps<T> = {
-  [K in keyof T]: T[K] extends Function ? never : K;
+  [K in keyof T]: T[K] extends (...args: any[]) => any ? never : K;
 }[keyof T];
 
 /** Extract function properties */
 export type FunctionProps<T> = {
-  [K in keyof T]: T[K] extends Function ? K : never;
+  [K in keyof T]: T[K] extends (...args: any[]) => any ? K : never;
 }[keyof T];
 
 // ============================================================================

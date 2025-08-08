@@ -183,7 +183,7 @@ describe('Directives', () => {
       expect(input.hasAttribute('disabled')).toBe(false);
     });
 
-    it('should update attributes reactively', () => {
+    it('should update attributes reactively', async () => {
       container.innerHTML = `
         <div uus-state="{ title: 'initial' }">
           <span id="target" uus-bind:title="title" uus-on:click="title = 'updated'"></span>
@@ -196,6 +196,7 @@ describe('Directives', () => {
       expect(span.title).toBe('initial');
 
       span.click();
+      await new Promise(resolve => setTimeout(resolve, 10));
       expect(span.title).toBe('updated');
     });
 
@@ -314,7 +315,7 @@ describe('Directives', () => {
       expect(div.innerHTML).toBe('<strong>Bold text</strong>');
     });
 
-    it('should update innerHTML reactively', () => {
+    it('should update innerHTML reactively', async () => {
       container.innerHTML = `
         <div uus-state="{ content: '<em>Initial</em>' }">
           <div id="target" uus-html="content"></div>
@@ -329,6 +330,7 @@ describe('Directives', () => {
       expect(div.innerHTML).toBe('<em>Initial</em>');
 
       button.click();
+      await new Promise(resolve => setTimeout(resolve, 10));
       expect(div.innerHTML).toBe('<u>Updated</u>');
     });
 

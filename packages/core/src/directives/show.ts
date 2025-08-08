@@ -11,7 +11,11 @@ export const showDirective: Directive<ConditionalDirectiveBinding> = {
 
     const cleanup = effect(() => {
       try {
-        const value = evaluator(binding.expression ? asExpressionString(binding.expression) : asExpressionString('true'));
+        const value = evaluator(
+          binding.expression
+            ? asExpressionString(binding.expression)
+            : asExpressionString('true')
+        );
         el.style.display = value ? originalDisplay : 'none';
       } catch (error) {
         console.error('Error evaluating show condition:', error);

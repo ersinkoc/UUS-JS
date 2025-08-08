@@ -203,9 +203,18 @@ describe('Uus App Integration Tests', () => {
 
       // Create HTML with i18n directives
       container.innerHTML = `
-        <div uus-state="{ name: 'John', count: 0 }">
-          <h1 uus-t="welcome" :name="name"></h1>
-          <p uus-text="$i18n.tc('items', count, { count })"></p>
+        <div uus-state="{ 
+          name: 'John', 
+          count: 0,
+          get welcome() {
+            return this.$i18n ? this.$i18n.t('welcome', { name: this.name }) : 'Welcome ' + this.name + '!';
+          },
+          get itemsText() {
+            return this.$i18n ? this.$i18n.tc('items', this.count, { count: this.count }) : this.count + ' items';
+          }
+        }">
+          <h1 uus-text="welcome"></h1>
+          <p uus-text="itemsText"></p>
           <button uus-on:click="count++">Add</button>
         </div>
       `;

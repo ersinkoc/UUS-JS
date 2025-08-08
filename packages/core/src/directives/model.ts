@@ -24,7 +24,11 @@ export const modelDirective: Directive<GenericDirectiveBinding> = {
     // Update element value when state changes
     const cleanup = effect(() => {
       try {
-        const value = evaluator(binding.expression ? asExpressionString(binding.expression) : asExpressionString(''));
+        const value = evaluator(
+          binding.expression
+            ? asExpressionString(binding.expression)
+            : asExpressionString('')
+        );
         if (
           el instanceof HTMLInputElement &&
           (el.type === 'checkbox' || el.type === 'radio')

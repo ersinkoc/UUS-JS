@@ -7,7 +7,9 @@ export const stateDirective: Directive<StateDirectiveBinding> = {
   name: asDirectiveName('state'),
   init(el, binding, uus) {
     try {
-      const expression = binding.expression ? asExpressionString(binding.expression) : asExpressionString('{}');
+      const expression = binding.expression
+        ? asExpressionString(binding.expression)
+        : asExpressionString('{}');
 
       // Create evaluator with current global context for parsing object literals
       const evaluator = createSafeEvaluator(uus.state || {});

@@ -12,7 +12,7 @@ export function createMemoryAwareApp() {
     debug: true,
     onError: (error) => {
       console.error('App error:', error);
-    }
+    },
   });
 
   // Register cleanup for when the app is no longer needed
@@ -64,35 +64,32 @@ export function createManagedComponent(element: HTMLElement) {
   // Use memory-aware component registration
   const { registerComponentWithTracking } = require('../lifecycle');
 
-  const cleanup = registerComponentWithTracking(
-    element,
-    {
-      created() {
-        console.log('Component created');
-      },
-      mounted() {
-        console.log('Component mounted');
-        
-        // Example: Add event listener that will be cleaned up
-        const handleClick = () => {
-          console.log('Component clicked');
-        };
-        
-        element.addEventListener('click', handleClick);
-        
-        // Register cleanup for the event listener
-        this.addCleanup(() => {
-          element.removeEventListener('click', handleClick);
-        });
-      },
-      updated() {
-        console.log('Component updated');
-      },
-      destroyed() {
-        console.log('Component destroyed');
-      }
-    }
-  );
+  const cleanup = registerComponentWithTracking(element, {
+    created() {
+      console.log('Component created');
+    },
+    mounted() {
+      console.log('Component mounted');
+
+      // Example: Add event listener that will be cleaned up
+      const handleClick = () => {
+        console.log('Component clicked');
+      };
+
+      element.addEventListener('click', handleClick);
+
+      // Register cleanup for the event listener
+      this.addCleanup(() => {
+        element.removeEventListener('click', handleClick);
+      });
+    },
+    updated() {
+      console.log('Component updated');
+    },
+    destroyed() {
+      console.log('Component destroyed');
+    },
+  });
 
   return cleanup;
 }
@@ -136,10 +133,10 @@ export function setupMemoryMonitoring() {
   const unsubscribe = detector.onReport((report) => {
     if (report.overall === 'critical') {
       console.error('🚨 Critical memory leaks detected!');
-      
+
       // Send alert to monitoring service
       sendMemoryAlert(report);
-      
+
       // Attempt automatic cleanup
       attemptAutomaticCleanup();
     } else if (report.overall === 'warning') {
@@ -151,29 +148,33 @@ export function setupMemoryMonitoring() {
   return {
     detector,
     unsubscribe,
-    getHealthReport: () => detector.performHealthCheck()
+    getHealthReport: () => detector.performHealthCheck(),
   };
 }
 
 // Example 6: Reactive system with circular reference prevention
 export function createSafeReactiveData() {
-  const { createReactive, deepReactive, CircularReferenceManager } = require('../reactive');
-  
+  const {
+    createReactive,
+    deepReactive,
+    CircularReferenceManager,
+  } = require('../reactive');
+
   const circularManager = new CircularReferenceManager();
 
   // Create data that might have circular references
   const data = {
     user: {
       name: 'John',
-      posts: [] as any[]
+      posts: [] as any[],
     },
-    posts: [] as any[]
+    posts: [] as any[],
   };
 
   // Add some posts with potential circular references
   const post1 = { id: 1, title: 'Post 1', author: data.user };
   const post2 = { id: 2, title: 'Post 2', author: data.user };
-  
+
   data.user.posts.push(post1, post2);
   data.posts.push(post1, post2);
 
@@ -181,7 +182,7 @@ export function createSafeReactiveData() {
   const circularPath = circularManager.detectCircular(data);
   if (circularPath) {
     console.warn('Circular reference detected:', circularPath);
-    
+
     // Break circular references
     const safedData = circularManager.breakCircular(data);
     return createReactive(safedData);
@@ -193,23 +194,27 @@ export function createSafeReactiveData() {
 // Example 7: Memory pressure testing
 export async function runMemoryTest() {
   console.log('🧪 Starting memory pressure test...');
-  
+
   const { runMemoryPressureTest } = require('../leak-detection');
-  
+
   try {
     const report = await runMemoryPressureTest(10000); // 10 second test
-    
+
     console.log('Memory test results:');
     console.log('- Overall health:', report.overall);
     console.log('- Total resources:', report.stats.totalResources);
-    console.log('- Memory usage:', (report.stats.memoryUsage / 1024 / 1024).toFixed(2), 'MB');
+    console.log(
+      '- Memory usage:',
+      (report.stats.memoryUsage / 1024 / 1024).toFixed(2),
+      'MB'
+    );
     console.log('- Leaks found:', report.leaks.length);
-    
+
     if (report.recommendations.length > 0) {
       console.log('Recommendations:');
       report.recommendations.forEach((rec: string) => console.log(`- ${rec}`));
     }
-    
+
     return report;
   } catch (error) {
     console.error('Memory test failed:', error);
@@ -221,24 +226,24 @@ export async function runMemoryTest() {
 export function createCompleteApp() {
   // 1. Setup memory monitoring
   const monitoring = setupMemoryMonitoring();
-  
+
   // 2. Create app with memory tracking
   const app = new Uus({
     debug: true,
     onError: (error) => {
       console.error('App error:', error);
-      
+
       // Check if error might be memory-related
       if (error.message.includes('memory') || error.message.includes('leak')) {
         monitoring.detector.performHealthCheck();
       }
-    }
+    },
   });
 
   // 3. Setup periodic health checks
   const healthCheckInterval = setInterval(() => {
     const report = monitoring.getHealthReport();
-    
+
     if (report.overall !== 'healthy') {
       console.log('Health check:', report.overall);
     }
@@ -256,28 +261,28 @@ export function createCompleteApp() {
   return {
     app,
     monitoring,
-    
+
     // Method to get current memory status
     getMemoryStatus() {
       return {
         app: app.getMemoryStats(),
         global: memoryManager.getMemoryStats(),
-        health: monitoring.getHealthReport()
+        health: monitoring.getHealthReport(),
       };
     },
-    
+
     // Method to force cleanup
     forceCleanup() {
       app.cleanupDeadReferences();
       memoryManager.resourceTracker.cleanupDeadRefs();
       return this.getMemoryStatus();
     },
-    
+
     // Method to destroy everything
     destroy() {
       app.destroy();
       console.log('App destroyed successfully');
-    }
+    },
   };
 }
 
@@ -288,24 +293,24 @@ function sendMemoryAlert(report: any) {
     timestamp: report.timestamp,
     severity: report.overall,
     leakCount: report.leaks.length,
-    memoryUsage: report.stats.memoryUsage
+    memoryUsage: report.stats.memoryUsage,
   });
 }
 
 function attemptAutomaticCleanup() {
   console.log('Attempting automatic cleanup...');
-  
+
   try {
     // Clean up dead references
     const cleaned = memoryManager.resourceTracker.cleanupDeadRefs();
     console.log(`Cleaned up ${cleaned} dead references`);
-    
+
     // Force garbage collection if available
     const { forceGC } = require('../leak-detection');
     if (forceGC()) {
       console.log('Forced garbage collection');
     }
-    
+
     return true;
   } catch (error) {
     console.error('Automatic cleanup failed:', error);

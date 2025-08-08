@@ -11,7 +11,11 @@ export const classDirective: Directive<StyleDirectiveBinding> = {
 
     const cleanup = effect(() => {
       try {
-        const value = evaluator(binding.expression ? asExpressionString(binding.expression) : asExpressionString('{}'));
+        const value = evaluator(
+          binding.expression
+            ? asExpressionString(binding.expression)
+            : asExpressionString('{}')
+        );
 
         // Reset to original classes
         el.className = originalClasses;

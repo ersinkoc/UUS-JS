@@ -1,8 +1,18 @@
-import type { Directive, LoopDirectiveBinding, UusInstance, ReactiveState } from '../types';
+import type {
+  Directive,
+  LoopDirectiveBinding,
+  UusInstance,
+  ReactiveState,
+} from '../types';
 import { effect, createReactive } from '../reactive';
 import { createSafeEvaluator } from '../evaluator';
-import { walkElement, removeDirectiveAttribute, parseDirective, createBinding } from '../parser';
-import { DirectiveError, ErrorCategory, ValidationError, validate } from '../errors';
+import {
+  walkElement,
+  removeDirectiveAttribute,
+  parseDirective,
+  createBinding,
+} from '../parser';
+import { DirectiveError, ErrorCategory, validate } from '../errors';
 import { asDirectiveName, asExpressionString } from '../type-guards';
 
 interface ForLoopContext {
@@ -24,7 +34,9 @@ function parseForExpression(expression: string): ForLoopContext | null {
     );
 
     if (!match) {
-      throw new Error(`Invalid for expression syntax: "${expression}". Expected format: "item in items" or "(item, index) in items"`);
+      throw new Error(
+        `Invalid for expression syntax: "${expression}". Expected format: "item in items" or "(item, index) in items"`
+      );
     }
 
     const [, item1, index, item2, items] = match;
@@ -43,7 +55,10 @@ function parseForExpression(expression: string): ForLoopContext | null {
       throw new Error(`Invalid item variable name: "${trimmedItemName}"`);
     }
 
-    if (trimmedIndexName && !trimmedIndexName.match(/^[a-zA-Z_$][a-zA-Z0-9_$]*$/)) {
+    if (
+      trimmedIndexName &&
+      !trimmedIndexName.match(/^[a-zA-Z_$][a-zA-Z0-9_$]*$/)
+    ) {
       throw new Error(`Invalid index variable name: "${trimmedIndexName}"`);
     }
 
@@ -56,7 +71,6 @@ function parseForExpression(expression: string): ForLoopContext | null {
       itemName: trimmedItemName,
       indexName: trimmedIndexName,
     };
-
   } catch (error) {
     return null; // Return null on parsing error, let the directive handle it
   }
@@ -69,12 +83,15 @@ export const forDirective: Directive<LoopDirectiveBinding> = {
       // Validate inputs
       validate('el', el, {
         required: true,
-        custom: (value) => value instanceof HTMLElement ? true : 'Element must be an HTMLElement'
+        custom: (value) =>
+          value instanceof HTMLElement
+            ? true
+            : 'Element must be an HTMLElement',
       });
 
       validate('binding', binding, {
         required: true,
-        type: 'object'
+        type: 'object',
       });
 
       if (!el.parentNode) {
@@ -120,21 +137,26 @@ export const forDirective: Directive<LoopDirectiveBinding> = {
         value: string;
         parsed: any;
       }> = [];
-      
+
       const originalAttributes = Array.from(el.attributes);
       for (const attr of originalAttributes) {
         if (attr.name.startsWith('uus-') && attr.name !== 'uus-for') {
           const parsed = uus.errorHandler.safe(
             () => parseDirective(attr),
             ErrorCategory.DIRECTIVE,
-            { element: el, directive: 'for', phase: 'parse-sibling-directive', attributeName: attr.name }
+            {
+              element: el,
+              directive: 'for',
+              phase: 'parse-sibling-directive',
+              attributeName: attr.name,
+            }
           );
-          
+
           if (parsed) {
             originalDirectives.push({
               name: attr.name,
               value: attr.value,
-              parsed
+              parsed,
             });
           }
         }
@@ -153,7 +175,12 @@ export const forDirective: Directive<LoopDirectiveBinding> = {
         uus.errorHandler.safe(
           () => template.removeAttribute(name),
           ErrorCategory.DIRECTIVE,
-          { element: template, directive: 'for', phase: 'cleanup-template-directives', attributeName: name },
+          {
+            element: template,
+            directive: 'for',
+            phase: 'cleanup-template-directives',
+            attributeName: name,
+          },
           undefined
         );
       });
@@ -175,7 +202,7 @@ export const forDirective: Directive<LoopDirectiveBinding> = {
           element: el,
           directive: 'for',
           expression: binding.expression,
-          parsed
+          parsed,
         };
 
         // Safely clear existing instances
@@ -195,10 +222,10 @@ export const forDirective: Directive<LoopDirectiveBinding> = {
             });
             cleanupFns.clear();
             instances.length = 0;
-            
+
             // Cleanup tracked resources
             if ((uus as any).memoryTracker) {
-              instanceResources.forEach(resourceId => {
+              instanceResources.forEach((resourceId) => {
                 (uus as any).memoryTracker.untrack(resourceId);
               });
             }
@@ -249,51 +276,60 @@ export const forDirective: Directive<LoopDirectiveBinding> = {
 
               // Store scoped state on the instance
               (
-                instance as HTMLElement & { __uusState?: Record<string, unknown> }
+                instance as HTMLElement & {
+                  __uusState?: Record<string, unknown>;
+                }
               ).__uusState = scopedState;
-              
+
               // Apply original directives from the template element to this instance with scoped state
-              originalDirectives.forEach(({ name, parsed: directiveParsed }) => {
-                uus.errorHandler.safe(
-                  () => {
-                    const dir = uus.directives.get(directiveParsed.name);
-                    if (!dir) return;
+              originalDirectives.forEach(
+                ({ name, parsed: directiveParsed }) => {
+                  uus.errorHandler.safe(
+                    () => {
+                      const dir = uus.directives.get(directiveParsed.name);
+                      if (!dir) return;
 
-                    const directiveBinding = createBinding(directiveParsed);
+                      const directiveBinding = createBinding(directiveParsed);
 
-                    // Add the directive attribute back to the instance for proper processing
-                    instance.setAttribute(name, directiveParsed.value);
+                      // Add the directive attribute back to the instance for proper processing
+                      instance.setAttribute(name, directiveParsed.value);
 
-                    if (dir.init) {
-                      dir.init(instance, directiveBinding, scopedUus);
-                    }
-                    if (dir.bind) {
-                      dir.bind(instance, directiveBinding, scopedUus);
-                    }
-                  },
-                  ErrorCategory.DIRECTIVE,
-                  { 
-                    parentElement: el,
-                    instance: instance,
-                    directive: directiveParsed.name,
-                    itemIndex: index,
-                    phase: 'apply-original-directive' 
-                  },
-                  undefined
-                );
-              });
-              
+                      if (dir.init) {
+                        dir.init(instance, directiveBinding, scopedUus);
+                      }
+                      if (dir.bind) {
+                        dir.bind(instance, directiveBinding, scopedUus);
+                      }
+                    },
+                    ErrorCategory.DIRECTIVE,
+                    {
+                      parentElement: el,
+                      instance: instance,
+                      directive: directiveParsed.name,
+                      itemIndex: index,
+                      phase: 'apply-original-directive',
+                    },
+                    undefined
+                  );
+                }
+              );
+
               // Track instance with memory manager
               if ((uus as any).memoryTracker) {
-                const resourceId = (uus as any).memoryTracker.track('component', instance, () => {
-                  if (instance.parentNode) {
-                    instance.parentNode.removeChild(instance);
+                const resourceId = (uus as any).memoryTracker.track(
+                  'component',
+                  instance,
+                  () => {
+                    if (instance.parentNode) {
+                      instance.parentNode.removeChild(instance);
+                    }
+                  },
+                  {
+                    type: 'for-instance',
+                    itemIndex: index,
+                    parentExpression: binding.expression,
                   }
-                }, {
-                  type: 'for-instance',
-                  itemIndex: index,
-                  parentExpression: binding.expression
-                });
+                );
                 instanceResources.push(resourceId);
               }
 
@@ -324,12 +360,12 @@ export const forDirective: Directive<LoopDirectiveBinding> = {
                     }
                   },
                   ErrorCategory.DIRECTIVE,
-                  { 
+                  {
                     parentElement: el,
                     childElement: childEl,
                     directive: directive.name,
                     itemIndex: index,
-                    phase: 'child-directive-binding' 
+                    phase: 'child-directive-binding',
                   },
                   undefined
                 );
@@ -341,11 +377,11 @@ export const forDirective: Directive<LoopDirectiveBinding> = {
               instances.push(instance);
             },
             ErrorCategory.DIRECTIVE,
-            { 
-              ...context, 
+            {
+              ...context,
               phase: 'instance-creation',
               itemIndex: index,
-              item: typeof item 
+              item: typeof item,
             },
             undefined
           );
@@ -370,10 +406,10 @@ export const forDirective: Directive<LoopDirectiveBinding> = {
                 instance.parentNode.removeChild(instance);
               }
             });
-            
+
             // Final cleanup of tracked resources
             if ((uus as any).memoryTracker) {
-              instanceResources.forEach(resourceId => {
+              instanceResources.forEach((resourceId) => {
                 (uus as any).memoryTracker.untrack(resourceId);
               });
             }
@@ -384,18 +420,20 @@ export const forDirective: Directive<LoopDirectiveBinding> = {
         );
       });
       uus.cleanups.set(el, cleanups);
-
     } catch (error) {
-      const directiveError = error instanceof DirectiveError ? error : new DirectiveError(
-        'for',
-        'bind',
-        error instanceof Error ? error : new Error(String(error)),
-        { element: el, expression: binding.expression }
-      );
+      const directiveError =
+        error instanceof DirectiveError
+          ? error
+          : new DirectiveError(
+              'for',
+              'bind',
+              error instanceof Error ? error : new Error(String(error)),
+              { element: el, expression: binding.expression }
+            );
       uus.errorHandler.handle(directiveError);
     }
   },
-  
+
   unbind(el, _, uus) {
     try {
       const cleanups = uus.cleanups.get(el);

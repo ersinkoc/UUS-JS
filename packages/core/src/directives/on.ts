@@ -1,16 +1,15 @@
-import type { 
-  Directive, 
-  EventDirectiveBinding, 
-  EventName, 
-  EventHandler 
+import type {
+  Directive,
+  EventDirectiveBinding,
+  EventName,
 } from '../types';
 import { createSafeEvaluator, evaluateAsEventHandler } from '../evaluator';
-import { 
-  isEventDirectiveBinding, 
-  isHTMLElement, 
+import {
+  isEventDirectiveBinding,
+  isHTMLElement,
   isDOMEvent,
   asDirectiveName,
-  asExpressionString
+  asExpressionString,
 } from '../type-guards';
 
 export const onDirective: Directive<EventDirectiveBinding> = {
@@ -55,11 +54,14 @@ export const onDirective: Directive<EventDirectiveBinding> = {
 
         // Evaluate event handler with enhanced type safety
         if (binding.expression) {
-          const eventHandler = evaluateAsEventHandler(binding.expression, uus.state);
-          
+          const eventHandler = evaluateAsEventHandler(
+            binding.expression,
+            uus.state
+          );
+
           if (typeof eventHandler === 'function') {
             // Execute as function with event parameter
-            (eventHandler as Function)(event);
+            (eventHandler as (...args: any[]) => any)(event);
           } else {
             // Execute as expression with $event in scope
             const originalState = uus.state;
@@ -80,10 +82,10 @@ export const onDirective: Directive<EventDirectiveBinding> = {
         uus.errorHandler.handleGenericError(
           error instanceof Error ? error : new Error(String(error)),
           'DIRECTIVE' as any,
-          { 
+          {
             directive: 'on',
             eventType,
-            expression: binding.expression
+            expression: binding.expression,
           }
         );
       }
@@ -93,7 +95,7 @@ export const onDirective: Directive<EventDirectiveBinding> = {
     const options: AddEventListenerOptions = {
       capture: Boolean(binding.modifiers?.capture),
       passive: Boolean(binding.modifiers?.passive),
-      once: Boolean(binding.modifiers?.once)
+      once: Boolean(binding.modifiers?.once),
     };
 
     el.addEventListener(eventType, handler, options);
@@ -103,13 +105,13 @@ export const onDirective: Directive<EventDirectiveBinding> = {
     const cleanups = uus.cleanups.get(el) || new Set();
     cleanups.add(cleanup);
     uus.cleanups.set(el, cleanups);
-    
+
     // Track event listener with memory manager if available
     if ((uus as any).memoryTracker) {
       (uus as any).memoryTracker.track('eventListener', el, cleanup, {
         eventType,
         element: el.tagName,
-        expression: binding.expression
+        expression: binding.expression,
       });
     }
   },

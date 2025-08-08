@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { Uus } from '../src/uus';
 
 describe('Uus', () => {
@@ -63,7 +63,7 @@ describe('Uus', () => {
       expect(span?.textContent).toBe('Hello');
     });
 
-    it('should handle reactive updates', () => {
+    it('should handle reactive updates', async () => {
       container.innerHTML = `
         <div uus-state="{ count: 0 }">
           <span id="display" uus-text="count"></span>
@@ -80,9 +80,11 @@ describe('Uus', () => {
       expect(display?.textContent).toBe('0');
 
       button.click();
+      await new Promise(resolve => setTimeout(resolve, 10));
       expect(display?.textContent).toBe('1');
 
       button.click();
+      await new Promise(resolve => setTimeout(resolve, 10));
       expect(display?.textContent).toBe('2');
     });
 
@@ -102,7 +104,7 @@ describe('Uus', () => {
   });
 
   describe('unmount', () => {
-    it('should clean up when unmounting', () => {
+    it('should clean up when unmounting', async () => {
       container.innerHTML = `
         <div uus-state="{ count: 0 }">
           <span id="display" uus-text="count"></span>
@@ -115,6 +117,7 @@ describe('Uus', () => {
 
       const button = container.querySelector('#btn') as HTMLButtonElement;
       button.click();
+      await new Promise(resolve => setTimeout(resolve, 10));
 
       const display = container.querySelector('#display');
       expect(display?.textContent).toBe('1');
@@ -124,6 +127,7 @@ describe('Uus', () => {
 
       // Click should not update after unmount
       button.click();
+      await new Promise(resolve => setTimeout(resolve, 10));
       expect(display?.textContent).toBe('1');
     });
   });

@@ -24,7 +24,7 @@ import type {
   Directive,
   Effect,
   EventHandler,
-  Result
+  Result,
 } from './types';
 
 // ============================================================================
@@ -35,7 +35,11 @@ import type {
  * Type guard for directive names
  */
 export function isDirectiveName(value: unknown): value is DirectiveName {
-  return typeof value === 'string' && value.length > 0 && /^[a-zA-Z][a-zA-Z0-9:-]*$/.test(value);
+  return (
+    typeof value === 'string' &&
+    value.length > 0 &&
+    /^[a-zA-Z][a-zA-Z0-9:-]*$/.test(value)
+  );
 }
 
 /**
@@ -45,7 +49,7 @@ export function isElementSelector(value: unknown): value is ElementSelector {
   if (typeof value !== 'string' || !value.trim()) {
     return false;
   }
-  
+
   try {
     // Test if it's a valid CSS selector by attempting to query it
     document.querySelector(value);
@@ -94,7 +98,9 @@ export function isRef<T = unknown>(value: unknown): value is Ref<T> {
 /**
  * Type guard for reactive objects
  */
-export function isReactive(value: unknown): value is ReactiveState & ReactiveMarkers {
+export function isReactive(
+  value: unknown
+): value is ReactiveState & ReactiveMarkers {
   return (
     value !== null &&
     typeof value === 'object' &&
@@ -109,7 +115,7 @@ export function hasReactiveMarkers(value: unknown): value is ReactiveMarkers {
   if (value === null || typeof value !== 'object') {
     return false;
   }
-  
+
   const obj = value as Record<string, unknown>;
   return '__isReactive' in obj || '__raw' in obj || '__markRaw' in obj;
 }
@@ -129,17 +135,15 @@ export function isEffect(value: unknown): value is Effect {
  * Type guard for base directive binding
  */
 export function isDirectiveBinding(value: unknown): value is DirectiveBinding {
-  return (
-    value !== null &&
-    typeof value === 'object' &&
-    'value' in value
-  );
+  return value !== null && typeof value === 'object' && 'value' in value;
 }
 
 /**
  * Type guard for state directive binding
  */
-export function isStateDirectiveBinding(value: unknown): value is StateDirectiveBinding {
+export function isStateDirectiveBinding(
+  value: unknown
+): value is StateDirectiveBinding {
   return (
     isDirectiveBinding(value) &&
     typeof (value as StateDirectiveBinding).value === 'object' &&
@@ -150,7 +154,9 @@ export function isStateDirectiveBinding(value: unknown): value is StateDirective
 /**
  * Type guard for event directive binding
  */
-export function isEventDirectiveBinding(value: unknown): value is EventDirectiveBinding {
+export function isEventDirectiveBinding(
+  value: unknown
+): value is EventDirectiveBinding {
   return (
     isDirectiveBinding(value) &&
     'arg' in value &&
@@ -163,7 +169,9 @@ export function isEventDirectiveBinding(value: unknown): value is EventDirective
 /**
  * Type guard for bind directive binding
  */
-export function isBindDirectiveBinding(value: unknown): value is BindDirectiveBinding {
+export function isBindDirectiveBinding(
+  value: unknown
+): value is BindDirectiveBinding {
   return (
     isDirectiveBinding(value) &&
     'arg' in value &&
@@ -174,52 +182,54 @@ export function isBindDirectiveBinding(value: unknown): value is BindDirectiveBi
 /**
  * Type guard for conditional directive binding
  */
-export function isConditionalDirectiveBinding(value: unknown): value is ConditionalDirectiveBinding {
+export function isConditionalDirectiveBinding(
+  value: unknown
+): value is ConditionalDirectiveBinding {
   return isDirectiveBinding(value);
 }
 
 /**
  * Type guard for loop directive binding
  */
-export function isLoopDirectiveBinding(value: unknown): value is LoopDirectiveBinding {
+export function isLoopDirectiveBinding(
+  value: unknown
+): value is LoopDirectiveBinding {
   const binding = value as LoopDirectiveBinding;
   return (
     isDirectiveBinding(value) &&
-    (
-      Array.isArray(binding.value) ||
+    (Array.isArray(binding.value) ||
       (typeof binding.value === 'object' && binding.value !== null) ||
-      typeof binding.value === 'string'
-    )
+      typeof binding.value === 'string')
   );
 }
 
 /**
  * Type guard for content directive binding
  */
-export function isContentDirectiveBinding(value: unknown): value is ContentDirectiveBinding {
+export function isContentDirectiveBinding(
+  value: unknown
+): value is ContentDirectiveBinding {
   const binding = value as ContentDirectiveBinding;
   return (
     isDirectiveBinding(value) &&
-    (
-      typeof binding.value === 'string' ||
+    (typeof binding.value === 'string' ||
       typeof binding.value === 'number' ||
       binding.value === null ||
-      binding.value === undefined
-    )
+      binding.value === undefined)
   );
 }
 
 /**
  * Type guard for style directive binding
  */
-export function isStyleDirectiveBinding(value: unknown): value is StyleDirectiveBinding {
+export function isStyleDirectiveBinding(
+  value: unknown
+): value is StyleDirectiveBinding {
   const binding = value as StyleDirectiveBinding;
   return (
     isDirectiveBinding(value) &&
-    (
-      typeof binding.value === 'string' ||
-      (typeof binding.value === 'object' && binding.value !== null)
-    )
+    (typeof binding.value === 'string' ||
+      (typeof binding.value === 'object' && binding.value !== null))
   );
 }
 
@@ -231,10 +241,7 @@ export function isStyleDirectiveBinding(value: unknown): value is StyleDirective
  * Type guard for event handlers
  */
 export function isEventHandler(value: unknown): value is EventHandler {
-  return (
-    typeof value === 'function' ||
-    typeof value === 'string'
-  );
+  return typeof value === 'function' || typeof value === 'string';
 }
 
 /**
@@ -276,22 +283,22 @@ export function isUusConfig(value: unknown): value is UusConfig {
   if (value === null || typeof value !== 'object') {
     return false;
   }
-  
+
   const config = value as Record<string, unknown>;
-  
+
   // Check optional properties
   if ('debug' in config && typeof config.debug !== 'boolean') {
     return false;
   }
-  
+
   if ('prefix' in config && typeof config.prefix !== 'string') {
     return false;
   }
-  
+
   if ('onError' in config && typeof config.onError !== 'function') {
     return false;
   }
-  
+
   return true;
 }
 
@@ -302,20 +309,20 @@ export function isDirective(value: unknown): value is Directive {
   if (value === null || typeof value !== 'object') {
     return false;
   }
-  
+
   const directive = value as Record<string, unknown>;
-  
+
   // Must have name
   if (!('name' in directive) || typeof directive.name !== 'string') {
     return false;
   }
-  
+
   // Must have at least one lifecycle hook
   const hooks = ['init', 'bind', 'update', 'unbind'];
-  const hasHook = hooks.some(hook => 
-    hook in directive && typeof directive[hook] === 'function'
+  const hasHook = hooks.some(
+    (hook) => hook in directive && typeof directive[hook] === 'function'
   );
-  
+
   return hasHook;
 }
 
@@ -326,14 +333,18 @@ export function isDirective(value: unknown): value is Directive {
 /**
  * Type guard for Result success
  */
-export function isResultSuccess<T, E>(result: Result<T, E>): result is { success: true; data: T } {
+export function isResultSuccess<T, E>(
+  result: Result<T, E>
+): result is { success: true; data: T } {
   return result.success === true;
 }
 
 /**
  * Type guard for Result failure
  */
-export function isResultFailure<T, E>(result: Result<T, E>): result is { success: false; error: E } {
+export function isResultFailure<T, E>(
+  result: Result<T, E>
+): result is { success: false; error: E } {
   return result.success === false;
 }
 
@@ -352,7 +363,9 @@ export function isIterable(value: unknown): value is Iterable<unknown> {
 /**
  * Type guard for plain objects (not arrays, dates, etc.)
  */
-export function isPlainObject(value: unknown): value is Record<string, unknown> {
+export function isPlainObject(
+  value: unknown
+): value is Record<string, unknown> {
   return (
     value !== null &&
     typeof value === 'object' &&
@@ -367,7 +380,7 @@ export function isPlainObject(value: unknown): value is Record<string, unknown> 
 /**
  * Type guard for functions
  */
-export function isFunction(value: unknown): value is Function {
+export function isFunction(value: unknown): value is (...args: any[]) => any {
   return typeof value === 'function';
 }
 
@@ -404,19 +417,21 @@ export function isStringOrNumber(value: unknown): value is string | number {
 /**
  * Validates directive name format with specific patterns
  */
-export function validateDirectiveNameFormat(name: string): name is DirectiveName {
+export function validateDirectiveNameFormat(
+  name: string
+): name is DirectiveName {
   if (!isDirectiveName(name)) {
     return false;
   }
-  
+
   // Check for valid directive patterns
   const patterns = [
     /^[a-zA-Z][a-zA-Z0-9]*$/, // Simple directive names
     /^on:[a-zA-Z][a-zA-Z0-9]*$/, // Event directives
-    /^bind:[a-zA-Z][a-zA-Z0-9-]*$/ // Bind directives
+    /^bind:[a-zA-Z][a-zA-Z0-9-]*$/, // Bind directives
   ];
-  
-  return patterns.some(pattern => pattern.test(name));
+
+  return patterns.some((pattern) => pattern.test(name));
 }
 
 /**
@@ -426,22 +441,30 @@ export function validateStateStructure(state: unknown): state is ReactiveState {
   if (!isPlainObject(state)) {
     return false;
   }
-  
+
   // Check for reserved properties
-  const reserved = ['__isReactive', '__raw', '__markRaw', 'constructor', 'prototype'];
+  const reserved = [
+    '__isReactive',
+    '__raw',
+    '__markRaw',
+    'constructor',
+    'prototype',
+  ];
   const keys = Object.keys(state);
-  
-  return !keys.some(key => reserved.includes(key));
+
+  return !keys.some((key) => reserved.includes(key));
 }
 
 /**
  * Validates expression string safety
  */
-export function validateExpressionSafety(expression: string): expression is ExpressionString {
+export function validateExpressionSafety(
+  expression: string
+): expression is ExpressionString {
   if (!isExpressionString(expression)) {
     return false;
   }
-  
+
   // Check for dangerous patterns
   const dangerousPatterns = [
     /eval\s*\(/,
@@ -453,10 +476,10 @@ export function validateExpressionSafety(expression: string): expression is Expr
     /require\s*\(/,
     /process\./,
     /global\./,
-    /window\./
+    /window\./,
   ];
-  
-  return !dangerousPatterns.some(pattern => pattern.test(expression));
+
+  return !dangerousPatterns.some((pattern) => pattern.test(expression));
 }
 
 /**
