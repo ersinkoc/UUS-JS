@@ -55,9 +55,11 @@ function drawChart(containerId) {
   ctx.beginPath();
 
   const max = Math.max(...data);
+  // BUG-NEW-021 FIX: Prevent division by zero when data.length <= 1
+  const xStep = data.length > 1 ? chartWidth / (data.length - 1) : 0;
 
   data.forEach((value, index) => {
-    const x = margin + (index * chartWidth) / (data.length - 1);
+    const x = data.length > 1 ? margin + (index * xStep) : margin + chartWidth / 2;
     const y = margin + chartHeight - (value / max) * chartHeight;
 
     if (index === 0) {
@@ -72,7 +74,7 @@ function drawChart(containerId) {
   // Data points
   ctx.fillStyle = containerId === 'revenue-chart' ? '#2ecc71' : '#3498db';
   data.forEach((value, index) => {
-    const x = margin + (index * chartWidth) / (data.length - 1);
+    const x = data.length > 1 ? margin + (index * xStep) : margin + chartWidth / 2;
     const y = margin + chartHeight - (value / max) * chartHeight;
 
     ctx.beginPath();
@@ -86,7 +88,7 @@ function drawChart(containerId) {
   ctx.textAlign = 'center';
 
   labels.forEach((label, index) => {
-    const x = margin + (index * chartWidth) / (data.length - 1);
+    const x = data.length > 1 ? margin + (index * xStep) : margin + chartWidth / 2;
     ctx.fillText(label, x, canvas.height - 10);
   });
 }

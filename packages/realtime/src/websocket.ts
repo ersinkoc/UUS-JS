@@ -329,16 +329,32 @@ export function createWebSocket(
   async function join(room: string): Promise<void> {
     send('join', { room });
 
-    return new Promise((resolve) => {
-      once(`joined:${room}`, resolve);
+    // BUG-NEW-025 FIX: Add timeout to prevent hanging promise
+    return new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        reject(new Error(`Timeout waiting for joined confirmation for room: ${room}`));
+      }, 5000); // 5 second timeout
+
+      once(`joined:${room}`, () => {
+        clearTimeout(timeout);
+        resolve();
+      });
     });
   }
 
   async function leave(room: string): Promise<void> {
     send('leave', { room });
 
-    return new Promise((resolve) => {
-      once(`left:${room}`, resolve);
+    // BUG-NEW-025 FIX: Add timeout to prevent hanging promise
+    return new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        reject(new Error(`Timeout waiting for left confirmation for room: ${room}`));
+      }, 5000); // 5 second timeout
+
+      once(`left:${room}`, () => {
+        clearTimeout(timeout);
+        resolve();
+      });
     });
   }
 

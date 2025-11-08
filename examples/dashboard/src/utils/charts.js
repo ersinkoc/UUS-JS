@@ -48,7 +48,8 @@ export function createChart(containerId, data, type = 'visitors') {
   }
 
   // Vertical grid lines
-  const stepX = chartWidth / (data.length - 1);
+  // BUG-NEW-021 FIX: Prevent division by zero when data.length <= 1
+  const stepX = data.length > 1 ? chartWidth / (data.length - 1) : 0;
   for (let i = 0; i < data.length; i += Math.ceil(data.length / 6)) {
     const x = padding + stepX * i;
     ctx.beginPath();
@@ -63,8 +64,11 @@ export function createChart(containerId, data, type = 'visitors') {
     ctx.lineWidth = 3;
     ctx.beginPath();
 
+    // BUG-NEW-021 FIX: Calculate x-step safely for single data point
+    const xStep = data.length > 1 ? chartWidth / (data.length - 1) : 0;
+
     for (let i = 0; i < data.length; i++) {
-      const x = padding + (chartWidth / (data.length - 1)) * i;
+      const x = data.length > 1 ? padding + xStep * i : padding + chartWidth / 2;
       const y =
         padding + chartHeight - ((values[i] - minValue) / range) * chartHeight;
 
@@ -80,7 +84,7 @@ export function createChart(containerId, data, type = 'visitors') {
     // Draw points
     ctx.fillStyle = type === 'revenue' ? '#2ecc71' : '#3498db';
     for (let i = 0; i < data.length; i++) {
-      const x = padding + (chartWidth / (data.length - 1)) * i;
+      const x = data.length > 1 ? padding + xStep * i : padding + chartWidth / 2;
       const y =
         padding + chartHeight - ((values[i] - minValue) / range) * chartHeight;
 
@@ -96,7 +100,7 @@ export function createChart(containerId, data, type = 'visitors') {
     ctx.moveTo(padding, canvas.height - padding);
 
     for (let i = 0; i < data.length; i++) {
-      const x = padding + (chartWidth / (data.length - 1)) * i;
+      const x = data.length > 1 ? padding + xStep * i : padding + chartWidth / 2;
       const y =
         padding + chartHeight - ((values[i] - minValue) / range) * chartHeight;
       ctx.lineTo(x, y);
@@ -130,10 +134,16 @@ export function createChart(containerId, data, type = 'visitors') {
 
   const labelStep = Math.ceil(data.length / 6);
   for (let i = 0; i < data.length; i += labelStep) {
-    const x = padding + (chartWidth / (data.length - 1)) * i;
-    const date = new Date(data[i].date);
-    const label = date.getMonth() + 1 + '/' + date.getDate();
-    ctx.fillText(label, x, canvas.height - padding + 10);
+    // BUG-NEW-021 FIX: Safely calculate x position and check bounds
+    const x = data.length > 1
+      ? padding + (chartWidth / (data.length - 1)) * i
+      : padding + chartWidth / 2;
+    // BUG-NEW-022 FIX: Ensure i is within bounds before accessing array
+    if (i < data.length && data[i] && data[i].date) {
+      const date = new Date(data[i].date);
+      const label = date.getMonth() + 1 + '/' + date.getDate();
+      ctx.fillText(label, x, canvas.height - padding + 10);
+    }
   }
 }
 

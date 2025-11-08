@@ -108,9 +108,14 @@ export function createApp(context?: SSRContext) {
     },
 
     setup(app) {
-      // Fetch initial data
-      app.state.fetchUser();
-      app.state.fetchPosts();
+      // BUG-NEW-024 FIX: Add error handling for fire-and-forget async calls
+      // Fetch initial data with proper error handling
+      app.state.fetchUser().catch((error: Error) => {
+        console.error('Failed to fetch user in setup:', error);
+      });
+      app.state.fetchPosts().catch((error: Error) => {
+        console.error('Failed to fetch posts in setup:', error);
+      });
 
       // Set page title
       if (ctx?.title) {
