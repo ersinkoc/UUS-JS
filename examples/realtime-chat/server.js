@@ -31,6 +31,11 @@ wss.on('connection', (ws) => {
 
       switch (message.event) {
         case 'user:join':
+          // BUG-NEW-023 FIX: Validate message.data exists before accessing properties
+          if (!message.data || !message.data.id || !message.data.name) {
+            console.error('Invalid user:join message - missing data');
+            break;
+          }
           userId = message.data.id;
           users.set(userId, {
             ...message.data,
@@ -70,6 +75,11 @@ wss.on('connection', (ws) => {
           break;
 
         case 'message:send':
+          // BUG-NEW-023 FIX: Validate message.data exists
+          if (!message.data) {
+            console.error('Invalid message:send - missing data');
+            break;
+          }
           // Add message to history
           messages.push(message.data);
           if (messages.length > MAX_MESSAGES) {
@@ -84,6 +94,11 @@ wss.on('connection', (ws) => {
           break;
 
         case 'user:typing':
+          // BUG-NEW-023 FIX: Validate message.data and typing property exist
+          if (!message.data || typeof message.data.typing === 'undefined') {
+            console.error('Invalid user:typing message - missing data');
+            break;
+          }
           // Broadcast typing status
           broadcast(
             {
@@ -102,7 +117,7 @@ wss.on('connection', (ws) => {
           ws.send(
             JSON.stringify({
               event: 'pong',
-              data: message.data,
+              data: message.data || {},
             })
           );
           break;
