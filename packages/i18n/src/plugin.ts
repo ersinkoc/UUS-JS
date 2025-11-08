@@ -1,6 +1,24 @@
 import type { Uus } from '@uusjs/core';
 import type { I18nOptions, I18nPlugin, I18nInstance } from './types';
 import { I18n } from './i18n';
+import DOMPurify from 'dompurify';
+
+// HTML sanitization for translated content to prevent XSS
+function sanitizeHTML(html: string): string {
+  const config = {
+    ALLOWED_TAGS: [
+      'a', 'abbr', 'b', 'blockquote', 'br', 'code', 'dd', 'div', 'dl', 'dt',
+      'em', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'i', 'img', 'li', 'ol',
+      'p', 'pre', 'small', 'span', 'strong', 'sub', 'sup', 'table', 'tbody',
+      'td', 'tfoot', 'th', 'thead', 'tr', 'u', 'ul',
+    ],
+    ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'class', 'id', 'target'],
+    ALLOW_DATA_ATTR: false,
+    FORBID_TAGS: ['script', 'style', 'iframe', 'object', 'embed', 'form'],
+    FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover'],
+  };
+  return DOMPurify.sanitize(html, config);
+}
 
 /**
  * Create i18n plugin for Uus.js
@@ -60,7 +78,8 @@ export function createI18n(options: I18nOptions = {}): I18nPlugin {
           const key = arg || value;
 
           if (typeof key === 'string') {
-            el.innerHTML = i18n.t(key);
+            // Sanitize translated HTML content to prevent XSS
+            el.innerHTML = sanitizeHTML(i18n.t(key));
           }
         },
 
@@ -69,7 +88,8 @@ export function createI18n(options: I18nOptions = {}): I18nPlugin {
           const key = arg || value;
 
           if (typeof key === 'string') {
-            el.innerHTML = i18n.t(key);
+            // Sanitize translated HTML content to prevent XSS
+            el.innerHTML = sanitizeHTML(i18n.t(key));
           }
         },
       });

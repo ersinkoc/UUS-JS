@@ -249,7 +249,10 @@ export function createWebSocket(
 
     reconnectTimer = setTimeout(() => {
       reconnectTimer = null;
-      connect().catch(() => {});
+      connect().catch((error) => {
+        log('Reconnection failed', error);
+        // Will retry on next attempt if reconnect is still enabled
+      });
     }, delay);
   }
 
@@ -274,7 +277,7 @@ export function createWebSocket(
 
   function send(event: string, data?: any) {
     const message: RealtimeMessage = {
-      id: Math.random().toString(36).substr(2, 9),
+      id: Math.random().toString(36).substring(2, 11),
       event,
       data,
       timestamp: Date.now(),

@@ -226,7 +226,10 @@ export function createSSE(options: SSEOptions = {}): RealtimeConnection {
 
     reconnectTimer = setTimeout(() => {
       reconnectTimer = null;
-      connect().catch(() => {});
+      connect().catch((error) => {
+        log('Reconnection failed', error);
+        // Will retry on next attempt if reconnect is still enabled
+      });
     }, delay);
   }
 
