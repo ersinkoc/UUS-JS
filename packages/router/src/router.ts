@@ -63,6 +63,13 @@ export class Router implements RouterInterface {
     this.afterHooks.push(hook);
   }
 
+  removeAfterEach(hook: (to: RouteMatch, from: RouteMatch | null) => void): void {
+    const index = this.afterHooks.indexOf(hook);
+    if (index > -1) {
+      this.afterHooks.splice(index, 1);
+    }
+  }
+
   resolve(path: string): RouteMatch | null {
     return this.matcher.match(path);
   }
@@ -214,6 +221,7 @@ const linkDirective = {
     const cleanups = uus.cleanups.get(el) || new Set();
     cleanups.add(() => {
       el.removeEventListener('click', handleClick);
+      router.removeAfterEach(updateActive);
     });
     uus.cleanups.set(el, cleanups);
   },

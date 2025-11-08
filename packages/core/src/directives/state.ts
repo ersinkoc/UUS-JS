@@ -32,7 +32,10 @@ export const stateDirective: Directive<StateDirectiveBinding> = {
       if (!uus.state) {
         (uus as any).state = reactiveState;
       } else {
-        Object.assign(uus.state, reactiveState);
+        // Assign each property individually to preserve reactivity
+        for (const key in reactiveState) {
+          uus.state[key] = reactiveState[key];
+        }
       }
 
       // Store state reference on element for child directives

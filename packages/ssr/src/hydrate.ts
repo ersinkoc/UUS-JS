@@ -23,7 +23,10 @@ export function hydrate(
   if (serverState) {
     try {
       const state = JSON.parse(serverState);
-      Object.assign(app.state, state);
+      // Assign each property individually to preserve reactivity
+      for (const key in state) {
+        app.state[key] = state[key];
+      }
     } catch (error) {
       console.error('Failed to restore server state:', error);
     }

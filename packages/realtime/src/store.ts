@@ -47,13 +47,18 @@ export function createRealtimeStore<T = any>(
         // Keep local state
         return;
       } else if (opts.conflictResolution === 'remote') {
-        // Use remote state
-        Object.assign(state, data.state);
+        // Use remote state - assign each property to trigger reactivity
+        for (const key in data.state) {
+          (state as any)[key] = data.state[key];
+        }
         version = data.version;
       } else if (typeof opts.conflictResolution === 'function') {
         // Custom conflict resolution
         const resolved = opts.conflictResolution(state as T, data.state);
-        Object.assign(state, resolved);
+        // Assign each property individually to preserve reactivity
+        for (const key in resolved) {
+          (state as any)[key] = (resolved as any)[key];
+        }
         version = data.version;
       }
 

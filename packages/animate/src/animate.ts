@@ -45,14 +45,18 @@ export const animateDirective: Directive = {
     };
 
     // Handle different triggers
+    let eventCleanup: (() => void) | null = null;
+
     if (trigger === 'immediate') {
       runAnimation();
     } else if (trigger === 'visible') {
       setupScrollAnimation(el, runAnimation, binding, uus);
     } else if (trigger === 'hover') {
       el.addEventListener('mouseenter', runAnimation);
+      eventCleanup = () => el.removeEventListener('mouseenter', runAnimation);
     } else if (trigger === 'click') {
       el.addEventListener('click', runAnimation);
+      eventCleanup = () => el.removeEventListener('click', runAnimation);
     }
 
     // Store cleanup
@@ -60,6 +64,8 @@ export const animateDirective: Directive = {
     cleanups.add(() => {
       // Cancel any running animations
       el.getAnimations().forEach((animation) => animation.cancel());
+      // Remove event listener if it exists
+      if (eventCleanup) eventCleanup();
     });
     uus.cleanups.set(el, cleanups);
   },

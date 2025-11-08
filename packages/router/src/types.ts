@@ -43,6 +43,7 @@ export interface Router {
   forward(): void;
   beforeEach(guard: RouteGuard): void;
   afterEach(hook: (to: RouteMatch, from: RouteMatch | null) => void): void;
+  removeAfterEach(hook: (to: RouteMatch, from: RouteMatch | null) => void): void;
   resolve(path: string): RouteMatch | null;
   install(uus: any): void;
 }

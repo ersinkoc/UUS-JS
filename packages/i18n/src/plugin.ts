@@ -188,7 +188,8 @@ export const i18nDirectives = {
       const key = arg || value;
 
       if (typeof key === 'string') {
-        el.innerHTML = i18n.t(key);
+        // Sanitize translated HTML content to prevent XSS
+        el.innerHTML = sanitizeHTML(i18n.t(key));
       }
 
       (el as any).__i18nKey = key;
@@ -200,7 +201,8 @@ export const i18nDirectives = {
       const key = arg || value;
 
       if (typeof key === 'string' && key !== (el as any).__i18nKey) {
-        el.innerHTML = i18n.t(key);
+        // Sanitize translated HTML content to prevent XSS
+        el.innerHTML = sanitizeHTML(i18n.t(key));
         (el as any).__i18nKey = key;
       }
     },

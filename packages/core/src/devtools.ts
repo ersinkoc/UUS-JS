@@ -261,8 +261,10 @@ export class DevTools {
       'color: #9b59b6; font-weight: bold;'
     );
 
-    // Restore state
-    Object.assign(this.app.state, snapshot.state);
+    // Restore state - assign each property individually to preserve reactivity
+    for (const key in snapshot.state) {
+      this.app.state[key] = snapshot.state[key];
+    }
   }
 
   /**
@@ -423,7 +425,10 @@ export class DevTools {
       const data = JSON.parse(text);
 
       if (data.state) {
-        Object.assign(this.app.state, data.state);
+        // Assign each property individually to preserve reactivity
+        for (const key in data.state) {
+          this.app.state[key] = data.state[key];
+        }
         console.log('%c📥 State imported', 'color: #27ae60;');
       }
 
@@ -605,11 +610,17 @@ export class DevToolsExtensionBridge {
   }
 
   private updateState(updates: Record<string, unknown>) {
-    Object.assign(this.app.state, updates);
+    // Assign each property individually to preserve reactivity
+    for (const key in updates) {
+      this.app.state[key] = updates[key];
+    }
   }
 
   private timeTravel(snapshot: Record<string, unknown>) {
-    Object.assign(this.app.state, snapshot);
+    // Assign each property individually to preserve reactivity
+    for (const key in snapshot) {
+      this.app.state[key] = snapshot[key];
+    }
   }
 
   private inspectElement(selector: string) {
