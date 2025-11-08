@@ -246,9 +246,12 @@ function renderRoute(
 
     (el as HTMLElement).style.display = shouldShow ? '' : 'none';
 
-    // Update route params in state
+    // Update route params in state using reactive property assignment
     if (shouldShow && route.params) {
-      Object.assign(uus.state, route.params);
+      // Instead of Object.assign which bypasses reactivity, assign each param individually
+      for (const [key, value] of Object.entries(route.params)) {
+        uus.state[key] = value;
+      }
     }
   });
 }

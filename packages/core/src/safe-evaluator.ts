@@ -315,7 +315,7 @@ export class SafeTokenizer {
     ];
 
     for (const op of operators) {
-      if (this.expression.substr(this.position, op.length) === op) {
+      if (this.expression.substring(this.position, this.position + op.length) === op) {
         this.position += op.length;
         return { type: 'Operator', value: op };
       }

@@ -85,14 +85,22 @@ export const modelDirective: Directive<GenericDirectiveBinding> = {
     // Listen for input events
     const eventType = el instanceof HTMLSelectElement ? 'change' : 'input';
     el.addEventListener(eventType, updateState);
-    el.addEventListener('change', updateState);
+    // Note: For select elements, only 'change' is needed (already handled above)
+    // For input elements, only 'input' is needed for real-time updates
+    if (el instanceof HTMLInputElement && el.type !== 'checkbox' && el.type !== 'radio') {
+      // Add change event for additional validation triggers
+      el.addEventListener('change', updateState);
+    }
 
     // Store cleanup functions
     const cleanups = uus.cleanups.get(el) || new Set();
     cleanups.add(cleanup);
     cleanups.add(() => {
       el.removeEventListener(eventType, updateState);
-      el.removeEventListener('change', updateState);
+      // Only remove change listener if it was added
+      if (el instanceof HTMLInputElement && el.type !== 'checkbox' && el.type !== 'radio') {
+        el.removeEventListener('change', updateState);
+      }
     });
     uus.cleanups.set(el, cleanups);
   },
