@@ -1,0 +1,138 @@
+version: 2
+
+updates:
+  # Main package dependencies
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "security-team"
+    labels:
+      - "dependencies"
+      - "security"
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    versioning-strategy: increase
+    # Group minor and patch updates
+    groups:
+      development-dependencies:
+        patterns:
+          - "@types/*"
+          - "eslint*"
+          - "prettier"
+          - "typescript"
+          - "vitest"
+        update-types:
+          - "minor"
+          - "patch"
+      security-updates:
+        patterns:
+          - "*"
+        update-types:
+          - "security"
+
+  # Core package
+  - package-ecosystem: "npm"
+    directory: "/packages/core"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "core"
+
+  # Router package
+  - package-ecosystem: "npm"
+    directory: "/packages/router"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "router"
+
+  # Realtime package
+  - package-ecosystem: "npm"
+    directory: "/packages/realtime"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "realtime"
+
+  # i18n package
+  - package-ecosystem: "npm"
+    directory: "/packages/i18n"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "i18n"
+
+  # Forms package
+  - package-ecosystem: "npm"
+    directory: "/packages/forms"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "forms"
+
+  # SSR package
+  - package-ecosystem: "npm"
+    directory: "/packages/ssr"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "ssr"
+
+  # Animate package
+  - package-ecosystem: "npm"
+    directory: "/packages/animate"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "animate"
+
+  # DevTools package
+  - package-ecosystem: "npm"
+    directory: "/packages/devtools"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "devtools"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "ci/cd"
+    commit-message:
+      prefix: "chore(ci)"

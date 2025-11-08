@@ -35,6 +35,13 @@ export interface PerformanceMetric {
   timestamp: number;
 }
 
+// HTML escape function to prevent XSS in DevTools UI
+function escapeHTML(str: string): string {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
 export class UusDevTools {
   private config: DevToolsConfig;
   private components: Map<string, ComponentInfo> = new Map();
@@ -229,11 +236,16 @@ export class UusDevTools {
 
     let html = '';
     this.components.forEach(component => {
+      const safeName = escapeHTML(component.name);
+      const safeId = escapeHTML(String(component.id));
+      const safeDirectives = component.directives.map(d => escapeHTML(d)).join(', ');
+      const safeKeys = Object.keys(component.state).map(k => escapeHTML(k)).join(', ');
+
       html += `
         <div class="uus-component">
-          <div><strong>${component.name}</strong> #${component.id}</div>
-          <div>Directives: ${component.directives.join(', ')}</div>
-          <div>State keys: ${Object.keys(component.state).join(', ')}</div>
+          <div><strong>${safeName}</strong> #${safeId}</div>
+          <div>Directives: ${safeDirectives}</div>
+          <div>State keys: ${safeKeys}</div>
         </div>
       `;
     });
@@ -249,12 +261,17 @@ export class UusDevTools {
     let html = '<div>';
     this.stateHistory.slice(-20).reverse().forEach(change => {
       const time = new Date(change.timestamp).toLocaleTimeString();
+      const safeComponent = escapeHTML(change.component);
+      const safeProperty = escapeHTML(change.property);
+      const safeOldValue = escapeHTML(JSON.stringify(change.oldValue));
+      const safeNewValue = escapeHTML(JSON.stringify(change.newValue));
+
       html += `
         <div class="uus-state-item">
-          <div>${time} - ${change.component}</div>
+          <div>${time} - ${safeComponent}</div>
           <div>
-            <span class="uus-state-key">${change.property}:</span>
-            <span class="uus-state-value">${JSON.stringify(change.oldValue)} → ${JSON.stringify(change.newValue)}</span>
+            <span class="uus-state-key">${safeProperty}:</span>
+            <span class="uus-state-value">${safeOldValue} → ${safeNewValue}</span>
           </div>
         </div>
       `;

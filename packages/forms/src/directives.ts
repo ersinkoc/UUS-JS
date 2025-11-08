@@ -127,17 +127,21 @@ export const fieldDirective: Directive = {
     });
 
     // Event handlers
+    const handleBlur = () => {
+      form.setFieldTouched(fieldName);
+    };
+
     el.addEventListener('input', updateValue);
     el.addEventListener('change', updateValue);
-    el.addEventListener('blur', () => {
-      form.setFieldTouched(fieldName);
-    });
+    el.addEventListener('blur', handleBlur);
 
     // Store cleanup
     const cleanups = uus.cleanups.get(el) || new Set();
     cleanups.add(() => {
       el.removeEventListener('input', updateValue);
       el.removeEventListener('change', updateValue);
+      el.removeEventListener('blur', handleBlur);
+      // Cleanup the effect
       updateElement();
     });
     uus.cleanups.set(el, cleanups);

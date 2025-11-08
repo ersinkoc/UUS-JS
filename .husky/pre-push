@@ -1,0 +1,19 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Run security audit
+echo "🔒 Running security audit..."
+pnpm audit --audit-level=high || {
+  echo "⚠️  WARNING: High or critical vulnerabilities detected!"
+  echo "Please run 'pnpm audit' to see details and fix vulnerabilities before pushing."
+  exit 1
+}
+
+# Run tests
+echo "🧪 Running test suite..."
+pnpm test || {
+  echo "❌ Tests failed. Please fix failing tests before pushing."
+  exit 1
+}
+
+echo "✅ Pre-push checks passed!"

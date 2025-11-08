@@ -36,7 +36,10 @@ export const componentDirective: Directive<GenericDirectiveBinding> = {
       // Create component state if defined
       if (componentDef.state && typeof componentDef.state === 'object') {
         const componentState = createReactive(componentDef.state);
-        Object.assign(uus.state, componentState);
+        // Assign each property individually to preserve reactivity
+        for (const key in componentState) {
+          uus.state[key] = componentState[key];
+        }
         (
           el as HTMLElement & { __uusState?: Record<string, unknown> }
         ).__uusState = componentState;
