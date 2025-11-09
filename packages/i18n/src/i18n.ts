@@ -298,8 +298,18 @@ export class I18n implements I18nInstance {
       return String(value);
     }
 
-    let processed = interpolate(value, params);
+    // Escape params FIRST if HTML escaping is enabled
+    const safeParams = this.options.escapeHtml
+      ? Object.entries(params).reduce((acc, [key, val]) => {
+          acc[key] = typeof val === 'string' ? escapeHtml(val) : val;
+          return acc;
+        }, {} as Record<string, any>)
+      : params;
 
+    // Then interpolate with safe params
+    let processed = interpolate(value, safeParams);
+
+    // Finally escape the template string itself if needed
     if (this.options.escapeHtml) {
       processed = escapeHtml(processed);
     }

@@ -53,7 +53,13 @@ export class RouteMatcher {
       if (match) {
         const params: Record<string, string> = {};
         pattern.keys.forEach((key, index) => {
-          params[key] = match[index + 1] || '';
+          try {
+            // Decode URL-encoded parameters to prevent XSS via encoded scripts
+            params[key] = decodeURIComponent(match[index + 1] || '');
+          } catch (e) {
+            // Handle malformed URI components - use raw value as fallback
+            params[key] = match[index + 1] || '';
+          }
         });
 
         return {

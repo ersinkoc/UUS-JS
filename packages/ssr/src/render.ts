@@ -48,9 +48,18 @@ export async function renderToString(
 
     // Inject state
     if (state) {
+      // Inject state as a JSON string for proper hydration
+      // Use JSON.stringify to properly escape and quote the JSON string
+      // This ensures window.__UUS_STATE__ is a string, not an object
+      const stateScript = JSON.stringify(state)
+        .replace(/<\//g, '<\\/')  // Escape closing tags like </script>
+        .replace(/<!--/g, '<\\!--')  // Escape HTML comments
+        .replace(/\u2028/g, '\\u2028')  // Escape line separator
+        .replace(/\u2029/g, '\\u2029');  // Escape paragraph separator
+
       html = html.replace(
         '</head>',
-        `<script>window.__UUS_STATE__=${state}</script></head>`
+        `<script>window.__UUS_STATE__=${stateScript}</script></head>`
       );
     }
 

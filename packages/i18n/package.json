@@ -46,7 +46,9 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@uusjs/core": "workspace:*"
+    "@uusjs/core": "workspace:*",
+    "@types/dompurify": "^3.0.5",
+    "dompurify": "^3.2.6"
   },
   "devDependencies": {
     "@types/node": "^20.11.5",

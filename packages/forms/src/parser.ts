@@ -45,9 +45,23 @@ function parseArg(arg: string): any {
   // Try to parse as regex
   if (arg.startsWith('/') && arg.endsWith('/')) {
     try {
-      return new RegExp(arg.slice(1, -1));
-    } catch {
-      // Invalid regex, return as string
+      const pattern = arg.slice(1, -1);
+
+      // Reject patterns with excessive repetition operators that can cause ReDoS
+      if (/(\*\+|\+\*|\{\d+,\}.*\{\d+,\})/.test(pattern)) {
+        throw new Error('Potentially unsafe regex pattern');
+      }
+
+      // Limit complexity to prevent catastrophic backtracking
+      if (pattern.length > 100) {
+        throw new Error('Regex pattern too complex');
+      }
+
+      return new RegExp(pattern);
+    } catch (error) {
+      console.warn('Invalid regex pattern:', error);
+      // Invalid regex, return as string fallback
+      return arg;
     }
   }
 

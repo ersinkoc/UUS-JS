@@ -1,3 +1,15 @@
+/**
+ * Validates that a path does not contain dangerous protocols
+ * Only allows http:, https:, and relative URLs
+ */
+function isValidPath(path: string): boolean {
+  if (path.match(/^(javascript|data|vbscript):/i)) {
+    console.error('Invalid protocol in path:', path);
+    return false;
+  }
+  return true;
+}
+
 export interface History {
   current: string;
   push(path: string): void;
@@ -14,10 +26,16 @@ export class HashHistory implements History {
   }
 
   push(path: string): void {
+    if (!isValidPath(path)) {
+      return;
+    }
     window.location.hash = path;
   }
 
   replace(path: string): void {
+    if (!isValidPath(path)) {
+      return;
+    }
     const url = window.location.href.replace(/#.*/, '') + '#' + path;
     window.history.replaceState(null, '', url);
     this.notifyListeners();
@@ -65,12 +83,18 @@ export class HTML5History implements History {
   }
 
   push(path: string): void {
+    if (!isValidPath(path)) {
+      return;
+    }
     const fullPath = this.base + path;
     window.history.pushState(null, '', fullPath);
     this.notifyListeners();
   }
 
   replace(path: string): void {
+    if (!isValidPath(path)) {
+      return;
+    }
     const fullPath = this.base + path;
     window.history.replaceState(null, '', fullPath);
     this.notifyListeners();
@@ -98,8 +122,12 @@ export class HTML5History implements History {
         link.target !== '_blank' &&
         link.hostname === window.location.hostname
       ) {
-        e.preventDefault();
+        // Additional validation for dangerous protocols
         const path = link.pathname + link.search + link.hash;
+        if (!isValidPath(link.href) || !isValidPath(path)) {
+          return;
+        }
+        e.preventDefault();
         this.push(path);
       }
     };

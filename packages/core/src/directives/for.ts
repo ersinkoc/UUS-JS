@@ -114,7 +114,12 @@ export const forDirective: Directive<LoopDirectiveBinding> = {
       }
 
       const template = uus.errorHandler.safe(
-        () => el.cloneNode(true) as HTMLElement,
+        () => {
+          const clonedTemplate = el.cloneNode(true) as HTMLElement;
+          // Remove all script tags from cloned template to prevent XSS
+          clonedTemplate.querySelectorAll('script').forEach(script => script.remove());
+          return clonedTemplate;
+        },
         ErrorCategory.DIRECTIVE,
         { element: el, directive: 'for', phase: 'template-clone' }
       );
@@ -260,6 +265,8 @@ export const forDirective: Directive<LoopDirectiveBinding> = {
           uus.errorHandler.safe(
             () => {
               const instance = template.cloneNode(true) as HTMLElement;
+              // Remove all script tags from cloned template to prevent XSS
+              instance.querySelectorAll('script').forEach(script => script.remove());
 
               // Create scoped state for this iteration
               const scopedState = createReactive({

@@ -7,6 +7,27 @@ import {
   isBindDirectiveBinding,
 } from '../type-guards';
 
+// Blacklist of dangerous event handler attributes to prevent XSS attacks
+const DANGEROUS_ATTRIBUTES = new Set([
+  'onclick', 'onerror', 'onload', 'onmouseover',
+  'onfocus', 'onblur', 'onchange', 'onsubmit',
+  'onmouseenter', 'onmouseleave', 'onkeydown',
+  'onkeyup', 'onkeypress', 'onmousedown', 'onmouseup',
+  'ondblclick', 'oncontextmenu', 'oninput', 'oninvalid',
+  'onreset', 'onselect', 'onabort', 'oncanplay',
+  'oncanplaythrough', 'oncuechange', 'ondurationchange',
+  'onemptied', 'onended', 'onloadeddata', 'onloadedmetadata',
+  'onloadstart', 'onpause', 'onplay', 'onplaying',
+  'onprogress', 'onratechange', 'onseeked', 'onseeking',
+  'onstalled', 'onsuspend', 'ontimeupdate', 'onvolumechange',
+  'onwaiting', 'onwheel', 'oncopy', 'oncut', 'onpaste',
+  'onanimationstart', 'onanimationend', 'onanimationiteration',
+  'ontransitionend', 'ontransitionstart', 'ontransitioncancel',
+  'ontransitionrun', 'ondrag', 'ondragend', 'ondragenter',
+  'ondragleave', 'ondragover', 'ondragstart', 'ondrop',
+  'onscroll', 'onresize', 'onfocusin', 'onfocusout',
+]);
+
 export const bindDirective: Directive<BindDirectiveBinding> = {
   name: asDirectiveName('bind'),
   bind(el, binding, uus) {
@@ -62,6 +83,12 @@ export const bindDirective: Directive<BindDirectiveBinding> = {
           // Remove attribute for falsy values
           el.removeAttribute(attrName);
         } else {
+          // Validate attribute name to prevent XSS attacks via event handler attributes
+          if (DANGEROUS_ATTRIBUTES.has(attrName.toLowerCase())) {
+            console.error(`Dangerous attribute binding blocked: ${attrName}`);
+            return;
+          }
+
           // Set attribute value
           el.setAttribute(attrName, String(value));
         }

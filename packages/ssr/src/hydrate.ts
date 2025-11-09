@@ -22,7 +22,11 @@ export function hydrate(
   const serverState = (window as any).__UUS_STATE__;
   if (serverState) {
     try {
-      const state = JSON.parse(serverState);
+      // Handle both string (correct) and object (legacy/fallback) cases
+      const state = typeof serverState === 'string'
+        ? JSON.parse(serverState)
+        : serverState;
+
       // Assign each property individually to preserve reactivity
       for (const key in state) {
         app.state[key] = state[key];
@@ -111,26 +115,4 @@ function getDirectives(
   }
 
   return directives;
-}
-
-/**
- * Create SSR-aware app
- */
-export function createSSRApp(options?: any): Uus {
-  const app = new Uus(options);
-
-  // Override mount to handle hydration
-  const originalMount = app.mount.bind(app);
-
-  app.mount = function (container?: string | Element) {
-    // Check if we're hydrating
-    if (typeof window !== 'undefined' && (window as any).__UUS_STATE__) {
-      hydrate(app, container);
-      return app;
-    }
-
-    return originalMount(container);
-  };
-
-  return app;
 }
