@@ -345,10 +345,50 @@ describe('WebSocket', () => {
 
   it('should disable reconnect on manual disconnect', () => {
     ws.disconnect();
-    
+
     // Should disable reconnect
     expect(ws.connected).toBe(false);
   });
+
+  it('should not affect other instances when disconnecting (REALTIME-001 fix)', async () => {
+    // Create shared options object
+    const sharedOptions = {
+      url: 'ws://localhost:3000',
+      reconnect: {
+        enabled: true,
+        delay: 100,
+        maxDelay: 1000,
+        attempts: 3
+      }
+    };
+
+    // Create two instances with the same shared options
+    const ws1 = createWebSocket(sharedOptions);
+    const ws2 = createWebSocket(sharedOptions);
+
+    await ws1.connect();
+    await ws2.connect();
+    await new Promise((resolve) => setTimeout(resolve, 10));
+
+    // Disconnect first instance
+    ws1.disconnect();
+
+    // Verify the shared options object was not mutated
+    expect(sharedOptions.reconnect.enabled).toBe(true);
+
+    // Simulate connection loss on second instance
+    const mockWs2 = MockWebSocketWithTracking.instances[1];
+    if (mockWs2.onclose) {
+      mockWs2.onclose(new CloseEvent('close', { code: 1006, reason: 'Connection lost' }));
+    }
+
+    // Second instance should still be able to reconnect since we didn't disconnect it manually
+    // (The reconnection timer should be scheduled)
+    expect(ws2.connected).toBe(false);
+
+    // Clean up
+    ws2.disconnect();
+  }, 1000);
 
   it('should clear heartbeat on disconnect', async () => {
     ws = createWebSocket({

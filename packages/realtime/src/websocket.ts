@@ -52,6 +52,7 @@ export function createWebSocket(
   let reconnectTimer: any = null;
   let heartbeatTimer: any = null;
   let reconnectAttempts = 0;
+  let shouldReconnect = true; // Instance-specific reconnection flag
 
   const state = reactive({
     connected: false,
@@ -191,8 +192,9 @@ export function createWebSocket(
 
         emit('disconnect', { code: event.code, reason: event.reason });
 
-        // Reconnect if enabled
+        // Reconnect if enabled (check both instance and options flags)
         if (
+          shouldReconnect &&
           opts.reconnect.enabled &&
           reconnectAttempts < opts.reconnect.attempts
         ) {
@@ -228,7 +230,8 @@ export function createWebSocket(
       state.connecting = false;
       emit('error', error);
 
-      if (opts.reconnect.enabled) {
+      // Check both instance and options flags for reconnection
+      if (shouldReconnect && opts.reconnect.enabled) {
         scheduleReconnect();
       }
 
@@ -257,7 +260,8 @@ export function createWebSocket(
   }
 
   function disconnect() {
-    opts.reconnect.enabled = false;
+    // Use instance-specific flag instead of mutating shared options
+    shouldReconnect = false;
 
     if (reconnectTimer) {
       clearTimeout(reconnectTimer);

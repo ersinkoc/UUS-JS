@@ -37,6 +37,28 @@ export interface FormValidator {
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+/**
+ * Sanitizes error messages to prevent XSS attacks
+ * - Escapes HTML special characters
+ * - Limits message length to prevent DOM bloat
+ * @param message - The error message to sanitize
+ * @returns Sanitized error message safe for DOM rendering
+ */
+function sanitizeErrorMessage(message: string): string {
+  if (typeof message !== 'string') {
+    message = String(message);
+  }
+
+  return message
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;')
+    .replace(/\//g, '&#x2F;')
+    .substring(0, 200); // Limit length to prevent DOM bloat
+}
+
 export function createFormValidator(): FormValidator {
   const rules = new Map<string, ValidationRule>();
 
@@ -67,12 +89,12 @@ export function createFormValidator(): FormValidator {
     try {
       // Required validation
       if (rule.required) {
-        const isRequired = typeof rule.required === 'function' 
-          ? rule.required(formData) 
+        const isRequired = typeof rule.required === 'function'
+          ? rule.required(formData)
           : rule.required;
-        
+
         if (isRequired && (value === null || value === undefined || value === '')) {
-          errors.push(getErrorMessage(rule, 'This field is required', value));
+          errors.push(sanitizeErrorMessage(getErrorMessage(rule, 'This field is required', value)));
           if (!collectAll) return { valid: false, errors };
         }
       }
@@ -85,7 +107,7 @@ export function createFormValidator(): FormValidator {
       // MinLength validation
       if (rule.minLength !== undefined && typeof value === 'string') {
         if (value.length < rule.minLength) {
-          errors.push(getErrorMessage(rule, `Must be at least ${rule.minLength} characters`, value));
+          errors.push(sanitizeErrorMessage(getErrorMessage(rule, `Must be at least ${rule.minLength} characters`, value)));
           if (!collectAll) return { valid: false, errors };
         }
       }
@@ -93,7 +115,7 @@ export function createFormValidator(): FormValidator {
       // MaxLength validation
       if (rule.maxLength !== undefined && typeof value === 'string') {
         if (value.length > rule.maxLength) {
-          errors.push(getErrorMessage(rule, `Must be no more than ${rule.maxLength} characters`, value));
+          errors.push(sanitizeErrorMessage(getErrorMessage(rule, `Must be no more than ${rule.maxLength} characters`, value)));
           if (!collectAll) return { valid: false, errors };
         }
       }
@@ -101,7 +123,7 @@ export function createFormValidator(): FormValidator {
       // Pattern validation
       if (rule.pattern && typeof value === 'string') {
         if (!rule.pattern.test(value)) {
-          errors.push(getErrorMessage(rule, 'Invalid format', value));
+          errors.push(sanitizeErrorMessage(getErrorMessage(rule, 'Invalid format', value)));
           if (!collectAll) return { valid: false, errors };
         }
       }
@@ -109,7 +131,7 @@ export function createFormValidator(): FormValidator {
       // Email validation
       if (rule.email && typeof value === 'string') {
         if (!EMAIL_REGEX.test(value)) {
-          errors.push(getErrorMessage(rule, 'Invalid email format', value));
+          errors.push(sanitizeErrorMessage(getErrorMessage(rule, 'Invalid email format', value)));
           if (!collectAll) return { valid: false, errors };
         }
       }
@@ -118,7 +140,7 @@ export function createFormValidator(): FormValidator {
       if (rule.numeric) {
         const num = Number(value);
         if (isNaN(num)) {
-          errors.push(getErrorMessage(rule, 'Must be a number', value));
+          errors.push(sanitizeErrorMessage(getErrorMessage(rule, 'Must be a number', value)));
           if (!collectAll) return { valid: false, errors };
         }
       }
@@ -127,7 +149,7 @@ export function createFormValidator(): FormValidator {
       if (rule.min !== undefined) {
         const num = Number(value);
         if (!isNaN(num) && num < rule.min) {
-          errors.push(getErrorMessage(rule, `Must be at least ${rule.min}`, value));
+          errors.push(sanitizeErrorMessage(getErrorMessage(rule, `Must be at least ${rule.min}`, value)));
           if (!collectAll) return { valid: false, errors };
         }
       }
@@ -136,7 +158,7 @@ export function createFormValidator(): FormValidator {
       if (rule.max !== undefined) {
         const num = Number(value);
         if (!isNaN(num) && num > rule.max) {
-          errors.push(getErrorMessage(rule, `Must be no more than ${rule.max}`, value));
+          errors.push(sanitizeErrorMessage(getErrorMessage(rule, `Must be no more than ${rule.max}`, value)));
           if (!collectAll) return { valid: false, errors };
         }
       }
@@ -146,16 +168,17 @@ export function createFormValidator(): FormValidator {
         const result = rule.custom(value, formData);
         if (result !== true && result !== undefined) {
           if (typeof result === 'string') {
-            errors.push(result);
+            errors.push(sanitizeErrorMessage(result));
           } else {
-            errors.push(getErrorMessage(rule, 'Validation failed', value));
+            errors.push(sanitizeErrorMessage(getErrorMessage(rule, 'Validation failed', value)));
           }
           if (!collectAll) return { valid: false, errors };
         }
       }
 
     } catch (error) {
-      errors.push(`Validation error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      errors.push(sanitizeErrorMessage(`Validation error: ${errorMessage}`));
     }
 
     return {
@@ -184,13 +207,14 @@ export function createFormValidator(): FormValidator {
         const result = await rule.custom(value, formData);
         if (result !== true && result !== undefined) {
           if (typeof result === 'string') {
-            errors.push(result);
+            errors.push(sanitizeErrorMessage(result));
           } else {
-            errors.push(getErrorMessage(rule, 'Validation failed', value));
+            errors.push(sanitizeErrorMessage(getErrorMessage(rule, 'Validation failed', value)));
           }
         }
       } catch (error) {
-        errors.push(`Validation error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        errors.push(sanitizeErrorMessage(`Validation error: ${errorMessage}`));
       }
     }
 

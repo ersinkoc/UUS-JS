@@ -12,7 +12,7 @@ import {
   validate,
   createSafeFunction,
 } from './errors';
-import { safeEvaluateExpression } from './safe-evaluator';
+import { safeEvaluateExpression, parseExpression } from './safe-evaluator';
 
 const FORBIDDEN_GLOBALS = new Set([
   'eval',
@@ -21,8 +21,6 @@ const FORBIDDEN_GLOBALS = new Set([
   '__proto__',
   'prototype',
 ]);
-
-const expressionCache = new Map<string, (...args: unknown[]) => unknown>();
 
 export function createSafeEvaluator(
   state: ReactiveState,
@@ -134,146 +132,6 @@ export function createSafeEvaluator(
       return undefined; // Graceful fallback
     }
   };
-}
-
-/**
- * Compiles an expression into a safe executable function
- */
-function compileExpression(
-  expression: string,
-  state: ReactiveState,
-  allowedGlobals: Record<string, unknown>
-): ((...args: unknown[]) => unknown) | null {
-  try {
-    let processedExpression = expression.trim();
-
-    // Support template literals (convert to string concatenation)
-    processedExpression = processedExpression.replace(
-      /`([^`]*)`/g,
-      (match, content) => {
-        return '"' + content.replace(/\${([^}]+)}/g, '" + ($1) + "') + '"';
-      }
-    );
-
-    // Handle object literal expressions by wrapping in parentheses if needed
-    if (
-      processedExpression.startsWith('{') &&
-      processedExpression.endsWith('}')
-    ) {
-      processedExpression = `(${processedExpression})`;
-    }
-
-    // Build context with validation
-    const allContext = { ...state, ...allowedGlobals };
-    let contextBuilder = '';
-
-    // Transform assignment and increment/decrement expressions to use state object
-    const hasAssignment =
-      processedExpression.includes('=') &&
-      !processedExpression.includes('==') &&
-      !processedExpression.includes('!=') &&
-      !processedExpression.includes('<=') &&
-      !processedExpression.includes('>=');
-    const hasIncrement =
-      processedExpression.includes('++') || processedExpression.includes('--');
-
-    if (hasAssignment || hasIncrement) {
-      processedExpression = transformStateAccessors(processedExpression, state);
-    }
-
-    // Build context with variable declarations and validation
-    for (const [key] of Object.entries(allContext)) {
-      if (
-        key &&
-        typeof key === 'string' &&
-        key.match(/^[a-zA-Z_$][a-zA-Z0-9_$]*$/)
-      ) {
-        const reserved = [
-          'null',
-          'undefined',
-          'true',
-          'false',
-          'this',
-          'arguments',
-          'eval',
-          'Function',
-          '_state',
-        ];
-        if (!reserved.includes(key)) {
-          contextBuilder += `const ${key} = arguments[0]["${key}"];`;
-        }
-      }
-    }
-
-    const functionBody = `
-      "use strict"; 
-      ${contextBuilder}
-      try { 
-        return ${processedExpression}; 
-      } catch(e) { 
-        throw new Error('Expression execution failed: ' + e.message + ' in expression: ' + ${JSON.stringify(expression)}); 
-      }
-    `;
-
-    // Validate function body length to prevent malicious code
-    if (functionBody.length > 50000) {
-      throw new Error('Expression too complex');
-    }
-
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    return new Function(functionBody) as (...args: unknown[]) => unknown;
-  } catch (error) {
-    throw new EvaluationError(
-      expression,
-      error instanceof Error ? error : new Error(String(error)),
-      { phase: 'compilation' }
-    );
-  }
-}
-
-/**
- * Transforms state accessor patterns in expressions
- */
-function transformStateAccessors(
-  expression: string,
-  state: ReactiveState
-): string {
-  let processedExpression = expression;
-  const stateKeys = Object.keys(state);
-
-  for (const key of stateKeys) {
-    if (
-      key &&
-      typeof key === 'string' &&
-      key.match(/^[a-zA-Z_$][a-zA-Z0-9_$]*$/)
-    ) {
-      // Transform assignments like "clicked = true" to "arguments[0]._state.clicked = true"
-      const assignmentRegex = new RegExp(`\\b${key}\\s*([+\\-*\\/]?=)`, 'g');
-      processedExpression = processedExpression.replace(
-        assignmentRegex,
-        `arguments[0]._state.${key} $1`
-      );
-
-      // Transform increment/decrement like "count++" to "(arguments[0]._state.count++)"
-      const incrementRegex = new RegExp(`\\b${key}\\s*(\\+\\+|\\-\\-)`, 'g');
-      processedExpression = processedExpression.replace(
-        incrementRegex,
-        `(arguments[0]._state.${key}$1)`
-      );
-
-      // Transform pre-increment/decrement like "++count"
-      const preIncrementRegex = new RegExp(
-        `(\\+\\+|\\-\\-)\\s*\\b${key}\\b`,
-        'g'
-      );
-      processedExpression = processedExpression.replace(
-        preIncrementRegex,
-        `$1arguments[0]._state.${key}`
-      );
-    }
-  }
-
-  return processedExpression;
 }
 
 export function parseEventExpression(expression: ExpressionString): {
@@ -482,9 +340,8 @@ export function validateExpressionSyntax(
       return { success: true, data: true };
     }
 
-    // Check for basic syntax errors by attempting to parse as function body
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    new Function(`return (${expression})`);
+    // Use safe parser to validate syntax without executing
+    parseExpression(expression);
 
     return { success: true, data: true };
   } catch (error) {

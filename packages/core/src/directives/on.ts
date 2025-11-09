@@ -65,12 +65,14 @@ export const onDirective: Directive<EventDirectiveBinding> = {
           } else {
             // Execute as expression with $event in scope
             const originalState = uus.state;
-            // Add $event to the original state temporarily
             (originalState as any).$event = event;
-            const tempEvaluator = createSafeEvaluator(originalState);
-            tempEvaluator(asExpressionString(binding.expression));
-            // Clean up $event
-            delete (originalState as any).$event;
+            try {
+              const tempEvaluator = createSafeEvaluator(originalState);
+              tempEvaluator(asExpressionString(binding.expression));
+            } finally {
+              // Ensure cleanup happens even if evaluation throws
+              delete (originalState as any).$event;
+            }
           }
         }
 

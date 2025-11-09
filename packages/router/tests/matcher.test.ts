@@ -193,7 +193,23 @@ describe('RouteMatcher', () => {
     it('should handle encoded URLs', () => {
       const match = matcher.match('/user/john%40example.com');
       expect(match).toBeTruthy();
-      expect(match?.params).toEqual({ id: 'john%40example.com' });
+      // URL parameters should be decoded (%40 -> @)
+      expect(match?.params).toEqual({ id: 'john@example.com' });
+    });
+
+    it('should decode URL-encoded scripts to prevent XSS bypass (ROUTER-002)', () => {
+      const match = matcher.match('/user/%3Cscript%3Ealert(1)%3C%2Fscript%3E');
+      expect(match).toBeTruthy();
+      // Encoded scripts should be decoded so validation can catch them
+      expect(match?.params).toEqual({ id: '<script>alert(1)</script>' });
+    });
+
+    it('should handle malformed URI components gracefully', () => {
+      // Invalid percent encoding (% not followed by two hex digits)
+      const match = matcher.match('/user/test%');
+      expect(match).toBeTruthy();
+      // Should fallback to raw value when decoding fails
+      expect(match?.params).toEqual({ id: 'test%' });
     });
 
     it('should handle multiple slashes', () => {

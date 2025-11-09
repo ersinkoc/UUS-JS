@@ -13,7 +13,14 @@ export function getNestedProperty(obj: any, path: string): any {
  * Set nested property in object using dot notation
  */
 export function setNestedProperty(obj: any, path: string, value: any): void {
+  const dangerousKeys = ['__proto__', 'constructor', 'prototype'];
   const keys = path.split('.');
+
+  // Validate that no dangerous keys are present in the path
+  if (keys.some(k => dangerousKeys.includes(k))) {
+    throw new Error('Invalid property path: cannot set prototype pollution keys');
+  }
+
   const lastKey = keys.pop()!;
 
   const target = keys.reduce((current, key) => {
@@ -30,9 +37,20 @@ export function setNestedProperty(obj: any, path: string, value: any): void {
  * Deep merge two objects
  */
 export function deepMerge(target: any, source: any): any {
+  const dangerousKeys = ['__proto__', 'constructor', 'prototype'];
   const result = { ...target };
 
   for (const key in source) {
+    // Skip dangerous keys to prevent prototype pollution
+    if (dangerousKeys.includes(key)) {
+      continue;
+    }
+
+    // Only process own properties of source
+    if (!Object.prototype.hasOwnProperty.call(source, key)) {
+      continue;
+    }
+
     if (
       source[key] &&
       typeof source[key] === 'object' &&

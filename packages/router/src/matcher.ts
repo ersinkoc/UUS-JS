@@ -29,13 +29,38 @@ export class RouteMatcher {
 
   private pathToRegex(path: string): PathPattern {
     const keys: string[] = [];
-    const pattern = path
-      .replace(/\//g, '\\/')
-      .replace(/:(\w+)/g, (_, key) => {
-        keys.push(key);
-        return '([^\/]+)';
-      })
-      .replace(/\*/g, '(.*)');
+
+    // Validate pattern complexity to prevent ReDoS attacks
+    if (path.length > 1000) {
+      throw new Error('Path pattern too long (max 1000 characters)');
+    }
+
+    // Count dynamic segments and wildcards
+    const dynamicSegments = (path.match(/:\w+/g) || []).length;
+    const wildcards = (path.match(/\*/g) || []).length;
+
+    if (dynamicSegments > 20) {
+      throw new Error('Too many dynamic segments (max 20)');
+    }
+
+    if (wildcards > 5) {
+      throw new Error('Too many wildcards (max 5)');
+    }
+
+    // Escape regex special characters except our own markers (: and *)
+    let pattern = path.replace(/[.+?^${}()|[\]\\]/g, '\\$&');
+
+    // Escape forward slashes
+    pattern = pattern.replace(/\//g, '\\/');
+
+    // Handle dynamic segments with non-greedy match
+    pattern = pattern.replace(/:(\w+)/g, (_, key) => {
+      keys.push(key);
+      return '([^\\/]+)'; // Non-greedy match that stops at forward slash
+    });
+
+    // Handle wildcards with non-greedy match to prevent catastrophic backtracking
+    pattern = pattern.replace(/\*/g, '(.*?)'); // Non-greedy wildcard!
 
     return {
       pattern: new RegExp(`^${pattern}$`),
@@ -53,7 +78,13 @@ export class RouteMatcher {
       if (match) {
         const params: Record<string, string> = {};
         pattern.keys.forEach((key, index) => {
-          params[key] = match[index + 1] || '';
+          try {
+            // Decode URL-encoded parameters to prevent XSS via encoded scripts
+            params[key] = decodeURIComponent(match[index + 1] || '');
+          } catch (e) {
+            // Handle malformed URI components - use raw value as fallback
+            params[key] = match[index + 1] || '';
+          }
         });
 
         return {

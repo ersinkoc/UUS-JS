@@ -4,7 +4,7 @@ import type {
   UusInstance,
   ReactiveState,
 } from '../types';
-import { effect, createReactive } from '../reactive';
+import { effect, createReactive, toRaw } from '../reactive';
 import { createSafeEvaluator } from '../evaluator';
 import {
   walkElement,
@@ -114,7 +114,12 @@ export const forDirective: Directive<LoopDirectiveBinding> = {
       }
 
       const template = uus.errorHandler.safe(
-        () => el.cloneNode(true) as HTMLElement,
+        () => {
+          const clonedTemplate = el.cloneNode(true) as HTMLElement;
+          // Remove all script tags from cloned template to prevent XSS
+          clonedTemplate.querySelectorAll('script').forEach(script => script.remove());
+          return clonedTemplate;
+        },
         ErrorCategory.DIRECTIVE,
         { element: el, directive: 'for', phase: 'template-clone' }
       );
@@ -196,6 +201,7 @@ export const forDirective: Directive<LoopDirectiveBinding> = {
       const instances: HTMLElement[] = [];
       const cleanupFns: Set<() => void> = new Set();
       const instanceResources: string[] = []; // Track resource IDs
+      const scopedStateProxies: any[] = []; // Track reactive proxies for cleanup
 
       const cleanup = effect(() => {
         const context = {
@@ -208,7 +214,32 @@ export const forDirective: Directive<LoopDirectiveBinding> = {
         // Safely clear existing instances
         uus.errorHandler.safe(
           () => {
+            // Clean up reactive proxies before removing instances
+            scopedStateProxies.forEach((proxy) => {
+              try {
+                // Get raw target to help with cleanup
+                const target = toRaw(proxy);
+                // Clear references by converting to raw
+                if (target && typeof target === 'object') {
+                  // Help garbage collector by clearing the object
+                  Object.keys(target).forEach((key) => {
+                    delete target[key];
+                  });
+                }
+              } catch (error) {
+                console.warn('Error cleaning up scoped state proxy:', error);
+              }
+            });
+
             instances.forEach((instance) => {
+              // Clear scoped state reference from instance
+              const instanceWithState = instance as HTMLElement & {
+                __uusState?: Record<string, unknown>;
+              };
+              if (instanceWithState.__uusState) {
+                delete instanceWithState.__uusState;
+              }
+
               if (instance.parentNode) {
                 instance.parentNode.removeChild(instance);
               }
@@ -222,6 +253,7 @@ export const forDirective: Directive<LoopDirectiveBinding> = {
             });
             cleanupFns.clear();
             instances.length = 0;
+            scopedStateProxies.length = 0; // Clear proxy references
 
             // Cleanup tracked resources
             if ((uus as any).memoryTracker) {
@@ -260,6 +292,8 @@ export const forDirective: Directive<LoopDirectiveBinding> = {
           uus.errorHandler.safe(
             () => {
               const instance = template.cloneNode(true) as HTMLElement;
+              // Remove all script tags from cloned template to prevent XSS
+              instance.querySelectorAll('script').forEach(script => script.remove());
 
               // Create scoped state for this iteration
               const scopedState = createReactive({
@@ -267,6 +301,9 @@ export const forDirective: Directive<LoopDirectiveBinding> = {
                 [parsed.itemName]: item,
                 ...(parsed.indexName ? { [parsed.indexName]: index } : {}),
               });
+
+              // Track the scoped state proxy for cleanup
+              scopedStateProxies.push(scopedState);
 
               // Create a scoped Uus instance for this iteration
               const scopedUus: UusInstance = {
@@ -394,6 +431,20 @@ export const forDirective: Directive<LoopDirectiveBinding> = {
       cleanups.add(() => {
         uus.errorHandler.safe(
           () => {
+            // Final cleanup of scoped state proxies
+            scopedStateProxies.forEach((proxy) => {
+              try {
+                const target = toRaw(proxy);
+                if (target && typeof target === 'object') {
+                  Object.keys(target).forEach((key) => {
+                    delete target[key];
+                  });
+                }
+              } catch (error) {
+                console.warn('Error in final scoped state cleanup:', error);
+              }
+            });
+
             cleanupFns.forEach((fn) => {
               try {
                 fn();
@@ -402,16 +453,28 @@ export const forDirective: Directive<LoopDirectiveBinding> = {
               }
             });
             instances.forEach((instance) => {
+              const instanceWithState = instance as HTMLElement & {
+                __uusState?: Record<string, unknown>;
+              };
+              if (instanceWithState.__uusState) {
+                delete instanceWithState.__uusState;
+              }
+
               if (instance.parentNode) {
                 instance.parentNode.removeChild(instance);
               }
             });
+
+            // Clear all tracking arrays
+            scopedStateProxies.length = 0;
+            instances.length = 0;
 
             // Final cleanup of tracked resources
             if ((uus as any).memoryTracker) {
               instanceResources.forEach((resourceId) => {
                 (uus as any).memoryTracker.untrack(resourceId);
               });
+              instanceResources.length = 0;
             }
           },
           ErrorCategory.DIRECTIVE,
