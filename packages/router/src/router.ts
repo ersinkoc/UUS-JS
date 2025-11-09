@@ -17,6 +17,8 @@ export class Router implements RouterInterface {
     [];
   public currentRoute: RouteMatch | null = null;
   private scrollBehavior?: RouterOptions['scrollBehavior'];
+  private navigating = false;
+  private pendingPath: string | null = null;
 
   constructor(options: RouterOptions) {
     this.matcher = new RouteMatcher(options.routes);
@@ -75,6 +77,12 @@ export class Router implements RouterInterface {
   }
 
   private navigate(path: string): void {
+    // Prevent concurrent navigation - queue if already navigating
+    if (this.navigating) {
+      this.pendingPath = path;
+      return;
+    }
+
     const to = this.resolve(path);
     if (!to) {
       console.warn(`No route found for path: ${path}`);
@@ -83,33 +91,48 @@ export class Router implements RouterInterface {
 
     const from = this.currentRoute;
 
+    // Set navigation lock
+    this.navigating = true;
+
     // Run navigation guards
     this.runGuards(to, from, (shouldContinue) => {
-      if (shouldContinue === false) {
-        // Navigation cancelled
-        if (from) {
-          this.history.replace(from.path);
+      try {
+        if (shouldContinue === false) {
+          // Navigation cancelled
+          if (from) {
+            this.history.replace(from.path);
+          }
+          return;
         }
-        return;
-      }
 
-      if (typeof shouldContinue === 'string') {
-        // Redirect
-        this.push(shouldContinue);
-        return;
-      }
+        if (typeof shouldContinue === 'string') {
+          // Redirect
+          this.push(shouldContinue);
+          return;
+        }
 
-      // Update current route
-      this.currentRoute = to;
+        // Update current route
+        this.currentRoute = to;
 
-      // Run after hooks
-      this.afterHooks.forEach((hook) => hook(to, from));
+        // Run after hooks
+        this.afterHooks.forEach((hook) => hook(to, from));
 
-      // Handle scroll behavior
-      if (this.scrollBehavior) {
-        const position = this.scrollBehavior(to, from);
-        if (position) {
-          window.scrollTo(position.x, position.y);
+        // Handle scroll behavior
+        if (this.scrollBehavior) {
+          const position = this.scrollBehavior(to, from);
+          if (position) {
+            window.scrollTo(position.x, position.y);
+          }
+        }
+      } finally {
+        // Release navigation lock
+        this.navigating = false;
+
+        // Process queued navigation if any
+        if (this.pendingPath) {
+          const next = this.pendingPath;
+          this.pendingPath = null;
+          this.navigate(next);
         }
       }
     });
